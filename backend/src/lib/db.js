@@ -47,9 +47,6 @@ const userSchema = new mongoose.Schema(
     refreshToken: {
       type: String,
     },
-    refreshTokenJwtID: {
-      type: String,
-    },
   },
 
   { timestamps: true }

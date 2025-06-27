@@ -44,10 +44,9 @@ router.post(
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV !== "DEVELOPMENT",
-        maxAge: 7 * 1000 * 60 * 60 * 24, // 7 days
+        maxAge: parseInt(process.env.ACCESS_TOKEN_EXPIRY, 10),
       });
 
-      // Set refresh token and jwt ID in the database
       try {
         await User.findByIdAndUpdate(
           user._id,
@@ -55,7 +54,7 @@ router.post(
           { new: false, runValidators: true }
         );
       } catch (err) {
-        console.error("Error saving refresh token JWT ID", err);
+        logger.error("refresh token", "Error saving refresh token", err);
         return apiError(res, 500, "Internal server error");
       }
       return apiResponse(
@@ -112,7 +111,7 @@ router.post(
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV !== "DEVELOPMENT",
-        maxAge: 7 * 1000 * 60 * 60 * 24, // 7 days
+        maxAge: parseInt(process.env.ACCESS_TOKEN_EXPIRY, 10),
       });
 
       return apiResponse(
@@ -132,27 +131,31 @@ router.post("/refresh-token", async (req, res) => {
   if (!oldRefreshToken) {
     return apiError(res, 401, "Refresh token is required");
   }
-
   try {
-    const decoded = jwt.verify(
-      oldRefreshToken,
-      process.env.REFRESH_TOKEN_SECRET
-    );
-    const user = await User.findById(decoded.userId);
-    if (!user || user.refreshToken !== oldRefreshToken) {
+    const foundUser = await User.findOne({ refreshToken: oldRefreshToken });
+    if (!foundUser) {
+      return apiError(res, 403, "Invalid refresh token");
+    }
+    let decoded;
+    try {
+      decoded = jwt.verify(oldRefreshToken, process.env.REFRESH_TOKEN_SECRET);
+    } catch (err) {
+      return apiError(res, 403, "Invalid refresh token");
+    }
+    if (!decoded || foundUser.email !== decoded.email) {
       return apiError(res, 403, "Invalid refresh token");
     }
 
     // Generate new tokens
     const { refreshToken, accessToken } = getRefreshTokenAndAccessToken(
-      user._id,
-      user.email
+      foundUser._id,
+      foundUser.email
     );
 
     // Update user with new refresh token
     await User.findByIdAndUpdate(
-      user._id,
-      { refreshToken},
+      foundUser._id,
+      { refreshToken },
       { new: false, runValidators: true }
     );
 
@@ -160,7 +163,7 @@ router.post("/refresh-token", async (req, res) => {
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV !== "DEVELOPMENT",
-      maxAge: 7 * 1000 * 60 * 60 * 24, // 7 days
+      maxAge: parseInt(process.env.REFRESH_TOKEN_EXPIRY, 10),
     });
 
     return apiResponse(res, 200, { accessToken }, "Access token refreshed");

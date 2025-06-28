@@ -188,22 +188,22 @@ router.post(
 router.post("/refresh-token", async (req, res) => {
   const oldRefreshToken = req.cookies?.refreshToken;
   if (!oldRefreshToken) {
-    return apiError(res, 401, "Refresh token is required");
+    return apiError(res, 401, "Invalid or expired refresh token");
   }
   try {
     const foundUser = await User.findOne({ refreshToken: oldRefreshToken });
     if (!foundUser) {
-      return apiError(res, 403, "Invalid refresh token");
+      return apiError(res, 403, "Invalid or expired refresh token");
     }
 
     let decoded;
     try {
       decoded = jwt.verify(oldRefreshToken, process.env.REFRESH_TOKEN_SECRET);
     } catch {
-      return apiError(res, 403, "Invalid refresh token");
+      return apiError(res, 403, "Invalid or expired refresh token");
     }
     if (!decoded || foundUser.email !== decoded.email) {
-      return apiError(res, 403, "Invalid refresh token");
+      return apiError(res, 403, "Invalid or expired refresh token");
     }
     let refreshToken, accessToken;
     try {

@@ -83,4 +83,4 @@ const setAuthTokens = async (user, res) => {
   }
 };
 
-export { getRefreshTokenAndAccessToken, setAuthTokens };
+export default setAuthTokens;

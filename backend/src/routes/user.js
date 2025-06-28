@@ -6,10 +6,7 @@ import apiResponse from "../utils/apiResponse.js";
 import apiError from "../utils/apiError.js";
 import logger from "../utils/logger.js";
 import jwt from "jsonwebtoken";
-import {
-  getRefreshTokenAndAccessToken,
-  setAuthTokens,
-} from "../utils/tokenHelper.js";
+import setAuthTokens from "../utils/tokenHelper.js";
 import authenticateAccessToken from "../middleware/authenticateAccessToken.js";
 
 const router = Router();

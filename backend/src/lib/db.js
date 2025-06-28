@@ -3,10 +3,11 @@ import argon2 from "argon2";
 import logger from "../utils/logger.js";
 
 try {
+  logger.info("db connection", "Started trying to connect to db");
   await mongoose.connect(process.env.MONGODB_URI);
-  logger.info("db", "Connected to MongoDB successfully");
+  logger.info("db start", "Connected to MongoDB successfully");
 } catch (err) {
-  logger.error("db", "Failed to connect to MongoDB:", err.message);
+  logger.error("db connection", "Failed to connect to MongoDB:", err.message);
   process.exit(1);
 }
 
@@ -20,7 +21,6 @@ const userSchema = new mongoose.Schema(
       trim: true,
       minLength: [6, "Email must be >=6 and <= 30 characters"],
       maxLength: [30, "Email must be >=6 and <= 30 characters"],
-      match: [/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/, "Email is invalid"],
       lowercase: true,
     },
     fullname: {
@@ -30,10 +30,21 @@ const userSchema = new mongoose.Schema(
       trim: true,
       minLength: [3, "Fullname must be >=6 and <= 30 characters"],
       maxLength: [30, "Fullname must be >=6 and <= 30 characters"],
-      match: [
-        /^[a-zA-Z]+(?:\s[a-zA-Z]+)*$/,
-        "Fullname should contain only letters with single spaces between names",
-      ],
+      validate: {
+        validator: (v) => {
+          if (
+            !v ||
+            typeof v !== "string" ||
+            v.startsWith(" ") ||
+            v.endsWith(" ")
+          )
+            return false;
+          const splitName = v.trim().split(/\s+/);
+          return splitName.every((name) => /^[a-zA-Z]+$/.test(name));
+        },
+        message:
+          "Fullname must only contain letters and spaces, no leading/trailing spaces.",
+      },
     },
     password: {
       type: String,

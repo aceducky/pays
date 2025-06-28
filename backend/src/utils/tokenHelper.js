@@ -1,3 +1,4 @@
+import jwt from "jsonwebtoken";
 const getRefreshToken = (userId, email) => {
   if (!userId || !email) {
     throw new Error("User ID and email are required to create a refresh token");

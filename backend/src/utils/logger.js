@@ -17,8 +17,6 @@ const logger = {
   info,
   warn,
   error,
-  infodb,
-  infoexpress,
 };
 
 export default logger;

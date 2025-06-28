@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import User from "../lib/db";
+import User from "../lib/db.js";
 
 const getRefreshToken = (userId, email) => {
   if (!userId || !email) {
@@ -61,18 +61,22 @@ const getRefreshTokenAndAccessToken = (userId, email) => {
   return { refreshToken, accessToken };
 };
 
-const setAuthTokens = async (user, res) => {
+const setAuthTokens = async (res, user) => {
   try {
+    console.log(user._id,user.email)
     const { refreshToken, accessToken } = getRefreshTokenAndAccessToken(
       user._id,
       user.email
     );
 
-    await User.findByIdAndUpdate(user._id, { refreshToken });
+    await User.findByIdAndUpdate(
+      { _id: user._id, email: user.email },
+      { refreshToken }
+    );
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      sameSite: "strict",
+      sameSite: process.env.NODE_ENV !== "DEVELOPMENT" ? "strict" : "lax",
       secure: process.env.NODE_ENV !== "DEVELOPMENT",
       maxAge: parseInt(process.env.REFRESH_TOKEN_EXPIRY, 10),
     });

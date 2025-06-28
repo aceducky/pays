@@ -1,8 +1,8 @@
 type: http_request
 model: http_request
-id: rq_BdqQEAoYUh
-createdAt: 2025-06-27T14:02:23.294890900
-updatedAt: 2025-06-28T16:59:05.076957200
+id: rq_mKN9LLb9kS
+createdAt: 2025-06-28T17:17:30.938548700
+updatedAt: 2025-06-28T17:17:55.228181
 workspaceId: wk_6KezG4VDZ3
 folderId: null
 authentication: {}
@@ -10,9 +10,7 @@ authenticationType: null
 body:
   text: |-
     {
-      "email":"a@a.com",
-      "fullname":"user one",
-      "password":"12345678"
+      "email"
     }
 bodyType: application/json
 description: ''
@@ -20,9 +18,9 @@ headers:
 - enabled: true
   name: Content-Type
   value: application/json
-  id: uXAeCtuMtt
+  id: RyeQFdi02y
 method: POST
 name: ''
 sortPriority: -1751032943275.0
-url: ${[ user ]}/signup
+url: ${[ user ]}/logout
 urlParameters: []

@@ -1,5 +1,5 @@
-import apiError from "../utils/apiError";
-import logger from "../utils/logger";
+import apiError from "../utils/apiError.js";
+import logger from "../utils/logger.js";
 
 const authenticateAccessToken = (req, res, next) => {
   const accessToken = req.headers.authorization?.split(" ")[1];

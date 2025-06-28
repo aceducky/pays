@@ -63,7 +63,7 @@ router.post(
         balance: Math.floor(Math.random() * 10000),
       });
 
-      const accessToken = await setAuthTokens(user, res);
+      const accessToken = await setAuthTokens(res, user);
 
       return apiResponse(
         res,
@@ -138,7 +138,7 @@ router.post(
         return apiError(res, 401, "Invalid credentials");
       }
 
-      const accessToken = await setAuthTokens(user, res);
+      const accessToken = await setAuthTokens(res, user);
 
       return apiResponse(
         res,
@@ -197,7 +197,7 @@ router.post("/refresh-token", async (req, res) => {
       return apiError(res, 403, "Invalid or expired refresh token");
     }
 
-    const accessToken = await setAuthTokens(foundUser, userId);
+    const accessToken = await setAuthTokens(res, foundUser);
 
     return apiResponse(res, 200, { accessToken }, "Access token refreshed");
   } catch (err) {
@@ -212,10 +212,15 @@ router.post("/refresh-token", async (req, res) => {
 
 router.post("/logout", authenticateAccessToken, async (req, res) => {
   try {
-    await User.findByIdAndUpdate(req.user.userId, {
+    const user = await User.findByIdAndUpdate(req.user.userId, {
       $unset: { refreshToken: 1 },
     });
 
+    if (!user) {
+      logger.warn("logout", "User not found during logout", {
+        userId: req.user.userId,
+      });
+    }
     res.clearCookie("refreshToken", {
       httpOnly: true,
       sameSite: "strict",
@@ -229,4 +234,4 @@ router.post("/logout", authenticateAccessToken, async (req, res) => {
   }
 });
 
-export default router;
+export { router as userRouter };

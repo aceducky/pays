@@ -80,8 +80,7 @@ router.post(
         return apiError(res, 400, "Invalid user data");
       }
 
-      if (err.message?.startsWith("VALIDATION_ERROR:")) {
-        logger.error("signup", "Token validation error", err);
+      if (err.message?.startsWith("TOKEN_VALIDATION_ERROR:")) {
         return apiError(res, 400, "Invalid user data");
       }
 
@@ -147,8 +146,7 @@ router.post(
         "User signed in successfully"
       );
     } catch (err) {
-      if (err.message?.startsWith("VALIDATION_ERROR:")) {
-        logger.error("login", "Token validation error", err);
+      if (err.message?.startsWith("TOKEN_VALIDATION_ERROR:")) {
         return apiError(res, 400, "Invalid credentials");
       }
 

@@ -2,16 +2,13 @@ type: http_request
 model: http_request
 id: rq_mKN9LLb9kS
 createdAt: 2025-06-28T17:17:30.938548700
-updatedAt: 2025-06-28T17:17:55.228181
+updatedAt: 2025-06-28T17:21:19.180466200
 workspaceId: wk_6KezG4VDZ3
 folderId: null
 authentication: {}
 authenticationType: null
 body:
-  text: |-
-    {
-      "email"
-    }
+  text: ''
 bodyType: application/json
 description: ''
 headers:

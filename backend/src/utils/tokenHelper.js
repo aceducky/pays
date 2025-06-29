@@ -4,7 +4,7 @@ import User from "../lib/db.js";
 const getRefreshToken = (userId, email) => {
   if (!userId || !email) {
     throw new Error(
-      "VALIDATION_ERROR: User ID and email are required to create a refresh token"
+      "TOKEN_VALIDATION_ERROR: User ID and email are required to create a refresh token"
     );
   }
   if (!process.env.REFRESH_TOKEN_SECRET) {
@@ -32,7 +32,7 @@ const getRefreshToken = (userId, email) => {
 const getAccessToken = (userId, email) => {
   if (!userId || !email) {
     throw new Error(
-      "VALIDATION_ERROR: User ID and email are required to create an access token"
+      "TOKEN_VALIDATION_ERROR: User ID and email are required to create an access token"
     );
   }
   if (!process.env.ACCESS_TOKEN_SECRET) {

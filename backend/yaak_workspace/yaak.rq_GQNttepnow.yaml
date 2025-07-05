@@ -1,0 +1,27 @@
+type: http_request
+model: http_request
+id: rq_GQNttepnow
+createdAt: 2025-06-28T10:45:29.946754800
+updatedAt: 2025-07-04T04:50:06.912549100
+workspaceId: wk_6KezG4VDZ3
+folderId: null
+authentication: {}
+authenticationType: null
+body:
+  text: |-
+    {
+      "email": "a@a.com",
+      "password":"12345678"
+    }
+bodyType: application/json
+description: ''
+headers:
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: 7jirCzWCqy
+method: POST
+name: ''
+sortPriority: 3000.0
+url: ${[ user ]}/login
+urlParameters: []

@@ -1,0 +1,29 @@
+type: http_request
+model: http_request
+id: rq_mKN9LLb9kS
+createdAt: 2025-06-28T17:17:30.938548700
+updatedAt: 2025-07-04T04:50:06.898764800
+workspaceId: wk_6KezG4VDZ3
+folderId: null
+authentication:
+  disabled: true
+  secretBase64: false
+authenticationType: jwt
+body:
+  text: ''
+bodyType: application/json
+description: ''
+headers:
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: vnG9psf6uD
+- enabled: true
+  name: Authorization
+  value: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODY0MWI0NGYxMGU2NjhlMzNmMTY5MzciLCJlbWFpbCI6ImFAYS5jb20iLCJpYXQiOjE3NTEzOTE5NzQsImV4cCI6MTc1MTQ1MTk3NH0.o4XSA4xrmCxFWntl60wh6t_avV9fDZLl18c8u_yVbMw
+  id: fafjjiaR5u
+method: POST
+name: ''
+sortPriority: 2000.0
+url: ${[ user ]}/logout
+urlParameters: []

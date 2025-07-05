@@ -1,0 +1,32 @@
+type: http_request
+model: http_request
+id: rq_Q3AwPo6kz5
+createdAt: 2025-07-02T08:30:56.395389700
+updatedAt: 2025-07-04T11:43:34.765890300
+workspaceId: wk_6KezG4VDZ3
+folderId: null
+authentication: {}
+authenticationType: none
+body:
+  text: |-
+    {
+      "fullname": "abcdefghi",
+      "oldPassword": "aaaaaaaaaaa",
+      "newPassword": "12345678"
+    }
+bodyType: application/json
+description: ''
+headers:
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: vw5TYKXv3u
+- enabled: true
+  name: Authorization
+  value: Bearer ${[ response.body.path(request='rq_BdqQEAoYUh', path=b64'JC5kYXRhLmFjY2Vzc1Rva2Vu', behavior='smart') ]}
+  id: FWzqjHyjxD
+method: PUT
+name: ''
+sortPriority: 1000.0
+url: ${[ user ]}/
+urlParameters: []

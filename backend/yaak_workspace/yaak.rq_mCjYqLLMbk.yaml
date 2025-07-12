@@ -1,0 +1,18 @@
+type: http_request
+model: http_request
+id: rq_mCjYqLLMbk
+createdAt: 2025-07-12T05:59:26.101889800
+updatedAt: 2025-07-12T06:52:38.744202200
+workspaceId: wk_6KezG4VDZ3
+folderId: null
+authentication: {}
+authenticationType: null
+body: {}
+bodyType: null
+description: ''
+headers: []
+method: GET
+name: 404 route
+sortPriority: 2999.9999
+url: ${[ base ]}
+urlParameters: []

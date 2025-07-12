@@ -26,6 +26,18 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use("/api/v1", rootRouter);
 
+//Not found
+app.all("/{*splat}", (req, res) => {
+  logger.error(
+    "not-found",
+    `Invalid Request: Could not ${req.method} ${req.url}`
+  );
+  throw new ApiError({
+    statusCode: 404,
+    message: "Page not found",
+  });
+});
+
 app.use((err, req, res, next) => {
   if (err instanceof SyntaxError && "body" in err) {
     logger.error("json parsing", err);

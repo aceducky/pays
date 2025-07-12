@@ -1,0 +1,26 @@
+type: http_request
+model: http_request
+id: rq_aCRVJrKRsf
+createdAt: 2025-07-11T06:45:32.700824200
+updatedAt: 2025-07-11T10:41:31.425891500
+workspaceId: wk_6KezG4VDZ3
+folderId: null
+authentication: {}
+authenticationType: null
+body: {}
+bodyType: null
+description: ''
+headers:
+- enabled: true
+  name: Authorization
+  value: Bearer ${[ response.body.path(request='rq_GQNttepnow', path=b64'JC5kYXRhLmFjY2Vzc1Rva2Vu', behavior='smart') ]}
+  id: jJ4IGg96n6
+- enabled: true
+  name: ''
+  value: ''
+  id: 8Aa9fZmDHJ
+method: GET
+name: user one payments/
+sortPriority: 4500.0
+url: ${[ payments ]}/
+urlParameters: []

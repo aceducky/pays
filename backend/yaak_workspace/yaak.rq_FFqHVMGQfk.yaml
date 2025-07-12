@@ -1,0 +1,26 @@
+type: http_request
+model: http_request
+id: rq_FFqHVMGQfk
+createdAt: 2025-07-05T09:55:07.444559800
+updatedAt: 2025-07-12T03:53:30.819751500
+workspaceId: wk_6KezG4VDZ3
+folderId: null
+authentication: {}
+authenticationType: null
+body: {}
+bodyType: null
+description: ''
+headers:
+- enabled: true
+  name: Authorization
+  value: Bearer ${[ response.body.path(request='rq_GQNttepnow', path=b64'JC5kYXRhLmFjY2Vzc1Rva2Vu', behavior='smart') ]}
+  id: 2vqKprkneb
+- enabled: true
+  name: ''
+  value: ''
+  id: crytnBvyk7
+method: GET
+name: user one /bulk
+sortPriority: 12000.0
+url: ${[ user ]}/bulk?filter=one
+urlParameters: []

@@ -1,0 +1,36 @@
+type: http_request
+model: http_request
+id: rq_SBiLu6QCov
+createdAt: 2025-07-10T07:35:11.474235700
+updatedAt: 2025-07-11T10:41:29.153802100
+workspaceId: wk_6KezG4VDZ3
+folderId: null
+authentication: {}
+authenticationType: null
+body:
+  text: |-
+    {
+      "receiverId": "${[ response.body.path(request='rq_GQNttepnow', path=b64'JC5kYXRhLnVzZXIuX2lk', behavior='smart') ]}",
+      "amount":1000,
+      "description":"user two to user one"
+    }
+bodyType: application/json
+description: ''
+headers:
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: 8pXzztxSt3
+- enabled: true
+  name: Authorization
+  value: Bearer ${[ response.body.path(request='rq_fup3mJps4a', path=b64'JC5kYXRhLmFjY2Vzc1Rva2Vu', behavior='smart') ]}
+  id: 26t9qD4b9v
+- enabled: true
+  name: ''
+  value: ''
+  id: cTXZw5Bv8k
+method: POST
+name: payment from user two to user one
+sortPriority: 7000.0
+url: ${[ payments ]}/
+urlParameters: []

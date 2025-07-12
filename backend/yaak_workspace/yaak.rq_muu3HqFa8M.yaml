@@ -1,0 +1,28 @@
+type: http_request
+model: http_request
+id: rq_muu3HqFa8M
+createdAt: 2025-07-09T12:02:32.184088600
+updatedAt: 2025-07-11T14:54:42.117953700
+workspaceId: wk_6KezG4VDZ3
+folderId: null
+authentication: {}
+authenticationType: null
+body:
+  text: |-
+    {
+      "email" : "a@a.com",
+      "fullName" : "user one",
+      "password" : "12345678"
+    }
+bodyType: application/json
+description: ''
+headers:
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: f4G9NdnPb9
+method: POST
+name: user one /signup
+sortPriority: 0.0
+url: ${[ user ]}/signup
+urlParameters: []

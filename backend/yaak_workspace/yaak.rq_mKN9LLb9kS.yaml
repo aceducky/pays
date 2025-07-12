@@ -1,0 +1,32 @@
+type: http_request
+model: http_request
+id: rq_mKN9LLb9kS
+createdAt: 2025-06-28T17:17:30.938548700
+updatedAt: 2025-07-11T10:41:29.194365400
+workspaceId: wk_6KezG4VDZ3
+folderId: null
+authentication:
+  disabled: true
+authenticationType: bearer
+body:
+  text: ''
+bodyType: application/json
+description: ''
+headers:
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: vnG9psf6uD
+- enabled: true
+  name: Authorization
+  value: Bearer ${[ response.body.path(request='rq_BdqQEAoYUh', path=b64'JC5kYXRhLmFjY2Vzc1Rva2Vu', behavior='smart') ]}
+  id: fafjjiaR5u
+- enabled: true
+  name: ''
+  value: ''
+  id: MR3eEhWwuu
+method: POST
+name: user one /logout
+sortPriority: 11000.0
+url: ${[ user ]}/logout
+urlParameters: []

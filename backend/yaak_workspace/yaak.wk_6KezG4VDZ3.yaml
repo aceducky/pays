@@ -1,0 +1,14 @@
+type: workspace
+model: workspace
+id: wk_6KezG4VDZ3
+createdAt: 2025-06-27T13:59:49.984230600
+updatedAt: 2025-06-27T13:59:49.984231200
+authentication: {}
+authenticationType: null
+description: ""
+headers: []
+name: pays
+encryptionKeyChallenge: null
+settingValidateCertificates: true
+settingFollowRedirects: true
+settingRequestTimeout: 0

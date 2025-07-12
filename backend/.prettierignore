@@ -1,0 +1,14 @@
+yaak_workspace
+
+node_modules/
+.env
+build/
+dist/
+out/
+coverage/
+
+*.min.js
+*.log
+
+generated-code/
+public/vendor/

@@ -1,6 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
+import path from "node:path";
 
 const ReactCompilerConfig = {
   target: "19",
@@ -17,5 +18,11 @@ export default defineConfig(() => {
         },
       }),
     ],
+    resolve: {
+      alias: {
+        "@": import.meta.dirname,
+        src: path.resolve(import.meta.dirname, "src"),
+      },
+    },
   };
 });

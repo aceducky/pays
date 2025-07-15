@@ -1,7 +1,7 @@
 import argon2 from "argon2";
 import mongoose from "mongoose";
 import logger from "../../utils/logger.js";
-import { emailField, fullNameField } from "./commonFields.js";
+import { emailField, fullNameField, usernameField } from "./commonFields.js";
 import {
   isValidAmountFormat,
   to2DecimalPlaces,
@@ -9,6 +9,7 @@ import {
 
 const userSchema = new mongoose.Schema(
   {
+    username: usernameField("Username",{"unique":[true,"Username must be unique"]}),
     email: emailField("Email"),
     fullName: fullNameField("Full name"),
     password: {

@@ -1,3 +1,13 @@
+export const usernameField = (safeFieldName,options={})=>({
+
+      type: String,
+      trim: true,
+      immutable:true,
+      minLength: [3,`${safeFieldName} must be at least 3 characters long`],
+      maxLength: [10,`${safeFieldName} must be at most 10 characters long`],
+      ...options,
+    
+})
 export const fullNameField = (safeFieldName, options = {}) => ({
   type: String,
   required: [true, `${safeFieldName} is required`],

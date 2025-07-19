@@ -43,7 +43,7 @@ const getRefreshTokenAndAccessToken = (payload) => {
 const setAuthTokens = async (res, user) => {
   const { refreshToken, accessToken } = getRefreshTokenAndAccessToken({
     userId: user._id,
-    email: user.email,
+    userName: user.userName,
   });
 
   let updatedUser;

@@ -9,6 +9,15 @@ export const userIdSchema = z
     error: "Invalid user id",
   });
 
+export const userNameSchema = z
+  .string("Username must be a string")
+  .min(3, "Username must be at least 3 characters long")
+  .max(15, "Username must be at most 15 characters long")
+  .regex(
+    /^[a-zA-Z][a-zA-Z_]+[a-zA-Z]$/,
+    "Username must start with letters and contain only letters and underscores and be 3 to 15 characters long"
+  );
+
 export const emailSchema = z
   .email("Invalid email")
   .trim()
@@ -35,11 +44,56 @@ export const fullNameSchema = z
     }
   );
 
+export const decodedJwtSchema = z.object({
+  userId:userIdSchema,
+  userName: userNameSchema,
+})
+
 export const passwordSchema = z
   .string()
   .min(8, "Password must be at least 8 characters")
   .max(30, "Password must be at most 30 characters");
 
+export const changeUserInfoSchema =  z
+  .object({
+    fullName: fullNameSchema.optional(),
+    oldPassword: passwordSchema.optional(),
+    newPassword: passwordSchema.optional(),
+  })
+  .check((ctx) => {
+    const { fullName, oldPassword, newPassword } = ctx.value;
+    if (!fullName && !oldPassword && !newPassword) {
+      ctx.issues.push({
+        code: "custom",
+        message:
+          "At least fullName or both oldPassword and newPassword or all of them must be provided",
+        path: [],
+      });
+    }
+    if (oldPassword || newPassword) {
+      if (!oldPassword) {
+        ctx.issues.push({
+          code: "custom",
+          message: "Old password must be provided",
+          path: ["oldPassword"],
+        });
+      }
+      if (!newPassword) {
+        ctx.issues.push({
+          code: "custom",
+          message: "New password must be provided",
+          path: ["newPassword"],
+        });
+      }
+      if (oldPassword && newPassword && oldPassword === newPassword) {
+        ctx.issues.push({
+          code: "custom",
+          message: "Old password and new password must be different",
+          path: ["newPassword"],
+        });
+      }
+    }
+  })
 export const paymentTypeSchema = z.enum(["", "sent", "received"]);
 
 export const paymentStatusSchema = z.enum(["", "success", "failed"]);

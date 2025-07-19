@@ -17,7 +17,6 @@ import { z } from "zod/v4";
 import ApiResponse from "../utils/ApiResponse.js";
 import mongoose from "mongoose";
 import logger from "../utils/logger.js";
-import { getFormattedPayment } from "../utils/responseHelpers.js";
 
 const router = express.Router();
 
@@ -68,63 +67,14 @@ router.get("/", authenticateAccessTokenMiddleware, async (req, res) => {
         },
         { $skip: skip },
         { $limit: limit },
-        {
-          $lookup: {
-            from: "users",
-            localField: "senderId",
-            foreignField: "_id",
-            as: "senderInfo",
-            pipeline: [
-              {
-                $project: {
-                  fullName: 1,
-                  _id: 0,
-                },
-              },
-            ],
-          },
-        },
-        {
-          $lookup: {
-            from: "users",
-            localField: "receiverId",
-            foreignField: "_id",
-            as: "receiverInfo",
-            pipeline: [
-              {
-                $project: {
-                  fullName: 1,
-                  _id: 0,
-                },
-              },
-            ],
-          },
-        },
-        {
-          $project: {
-            _id: 1,
-            senderId: 1,
-            receiverId: 1,
-            senderFullNameSnapshot: {
-              $arrayElemAt: ["$senderInfo.fullName", 0],
-            },
-            receiverFullNameSnapshot: {
-              $arrayElemAt: ["$receiverInfo.fullName", 0],
-            },
-            senderEmail: 1,
-            receiverEmail: 1,
-            amount: { $toString: "$amount" },
-            timestamp: "$createdAt",
-            status: 1,
-            description: 1,
-          },
-        },
       ],
       count: [{ $count: "total" }],
     },
   });
 
-  const [result] = await Payment.aggregate(pipeline);
+  const data = await Payment.aggregate(pipeline);
+  console.log(JSON.stringify(data, null, 2));
+  const [result] = data;
   const payments = result.data;
   const total = result.count[0]?.total ?? 0;
 
@@ -153,6 +103,7 @@ router.post(
   ),
   async (req, res) => {
     const senderId = req.userId;
+    const senderUserName = req.userName;
     const { receiverId, amount, description } = req.body;
 
     if (senderId === receiverId) {
@@ -168,11 +119,9 @@ router.post(
       session = await mongoose.startSession();
       const result = await session.withTransaction(async () => {
         const [sender, receiver] = await Promise.all([
-          User.findById(senderId)
-            .select("_id fullName email balance")
-            .session(session),
+          User.findById(senderId).select("fullName balance").session(session),
           User.findById(receiverId)
-            .select("_id fullName email")
+            .select("username fullName")
             .session(session),
         ]);
 
@@ -213,17 +162,17 @@ router.post(
         const payment = new Payment({
           senderId,
           receiverId,
+          senderUserName,
+          receiverUserName: receiver.userName,
           senderFullNameSnapshot: sender.fullName,
           receiverFullNameSnapshot: receiver.fullName,
-          senderEmail: sender.email,
-          receiverEmail: receiver.email,
           amount,
           status: "success",
           description,
         });
 
         await payment.save({ session });
-        return getFormattedPayment(payment);
+        return payment;
       });
       return new ApiResponse(res, 200, result, "Payment successful");
     } catch (err) {
@@ -234,29 +183,27 @@ router.post(
       try {
         const [senderInfo, receiverInfo] = await Promise.all([
           User.findById(senderId).select("fullName email").lean(),
-          User.findById(receiverId).select("fullName email").lean(),
+          User.findById(receiverId).select("userName fullName email").lean(),
         ]);
 
         const failedPayment = new Payment({
           senderId,
           receiverId,
+          senderUserName,
+          receiverUserName: receiverInfo.userName,
           senderFullNameSnapshot: senderInfo.fullName,
           receiverFullNameSnapshot: receiverInfo.fullName,
-          senderEmail: senderInfo.email,
-          receiverEmail: receiverInfo.email,
           amount,
           status: "failed",
           description,
         });
 
         const savedFailedPayment = await failedPayment.save();
-        const formattedPayment = getFormattedPayment(savedFailedPayment);
-
         logger.error("transaction", "Payment failed due to system error:", err);
 
         throw new ServerError({
           message: "Payment failed due to system error",
-          data: formattedPayment,
+          data: savedFailedPayment,
         });
       } catch (err) {
         if (err instanceof ServerError) {

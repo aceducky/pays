@@ -9,7 +9,13 @@ import setAuthTokens from "../utils/tokenHelper.js";
 import authenticateAccessTokenMiddleware from "../middleware/authenticateAccessToken.middleware.js";
 import { User } from "../db/models/user.model.js";
 import { getRefreshTokenSecret, isEnvDEVELOPMENT } from "../utils/envTeller.js";
-import { emailSchema, fullNameSchema, passwordSchema } from "../zodSchemas.js";
+import {
+  changeUserInfoSchema,
+  emailSchema,
+  fullNameSchema,
+  passwordSchema,
+  userNameSchema,
+} from "../zodSchemas.js";
 import { verifyPassword } from "../utils/verifyPassword.js";
 import { getPaginationValues } from "../utils/reqQueryHelper.js";
 
@@ -21,18 +27,20 @@ router.post(
     z
       .object({
         email: emailSchema,
+        userName: userNameSchema,
         fullName: fullNameSchema,
         password: passwordSchema,
       })
       .strip()
   ),
   async (req, res) => {
-    const { email, fullName, password } = req.body;
+    const { email, userName, fullName, password } = req.body;
 
     try {
       //MongoDB will handle duplicate email error
       const user = await User.create({
         email,
+        userName,
         fullName,
         password,
         balance: Math.floor(Math.random() * 10000),
@@ -46,8 +54,8 @@ router.post(
         {
           accessToken,
           user: {
-            _id: user._id,
             email: user.email,
+            userName: user.userName,
             fullName: user.fullName,
             balance: user.balance,
           },
@@ -104,8 +112,8 @@ router.post(
       {
         accessToken,
         user: {
-          _id: user._id,
           email,
+          userName: user.userName,
           fullName: user.fullName,
           balance: user.balance,
         },
@@ -125,7 +133,7 @@ router.get("/bulk", authenticateAccessTokenMiddleware, async (req, res) => {
         {},
         {
           _id: 1,
-          email: 1,
+          userName: 1,
           fullName: 1,
         }
       )
@@ -146,8 +154,7 @@ router.get("/bulk", authenticateAccessTokenMiddleware, async (req, res) => {
       },
       {
         $project: {
-          _id: 1,
-          email: 1,
+          userName: 1,
           fullName: 1,
         },
       },
@@ -196,9 +203,9 @@ router.post("/refresh-token", async (req, res) => {
     });
   }
   const refreshTokenSecret = getRefreshTokenSecret();
-  let userId, email;
+  let userId, userName;
   try {
-    ({ userId, email } = jwt.verify(oldRefreshToken, refreshTokenSecret));
+    ({ userId, userName } = jwt.verify(oldRefreshToken, refreshTokenSecret));
   } catch (err) {
     logger.error("/refresh-token", err);
     throw new ApiError({
@@ -207,7 +214,7 @@ router.post("/refresh-token", async (req, res) => {
     });
   }
 
-  if (!userId || !email || !emailSchema.safeParse(email).success) {
+  if (!userId || !userName) {
     throw new ApiError({
       statusCode: 403,
       message: "Invalid or expired refresh token",
@@ -216,14 +223,13 @@ router.post("/refresh-token", async (req, res) => {
 
   const foundUser = await User.findOne({
     _id: userId,
-    email,
     refreshToken: oldRefreshToken,
   }).lean();
 
   if (!foundUser) {
     logger.warn(
       "refresh token",
-      `User not found or update failed for userId: ${userId}, email: ${email}`
+      `User not found or update failed for userId: ${userId}, userName: ${userName}`
     );
     throw new ApiError({
       statusCode: 403,
@@ -258,63 +264,16 @@ router.post("/logout", authenticateAccessTokenMiddleware, async (req, res) => {
 router.put(
   "/",
   authenticateAccessTokenMiddleware,
-  reqBodyValidatorMiddleware(
-    z
-      .object({
-        fullName: fullNameSchema.optional(),
-        oldPassword: passwordSchema.optional(),
-        newPassword: passwordSchema.optional(),
-      })
-      .check((ctx) => {
-        const { fullName, oldPassword, newPassword } = ctx.value;
-        if (!fullName && !oldPassword && !newPassword) {
-          ctx.issues.push({
-            code: "custom",
-            message:
-              "At least fullName or both oldPassword and newPassword or all of them must be provided",
-            path: [],
-          });
-        }
-        if (oldPassword || newPassword) {
-          if (!oldPassword) {
-            ctx.issues.push({
-              code: "custom",
-              message: "Old password must be provided",
-              path: ["oldPassword"],
-            });
-          }
-          if (!newPassword) {
-            ctx.issues.push({
-              code: "custom",
-              message: "New password must be provided",
-              path: ["newPassword"],
-            });
-          }
-          if (oldPassword && newPassword && oldPassword === newPassword) {
-            ctx.issues.push({
-              code: "custom",
-              message: "Old password and new password must be different",
-              path: ["newPassword"],
-            });
-          }
-        }
-      })
-  ),
+  reqBodyValidatorMiddleware(changeUserInfoSchema),
   async (req, res) => {
     const { fullName, oldPassword, newPassword } = req.body;
     const isPasswordChangeRequested = oldPassword && newPassword;
     const changedFields = [];
-    const projection = { email: 1 };
+    const projection = {};
     if (fullName) projection.fullName = 1;
     if (isPasswordChangeRequested) projection.password = 1;
 
-    const foundUser = await User.findOne(
-      {
-        _id: req.userId,
-        email: req.email,
-      },
-      projection
-    );
+    const foundUser = await User.findById(req.userId, projection);
 
     if (!foundUser) {
       logger.warn(
@@ -358,28 +317,22 @@ router.put(
       foundUser.password = newPassword;
       changedFields.push("password");
     }
-
     await foundUser.save();
+
+    let data = changedFields.length > 0 ? {} : null;
+    if (changedFields.includes("fullName")) {
+      data.user = { fullName: foundUser.fullName };
+    }
+    if (changedFields.includes("password")) {
+      data.accessToken = accessToken;
+    }
     return new ApiResponse(
       res,
       200,
-      isPasswordChangeRequested
-        ? {
-            accessToken,
-            user: {
-              _id: foundUser._id,
-              email: foundUser.email,
-              fullName: foundUser.fullName,
-            },
-          }
-        : {
-            user: {
-              _id: foundUser._id,
-              email: foundUser.email,
-              fullName: foundUser.fullName,
-            },
-          },
-      `${changedFields.join(", ")} ${changedFields.length > 1 ? "are" : "is"} updated successfully`
+      data,
+      changedFields.length > 0
+        ? `${changedFields.join(", ")} ${changedFields.length > 1 ? "are" : "is"} updated successfully`
+        : "Nothing to update"
     );
   }
 );

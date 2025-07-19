@@ -1,19 +1,21 @@
-export const usernameField = (safeFieldName,options={})=>({
-
-      type: String,
-      trim: true,
-      immutable:true,
-      minLength: [3,`${safeFieldName} must be at least 3 characters long`],
-      maxLength: [10,`${safeFieldName} must be at most 10 characters long`],
-      ...options,
-    
-})
-export const fullNameField = (safeFieldName, options = {}) => ({
+export const userNameField = (options = {}) => ({
   type: String,
-  required: [true, `${safeFieldName} is required`],
   trim: true,
-  minLength: [3, `${safeFieldName} must be >=6 and <= 30 characters`],
-  maxLength: [30, `${safeFieldName} must be >=6 and <= 30 characters`],
+  immutable: true,
+  minLength: [3, "Username must be at least 3 characters long"],
+  maxLength: [10, "Username must be at most 10 characters long"],
+  match: [
+    /^[a-zA-Z][a-zA-Z_]+[a-zA-Z]$/,
+    "Username must start with letters and only contain letters and underscores and be 3 to 15 characters long",
+  ],
+  ...options,
+});
+export const fullNameField = (options = {}) => ({
+  type: String,
+  required: [true, "Full name is required"],
+  trim: true,
+  minLength: [3, "Full name must be >=6 and <= 30 characters"],
+  maxLength: [30, "Full name must be >=6 and <= 30 characters"],
   validate: {
     validator: (v) => {
       if (!v || typeof v !== "string") return false;
@@ -21,19 +23,8 @@ export const fullNameField = (safeFieldName, options = {}) => ({
       const words = v.trim().split(/\s+/);
       return words.every((w) => /^[A-Za-z]+$/.test(w));
     },
-    message: `${safeFieldName} must only contain letters and spaces, no leading/trailing spaces`,
+    message:
+      "Full name must only contain letters and spaces, no leading/trailing spaces",
   },
   ...options,
-});
-
-export const emailField = (safeFieldName) => ({
-  type: String,
-  required: [true, `${safeFieldName} is required`],
-  unique: true, //if autoIndex is off, then index won't be created. Instead, use:
-  // userSchema.index({ username: 1 }, { unique: true });
-  trim: true,
-  minLength: [6, `${safeFieldName} must be >= 6 and <= 3- characters`],
-  maxLength: [30, `${safeFieldName} must be >= 6 and <= 3- characters`],
-  lowercase: true,
-  immutable: true,
 });

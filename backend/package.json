@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "node --watch src/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "node --trace-warnings --watch src/index.js"
   },
   "type": "module",
   "keywords": [],

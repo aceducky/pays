@@ -27,6 +27,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/v1", rootRouter);
 
 //Not found
+// eslint-disable-next-line no-unused-vars
 app.all("/{*splat}", (req, res) => {
   logger.error(
     "not-found",
@@ -38,6 +39,7 @@ app.all("/{*splat}", (req, res) => {
   });
 });
 
+// eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   if (err instanceof SyntaxError && "body" in err) {
     logger.error("json parsing", err);

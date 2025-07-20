@@ -7,7 +7,7 @@ import {
   paymentSortSchema,
   paymentStatusSchema,
   paymentTypeSchema,
-  userIdSchema,
+  userNameSchema,
 } from "../zodSchemas.js";
 import { User } from "../db/models/user.model.js";
 import { ApiError, ServerError } from "../utils/Errors.js";
@@ -17,6 +17,7 @@ import { z } from "zod/v4";
 import ApiResponse from "../utils/ApiResponse.js";
 import mongoose from "mongoose";
 import logger from "../utils/logger.js";
+import { getFormattedPayment } from "../utils/responseHelpers.js";
 
 const router = express.Router();
 
@@ -32,21 +33,37 @@ router.get("/", authenticateAccessTokenMiddleware, async (req, res) => {
 
   const type = getQueryParam(req, "type", paymentTypeSchema, "");
   const status = getQueryParam(req, "status", paymentStatusSchema, "");
+
+  // Validate that users can't query non-success received payments
+  if (
+    (type === "received" || type === "") &&
+    status !== "" &&
+    status !== "success"
+  ) {
+    throw new ApiError({
+      statusCode: 400,
+      message: "Only successfully received payments are viewable",
+    });
+  }
+
   const { page, limit, skip } = getPaginationValues(req, 1, 10);
   const sort = getQueryParam(req, "sort", paymentSortSchema, "desc");
-
   const pipeline = [];
-
   let typeFilter = {};
+
   if (type === "") {
     typeFilter = {
-      $or: [{ senderId: userIdObjId }, { receiverId: userIdObjId }],
+      $or: [
+        { senderId: userIdObjId },
+        { receiverId: userIdObjId, status: "success" },
+      ],
     };
   } else if (type === "sent") {
     typeFilter = { senderId: userIdObjId };
   } else if (type === "received") {
-    typeFilter = { receiverId: userIdObjId };
+    typeFilter = { receiverId: userIdObjId, status: "success" };
   }
+
   pipeline.push({ $match: typeFilter });
 
   if (status !== "") {
@@ -56,13 +73,25 @@ router.get("/", authenticateAccessTokenMiddleware, async (req, res) => {
   }
 
   let sortFilter = sort === "asc" ? 1 : -1;
-
   pipeline.push({
     $facet: {
       data: [
         {
+          $project: {
+            _id: 1,
+            senderUserName: 1,
+            receiverUserName: 1,
+            senderFullNameSnapshot: 1,
+            receiverFullNameSnapshot: 1,
+            amount: 1,
+            status: 1,
+            description: 1,
+            timestamp: "$createdAt",
+          },
+        },
+        {
           $sort: {
-            createdAt: sortFilter,
+            timestamp: sortFilter,
           },
         },
         { $skip: skip },
@@ -72,9 +101,7 @@ router.get("/", authenticateAccessTokenMiddleware, async (req, res) => {
     },
   });
 
-  const data = await Payment.aggregate(pipeline);
-  console.log(JSON.stringify(data, null, 2));
-  const [result] = data;
+  const [result] = await Payment.aggregate(pipeline);
   const payments = result.data;
   const total = result.count[0]?.total ?? 0;
 
@@ -95,7 +122,7 @@ router.post(
   reqBodyValidatorMiddleware(
     z
       .object({
-        receiverId: userIdSchema,
+        receiverUserName: userNameSchema,
         amount: paymentAmountSchema,
         description: paymentDescriptionSchema,
       })
@@ -104,9 +131,9 @@ router.post(
   async (req, res) => {
     const senderId = req.userId;
     const senderUserName = req.userName;
-    const { receiverId, amount, description } = req.body;
+    const { receiverUserName, amount, description } = req.body;
 
-    if (senderId === receiverId) {
+    if (senderUserName === receiverUserName) {
       throw new ApiError({
         statusCode: 400,
         message: "Cannot send payment to yourself",
@@ -120,8 +147,8 @@ router.post(
       const result = await session.withTransaction(async () => {
         const [sender, receiver] = await Promise.all([
           User.findById(senderId).select("fullName balance").session(session),
-          User.findById(receiverId)
-            .select("username fullName")
+          User.findOne({ userName: receiverUserName })
+            .select("_id userName fullName")
             .session(session),
         ]);
 
@@ -131,6 +158,7 @@ router.post(
             message: "Sender does not exist",
           });
         }
+
         if (!receiver) {
           throw new ApiError({
             statusCode: 400,
@@ -144,6 +172,8 @@ router.post(
             message: "Insufficient balance",
           });
         }
+
+        const receiverId = receiver._id;
 
         // Update sender balance
         await User.findOneAndUpdate(
@@ -170,11 +200,12 @@ router.post(
           status: "success",
           description,
         });
-
         await payment.save({ session });
         return payment;
       });
-      return new ApiResponse(res, 200, result, "Payment successful");
+
+      const formattedPayment = getFormattedPayment(result);
+      return new ApiResponse(res, 200, formattedPayment, "Payment successful");
     } catch (err) {
       if (err instanceof ApiError) {
         throw err;
@@ -183,12 +214,14 @@ router.post(
       try {
         const [senderInfo, receiverInfo] = await Promise.all([
           User.findById(senderId).select("fullName email").lean(),
-          User.findById(receiverId).select("userName fullName email").lean(),
+          User.findOne({ userName: receiverUserName })
+            .select("_id userName fullName email")
+            .lean(),
         ]);
 
         const failedPayment = new Payment({
           senderId,
-          receiverId,
+          receiverId: receiverInfo._id,
           senderUserName,
           receiverUserName: receiverInfo.userName,
           senderFullNameSnapshot: senderInfo.fullName,
@@ -199,11 +232,12 @@ router.post(
         });
 
         const savedFailedPayment = await failedPayment.save();
+        const formattedPayment = getFormattedPayment(savedFailedPayment);
         logger.error("transaction", "Payment failed due to system error:", err);
 
         throw new ServerError({
           message: "Payment failed due to system error",
-          data: savedFailedPayment,
+          data: formattedPayment,
         });
       } catch (err) {
         if (err instanceof ServerError) {
@@ -215,6 +249,7 @@ router.post(
           "Failed to save failed payment record:",
           err
         );
+
         throw new ServerError({
           message: "Error while saving failed payment record",
         });

@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_aUrCjLmbfs
 createdAt: 2025-07-10T17:03:22.223167200
-updatedAt: 2025-07-11T10:41:29.163872
+updatedAt: 2025-07-20T10:46:44.862176
 workspaceId: wk_6KezG4VDZ3
 folderId: null
 authentication: {}
@@ -18,9 +18,9 @@ headers:
 - enabled: true
   name: ''
   value: ''
-  id: ZZdHKr8yAY
+  id: IMw8eNEj2D
 method: GET
 name: user one /balance
-sortPriority: 8000.0
+sortPriority: 9000.0
 url: ${[ user ]}/balance
 urlParameters: []

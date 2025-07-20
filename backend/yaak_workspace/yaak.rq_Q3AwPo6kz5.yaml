@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_Q3AwPo6kz5
 createdAt: 2025-07-02T08:30:56.395389700
-updatedAt: 2025-07-11T11:28:38.806528200
+updatedAt: 2025-07-20T07:17:05.624787600
 workspaceId: wk_6KezG4VDZ3
 folderId: null
 authentication: {}
@@ -10,7 +10,7 @@ authenticationType: none
 body:
   text: |-
     {
-      "fullName": "abcdefghi",
+      "fullName": "abcdefghijk",
       "oldPassword": "12345678",
       "newPassword": "aaaaaaaaaaa"
     }
@@ -28,9 +28,9 @@ headers:
 - enabled: true
   name: ''
   value: ''
-  id: 664yavZCq2
+  id: qcANK2rbM4
 method: PUT
 name: user one /
-sortPriority: 13000.0
+sortPriority: 14000.0
 url: ${[ user ]}/
 urlParameters: []

@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_FFqHVMGQfk
 createdAt: 2025-07-05T09:55:07.444559800
-updatedAt: 2025-07-12T03:53:30.819751500
+updatedAt: 2025-07-20T07:17:05.615999900
 workspaceId: wk_6KezG4VDZ3
 folderId: null
 authentication: {}
@@ -21,6 +21,6 @@ headers:
   id: crytnBvyk7
 method: GET
 name: user one /bulk
-sortPriority: 12000.0
-url: ${[ user ]}/bulk?filter=one
+sortPriority: 13000.0
+url: ${[ user ]}/bulk
 urlParameters: []

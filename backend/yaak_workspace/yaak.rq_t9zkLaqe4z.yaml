@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_t9zkLaqe4z
 createdAt: 2025-06-28T08:36:23.046957200
-updatedAt: 2025-07-11T10:41:29.184251
+updatedAt: 2025-07-20T07:17:05.597666900
 workspaceId: wk_6KezG4VDZ3
 folderId: null
 authentication: {}
@@ -22,6 +22,6 @@ headers:
   id: bqwGUXX5BJ
 method: POST
 name: user/refresh-token
-sortPriority: 10000.0
+sortPriority: 11000.0
 url: ${[ user ]}/refresh-token
 urlParameters: []

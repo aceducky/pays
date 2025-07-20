@@ -9,10 +9,11 @@ import {
 
 const userSchema = new mongoose.Schema(
   {
-    userName: userNameField({ unique: [true, "Username must be unique"] }),
-    emailField: {
+    userName: userNameField({ unique: true }),
+    email: {
       type: String,
       required: [true, "Email is required"],
+      unique: true,
       trim: true,
       minLength: [6, "Email must be >= 6 and <= 3- characters"],
       maxLength: [30, "Email must be >= 6 and <= 3- characters"],
@@ -34,7 +35,7 @@ const userSchema = new mongoose.Schema(
         `Balance cannot be more than ${Number.MAX_SAFE_INTEGER}`,
       ],
       validate: {
-        validator: function(value) {
+        validator: function (value) {
           return isValidAmountFormat(value);
         },
         message:
@@ -46,7 +47,7 @@ const userSchema = new mongoose.Schema(
       type: String,
     },
   },
-  { timestamps: true, strict: "throw" },
+  { timestamps: true, strict: "throw" }
 );
 
 /* Doing this via gui for now
@@ -63,7 +64,7 @@ userSchema.searchIndex({
 });
 await User.createSearchIndexes();// after connection
 * */
-userSchema.pre("save", async function(next) {
+userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
 
   try {

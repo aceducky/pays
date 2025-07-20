@@ -18,6 +18,7 @@ import {
 } from "../zodSchemas.js";
 import { verifyPassword } from "../utils/verifyPassword.js";
 import { getPaginationValues } from "../utils/reqQueryHelper.js";
+import { to2DecimalPlaces } from "../utils/numberHelpers.js";
 
 const router = Router();
 
@@ -43,7 +44,7 @@ router.post(
         userName,
         fullName,
         password,
-        balance: Math.floor(Math.random() * 10000),
+        balance: to2DecimalPlaces(Math.floor(Math.random() * 10000)),
       });
 
       const accessToken = await setAuthTokens(res, user);
@@ -132,7 +133,7 @@ router.get("/bulk", authenticateAccessTokenMiddleware, async (req, res) => {
       await User.find(
         {},
         {
-          _id: 1,
+          _id: 0,
           userName: 1,
           fullName: 1,
         }
@@ -143,7 +144,7 @@ router.get("/bulk", authenticateAccessTokenMiddleware, async (req, res) => {
       User.countDocuments(),
     ]);
   } else {
-    const result = await User.aggregate([
+    users = await User.aggregate([
       {
         $search: {
           text: {
@@ -162,7 +163,6 @@ router.get("/bulk", authenticateAccessTokenMiddleware, async (req, res) => {
       { $limit: limit },
       { $skip: skip },
     ]);
-    users = result;
   }
 
   return new ApiResponse(
@@ -189,7 +189,7 @@ router.get("/balance", authenticateAccessTokenMiddleware, async (req, res) => {
   return new ApiResponse(
     res,
     200,
-    { balance },
+    balance,
     "User balance retrieved successfully"
   );
 });
@@ -272,7 +272,6 @@ router.put(
     const projection = {};
     if (fullName) projection.fullName = 1;
     if (isPasswordChangeRequested) projection.password = 1;
-
     const foundUser = await User.findById(req.userId, projection);
 
     if (!foundUser) {

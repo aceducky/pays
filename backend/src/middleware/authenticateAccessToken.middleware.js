@@ -3,9 +3,7 @@ import { getAccessTokenSecret } from "../utils/envTeller.js";
 import jwt from "jsonwebtoken";
 import logger from "../utils/logger.js";
 import { setEmergencyOnAndBlockAllRequests } from "../utils/setEmergencyOnAndBlockAllRequests.js";
-import {
-  decodedJwtSchema,
-} from "../zodSchemas.js";
+import { decodedJwtSchema } from "../zodSchemas.js";
 
 const authenticateAccessTokenMiddleware = (req, res, next) => {
   const authHeader = req.headers.authorization;

@@ -45,21 +45,22 @@ export const fullNameSchema = z
   );
 
 export const decodedJwtSchema = z.object({
-  userId:userIdSchema,
+  userId: userIdSchema,
   userName: userNameSchema,
-})
+});
 
 export const passwordSchema = z
   .string()
   .min(8, "Password must be at least 8 characters")
   .max(30, "Password must be at most 30 characters");
 
-export const changeUserInfoSchema =  z
+export const changeUserInfoSchema = z
   .object({
     fullName: fullNameSchema.optional(),
     oldPassword: passwordSchema.optional(),
     newPassword: passwordSchema.optional(),
   })
+  .strip()
   .check((ctx) => {
     const { fullName, oldPassword, newPassword } = ctx.value;
     if (!fullName && !oldPassword && !newPassword) {
@@ -93,7 +94,7 @@ export const changeUserInfoSchema =  z
         });
       }
     }
-  })
+  });
 export const paymentTypeSchema = z.enum(["", "sent", "received"]);
 
 export const paymentStatusSchema = z.enum(["", "success", "failed"]);

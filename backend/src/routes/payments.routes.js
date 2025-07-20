@@ -7,7 +7,7 @@ import {
   paymentSortSchema,
   paymentStatusSchema,
   paymentTypeSchema,
-  userIdSchema,
+  userNameSchema,
 } from "../zodSchemas.js";
 import { User } from "../db/models/user.model.js";
 import { ApiError, ServerError } from "../utils/Errors.js";
@@ -33,21 +33,37 @@ router.get("/", authenticateAccessTokenMiddleware, async (req, res) => {
 
   const type = getQueryParam(req, "type", paymentTypeSchema, "");
   const status = getQueryParam(req, "status", paymentStatusSchema, "");
+
+  // Validate that users can't query non-success received payments
+  if (
+    (type === "received" || type === "") &&
+    status !== "" &&
+    status !== "success"
+  ) {
+    throw new ApiError({
+      statusCode: 400,
+      message: "Only successfully received payments are viewable",
+    });
+  }
+
   const { page, limit, skip } = getPaginationValues(req, 1, 10);
   const sort = getQueryParam(req, "sort", paymentSortSchema, "desc");
-
   const pipeline = [];
-
   let typeFilter = {};
+
   if (type === "") {
     typeFilter = {
-      $or: [{ senderId: userIdObjId }, { receiverId: userIdObjId }],
+      $or: [
+        { senderId: userIdObjId },
+        { receiverId: userIdObjId, status: "success" },
+      ],
     };
   } else if (type === "sent") {
     typeFilter = { senderId: userIdObjId };
   } else if (type === "received") {
-    typeFilter = { receiverId: userIdObjId };
+    typeFilter = { receiverId: userIdObjId, status: "success" };
   }
+
   pipeline.push({ $match: typeFilter });
 
   if (status !== "") {
@@ -57,68 +73,29 @@ router.get("/", authenticateAccessTokenMiddleware, async (req, res) => {
   }
 
   let sortFilter = sort === "asc" ? 1 : -1;
-
   pipeline.push({
     $facet: {
       data: [
         {
+          $project: {
+            _id: 1,
+            senderUserName: 1,
+            receiverUserName: 1,
+            senderFullNameSnapshot: 1,
+            receiverFullNameSnapshot: 1,
+            amount: 1,
+            status: 1,
+            description: 1,
+            timestamp: "$createdAt",
+          },
+        },
+        {
           $sort: {
-            createdAt: sortFilter,
+            timestamp: sortFilter,
           },
         },
         { $skip: skip },
         { $limit: limit },
-        {
-          $lookup: {
-            from: "users",
-            localField: "senderId",
-            foreignField: "_id",
-            as: "senderInfo",
-            pipeline: [
-              {
-                $project: {
-                  fullName: 1,
-                  _id: 0,
-                },
-              },
-            ],
-          },
-        },
-        {
-          $lookup: {
-            from: "users",
-            localField: "receiverId",
-            foreignField: "_id",
-            as: "receiverInfo",
-            pipeline: [
-              {
-                $project: {
-                  fullName: 1,
-                  _id: 0,
-                },
-              },
-            ],
-          },
-        },
-        {
-          $project: {
-            _id: 1,
-            senderId: 1,
-            receiverId: 1,
-            senderFullNameSnapshot: {
-              $arrayElemAt: ["$senderInfo.fullName", 0],
-            },
-            receiverFullNameSnapshot: {
-              $arrayElemAt: ["$receiverInfo.fullName", 0],
-            },
-            senderEmail: 1,
-            receiverEmail: 1,
-            amount: { $toString: "$amount" },
-            timestamp: "$createdAt",
-            status: 1,
-            description: 1,
-          },
-        },
       ],
       count: [{ $count: "total" }],
     },
@@ -145,7 +122,7 @@ router.post(
   reqBodyValidatorMiddleware(
     z
       .object({
-        receiverId: userIdSchema,
+        receiverUserName: userNameSchema,
         amount: paymentAmountSchema,
         description: paymentDescriptionSchema,
       })
@@ -153,9 +130,10 @@ router.post(
   ),
   async (req, res) => {
     const senderId = req.userId;
-    const { receiverId, amount, description } = req.body;
+    const senderUserName = req.userName;
+    const { receiverUserName, amount, description } = req.body;
 
-    if (senderId === receiverId) {
+    if (senderUserName === receiverUserName) {
       throw new ApiError({
         statusCode: 400,
         message: "Cannot send payment to yourself",
@@ -168,11 +146,9 @@ router.post(
       session = await mongoose.startSession();
       const result = await session.withTransaction(async () => {
         const [sender, receiver] = await Promise.all([
-          User.findById(senderId)
-            .select("_id fullName email balance")
-            .session(session),
-          User.findById(receiverId)
-            .select("_id fullName email")
+          User.findById(senderId).select("fullName balance").session(session),
+          User.findOne({ userName: receiverUserName })
+            .select("_id userName fullName")
             .session(session),
         ]);
 
@@ -182,6 +158,7 @@ router.post(
             message: "Sender does not exist",
           });
         }
+
         if (!receiver) {
           throw new ApiError({
             statusCode: 400,
@@ -195,6 +172,8 @@ router.post(
             message: "Insufficient balance",
           });
         }
+
+        const receiverId = receiver._id;
 
         // Update sender balance
         await User.findOneAndUpdate(
@@ -213,19 +192,20 @@ router.post(
         const payment = new Payment({
           senderId,
           receiverId,
+          senderUserName,
+          receiverUserName: receiver.userName,
           senderFullNameSnapshot: sender.fullName,
           receiverFullNameSnapshot: receiver.fullName,
-          senderEmail: sender.email,
-          receiverEmail: receiver.email,
           amount,
           status: "success",
           description,
         });
-
         await payment.save({ session });
-        return getFormattedPayment(payment);
+        return payment;
       });
-      return new ApiResponse(res, 200, result, "Payment successful");
+
+      const formattedPayment = getFormattedPayment(result);
+      return new ApiResponse(res, 200, formattedPayment, "Payment successful");
     } catch (err) {
       if (err instanceof ApiError) {
         throw err;
@@ -234,16 +214,18 @@ router.post(
       try {
         const [senderInfo, receiverInfo] = await Promise.all([
           User.findById(senderId).select("fullName email").lean(),
-          User.findById(receiverId).select("fullName email").lean(),
+          User.findOne({ userName: receiverUserName })
+            .select("_id userName fullName email")
+            .lean(),
         ]);
 
         const failedPayment = new Payment({
           senderId,
-          receiverId,
+          receiverId: receiverInfo._id,
+          senderUserName,
+          receiverUserName: receiverInfo.userName,
           senderFullNameSnapshot: senderInfo.fullName,
           receiverFullNameSnapshot: receiverInfo.fullName,
-          senderEmail: senderInfo.email,
-          receiverEmail: receiverInfo.email,
           amount,
           status: "failed",
           description,
@@ -251,7 +233,6 @@ router.post(
 
         const savedFailedPayment = await failedPayment.save();
         const formattedPayment = getFormattedPayment(savedFailedPayment);
-
         logger.error("transaction", "Payment failed due to system error:", err);
 
         throw new ServerError({
@@ -268,6 +249,7 @@ router.post(
           "Failed to save failed payment record:",
           err
         );
+
         throw new ServerError({
           message: "Error while saving failed payment record",
         });

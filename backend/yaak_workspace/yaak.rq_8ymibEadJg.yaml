@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_8ymibEadJg
 createdAt: 2025-07-11T07:21:22.393364700
-updatedAt: 2025-07-11T10:41:29.134265200
+updatedAt: 2025-07-20T11:12:39.597477900
 workspaceId: wk_6KezG4VDZ3
 folderId: null
 authentication: {}
@@ -18,9 +18,25 @@ headers:
 - enabled: true
   name: ''
   value: ''
-  id: sibHa97Uer
+  id: PZWyn6sq6R
 method: GET
 name: user two payments/
-sortPriority: 5000.0
+sortPriority: 6000.0
 url: ${[ payments ]}/
-urlParameters: []
+urlParameters:
+- enabled: true
+  name: type
+  value: sent
+  id: GNDbG4BGKg
+- enabled: true
+  name: status
+  value: success
+  id: Fggqs7kH34
+- enabled: false
+  name: ''
+  value: ''
+  id: V0i77A9Max
+- enabled: true
+  name: ''
+  value: ''
+  id: mK8MaADfgA

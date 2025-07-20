@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_EvP6wrhiCw
 createdAt: 2025-07-09T13:55:40.214406800
-updatedAt: 2025-07-11T10:41:29.144031500
+updatedAt: 2025-07-20T10:48:19.765661900
 workspaceId: wk_6KezG4VDZ3
 folderId: null
 authentication: {}
@@ -10,10 +10,9 @@ authenticationType: null
 body:
   text: |-
     {
-      "receiverId": "${[ response.body.path(request='rq_fup3mJps4a', path=b64'JC5kYXRhLnVzZXIuX2lk', behavior='smart') ]}",
-      "amount":100
-      ,
-      "description":"user one to user two"
+      "receiverUserName": "${[ response.body.path(request='rq_fup3mJps4a', path=b64'JC5kYXRhLnVzZXIudXNlck5hbWU', behavior='smart') ]}",
+      "amount":100,
+      "description":"user one to user two failed payment 1"
     }
 bodyType: application/json
 description: ''
@@ -32,6 +31,6 @@ headers:
   id: SW994jI9P2
 method: POST
 name: payment from user one to user two
-sortPriority: 6000.0
+sortPriority: 7000.0
 url: ${[ payments ]}/
 urlParameters: []

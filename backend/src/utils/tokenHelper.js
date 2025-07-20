@@ -31,33 +31,33 @@ const getRefreshTokenAndAccessToken = (payload) => {
   const accessToken = generateToken(
     payload,
     getAccessTokenSecret(),
-    getAccessTokenExpiry(),
+    getAccessTokenExpiry()
   );
   const refreshToken = generateToken(
     payload,
     getRefreshTokenSecret(),
-    getRefreshTokenExpiry(),
+    getRefreshTokenExpiry()
   );
   return { refreshToken, accessToken };
 };
 const setAuthTokens = async (res, user) => {
   const { refreshToken, accessToken } = getRefreshTokenAndAccessToken({
     userId: user._id,
-    email: user.email,
+    userName: user.userName,
   });
 
   let updatedUser;
   try {
     updatedUser = await User.findOneAndUpdate(
-      { _id: user._id, email: user.email },
+      { _id: user._id },
       { refreshToken },
-      { new: true, runValidators: true },
+      { new: true, runValidators: true }
     );
   } catch (err) {
     logger.error(
       "refresh token",
       "Error when setting refresh token in mongodb",
-      err,
+      err
     );
     throw err;
   }

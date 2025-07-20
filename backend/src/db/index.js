@@ -1,12 +1,13 @@
 import mongoose from "mongoose";
 import logger from "../utils/logger.js";
+import { getMONGODB_URI } from "../utils/envTeller.js";
 
 mongoose.set("transactionAsyncLocalStorage", true);
 
 async function connectToMongoDB() {
   try {
     logger.info("db connection", "Started trying to connect to db");
-    const connectionInstance = await mongoose.connect(process.env.MONGODB_URI);
+    const connectionInstance = await mongoose.connect(getMONGODB_URI());
     logger.info(
       "db start",
       "Connected to MongoDB:",

@@ -1,7 +1,7 @@
 import argon2 from "argon2";
 import mongoose from "mongoose";
 import logger from "../../utils/logger.js";
-import { emailField, fullNameField } from "./commonFields.js";
+import { fullNameField, userNameField } from "./commonFields.js";
 import {
   isValidAmountFormat,
   to2DecimalPlaces,
@@ -9,17 +9,31 @@ import {
 
 const userSchema = new mongoose.Schema(
   {
-    email: emailField("Email"),
-    fullName: fullNameField("Full name"),
+    userName: userNameField({ unique: true }),
+    email: {
+      type: String,
+      required: [true, "Email is required"],
+      unique: true,
+      trim: true,
+      minLength: [6, "Email must be >= 6 and <= 3- characters"],
+      maxLength: [30, "Email must be >= 6 and <= 3- characters"],
+      lowercase: true,
+      immutable: true,
+    },
+    fullName: fullNameField(),
     password: {
       type: String,
       required: [true, "Password is required"],
     },
-
     balance: {
       type: Number,
       required: [true, "Balance is required"],
       default: to2DecimalPlaces(1 + Math.random() * 10000),
+      min: [0, "Balance cannot be negative"],
+      max: [
+        Number.MAX_SAFE_INTEGER,
+        `Balance cannot be more than ${Number.MAX_SAFE_INTEGER}`,
+      ],
       validate: {
         validator: function (value) {
           return isValidAmountFormat(value);
@@ -27,20 +41,15 @@ const userSchema = new mongoose.Schema(
         message:
           "Balance must be a non negative number with at most 2 decimal places",
       },
-
-      min: [0, "Balance cannot be negative"],
-      max: [
-        Number.MAX_SAFE_INTEGER,
-        `Balance cannot be more than ${Number.MAX_SAFE_INTEGER}`,
-      ],
       set: (value) => to2DecimalPlaces(value),
     },
     refreshToken: {
       type: String,
     },
   },
-  { timestamps: true }
+  { timestamps: true, strict: "throw" }
 );
+
 /* Doing this via gui for now
 userSchema.searchIndex({
   name: "fullName_search_index", // using `default` as name in gui

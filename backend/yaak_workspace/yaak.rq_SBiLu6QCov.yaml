@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_SBiLu6QCov
 createdAt: 2025-07-10T07:35:11.474235700
-updatedAt: 2025-07-11T10:41:29.153802100
+updatedAt: 2025-07-20T10:50:13.312929800
 workspaceId: wk_6KezG4VDZ3
 folderId: null
 authentication: {}
@@ -10,9 +10,9 @@ authenticationType: null
 body:
   text: |-
     {
-      "receiverId": "${[ response.body.path(request='rq_GQNttepnow', path=b64'JC5kYXRhLnVzZXIuX2lk', behavior='smart') ]}",
+      "receiverUserName": "${[ response.body.path(request='rq_GQNttepnow', path=b64'JC5kYXRhLnVzZXIudXNlck5hbWU', behavior='smart') ]}",
       "amount":1000,
-      "description":"user two to user one"
+        "description":"user two to user one failed payment 1"
     }
 bodyType: application/json
 description: ''
@@ -31,6 +31,6 @@ headers:
   id: cTXZw5Bv8k
 method: POST
 name: payment from user two to user one
-sortPriority: 7000.0
+sortPriority: 8000.0
 url: ${[ payments ]}/
 urlParameters: []

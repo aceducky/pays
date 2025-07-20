@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_fup3mJps4a
 createdAt: 2025-07-09T13:42:52.881721900
-updatedAt: 2025-07-11T10:41:29.123696700
+updatedAt: 2025-07-20T07:17:05.652779500
 workspaceId: wk_6KezG4VDZ3
 folderId: null
 authentication: {}
@@ -22,6 +22,6 @@ headers:
   id: 7jirCzWCqy
 method: POST
 name: user two /login
-sortPriority: 4000.0
+sortPriority: 3000.0
 url: ${[ user ]}/login
 urlParameters: []

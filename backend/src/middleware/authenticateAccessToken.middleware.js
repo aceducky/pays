@@ -3,7 +3,7 @@ import { getAccessTokenSecret } from "../utils/envTeller.js";
 import jwt from "jsonwebtoken";
 import logger from "../utils/logger.js";
 import { setEmergencyOnAndBlockAllRequests } from "../utils/setEmergencyOnAndBlockAllRequests.js";
-import { emailSchema, userIdSchema } from "../zodSchemas.js";
+import { decodedJwtSchema } from "../zodSchemas.js";
 
 const authenticateAccessTokenMiddleware = (req, res, next) => {
   const authHeader = req.headers.authorization;
@@ -28,10 +28,7 @@ const authenticateAccessTokenMiddleware = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, accessTokenSecret);
-    if (
-      !userIdSchema.safeParse(decoded.userId).success ||
-      !emailSchema.safeParse(decoded.email).success
-    ) {
+    if (!decodedJwtSchema.safeParse(decoded).success) {
       logger.error(
         "EMERGENCY",
         "User id or email is invalid but the related access token is valid",
@@ -41,7 +38,7 @@ const authenticateAccessTokenMiddleware = (req, res, next) => {
       return setEmergencyOnAndBlockAllRequests(res);
     }
     req.userId = decoded.userId;
-    req.email = decoded.email;
+    req.userName = decoded.userName;
     next();
   } catch (err) {
     logger.error("access token", err);

@@ -9,7 +9,7 @@ export const verifyPassword = async (hash, incomingPassword) => {
   try {
     return await argon2.verify(hash, incomingPassword);
   } catch (err) {
-    logger.error("User model", "Password verification error", err);
+    logger.error("Users model", "Password verification error", err);
     return false;
   }
 };

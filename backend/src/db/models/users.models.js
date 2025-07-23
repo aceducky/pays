@@ -15,8 +15,8 @@ const userSchema = new mongoose.Schema(
       required: [true, "Email is required"],
       unique: true,
       trim: true,
-      minLength: [6, "Email must be >= 6 and <= 3- characters"],
-      maxLength: [30, "Email must be >= 6 and <= 3- characters"],
+      minLength: [6, "Email must be >= 6 and <= 3 characters"],
+      maxLength: [30, "Email must be >= 6 and <= 3 characters"],
       lowercase: true,
       immutable: true,
     },
@@ -62,7 +62,7 @@ userSchema.searchIndex({
     },
   },
 });
-await User.createSearchIndexes();// after connection
+await Users.createSearchIndexes();// after connection
 * */
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
@@ -77,9 +77,9 @@ userSchema.pre("save", async function (next) {
     });
     next();
   } catch (err) {
-    logger.error("User model", "Error while hashing the password", err);
+    logger.error("Users model", "Error while hashing the password", err);
     next(err);
   }
 });
 
-export const User = mongoose.model("User", userSchema);
+export const Users = mongoose.model("Users", userSchema);

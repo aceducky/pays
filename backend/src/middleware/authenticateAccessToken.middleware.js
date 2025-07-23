@@ -4,10 +4,10 @@ import jwt from "jsonwebtoken";
 import logger from "../utils/logger.js";
 import { setEmergencyOnAndBlockAllRequests } from "../utils/setEmergencyOnAndBlockAllRequests.js";
 import { decodedJwtSchema } from "../zodSchemas.js";
+import { isRevokedToken } from "../utils/tokenHelper.js";
 
-const authenticateAccessTokenMiddleware = (req, res, next) => {
+const authenticateAccessTokenMiddleware = async (req, res, next) => {
   const authHeader = req.headers.authorization;
-
   if (!authHeader) {
     throw new ApiError({
       statusCode: 401,
@@ -16,7 +16,6 @@ const authenticateAccessTokenMiddleware = (req, res, next) => {
   }
 
   const [scheme, token] = authHeader.split(" ");
-
   if (scheme !== "Bearer" || !token) {
     throw new ApiError({
       statusCode: 401,
@@ -25,26 +24,38 @@ const authenticateAccessTokenMiddleware = (req, res, next) => {
   }
 
   const accessTokenSecret = getAccessTokenSecret();
-
   try {
     const decoded = jwt.verify(token, accessTokenSecret);
+
     if (!decodedJwtSchema.safeParse(decoded).success) {
       logger.error(
         "EMERGENCY",
-        "User id or email is invalid but the related access token is valid",
+        "User's name or email is invalid but the related access token is valid",
         "token info:",
         decoded
       );
       return setEmergencyOnAndBlockAllRequests(res);
     }
+
+    if (await isRevokedToken(decoded.jti)) {
+      throw new ApiError({
+        statusCode: 401,
+        message: "Invalid or expired token",
+      });
+    }
+
     req.userId = decoded.userId;
     req.userName = decoded.userName;
     next();
   } catch (err) {
+    if (err instanceof ApiError) {
+      throw err;
+    }
+
     logger.error("access token", err);
     throw new ApiError({
       statusCode: 401,
-      message: "Invalid or expired access token",
+      message: "Invalid or expired token",
     });
   }
 };

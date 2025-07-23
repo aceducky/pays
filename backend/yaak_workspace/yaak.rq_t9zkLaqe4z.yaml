@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_t9zkLaqe4z
 createdAt: 2025-06-28T08:36:23.046957200
-updatedAt: 2025-07-20T07:17:05.597666900
+updatedAt: 2025-07-23T17:52:43.491627
 workspaceId: wk_6KezG4VDZ3
 folderId: null
 authentication: {}
@@ -13,13 +13,13 @@ bodyType: null
 description: ''
 headers:
 - enabled: true
-  name: ''
-  value: ''
-  id: eZkET9VmiQ
+  name: Authorization
+  value: Bearer ${[ response.body.path(request='rq_GQNttepnow', path=b64'JC5kYXRhLmFjY2Vzc1Rva2Vu', behavior='smart') ]}
+  id: 8EfZ53TBMR
 - enabled: true
   name: ''
   value: ''
-  id: bqwGUXX5BJ
+  id: dBr6XGt3Ni
 method: POST
 name: user/refresh-token
 sortPriority: 11000.0

@@ -9,9 +9,9 @@ import {
   paymentTypeSchema,
   userNameSchema,
 } from "../zodSchemas.js";
-import { User } from "../db/models/user.model.js";
+import { Users } from "../db/models/users.models.js";
 import { ApiError, ServerError } from "../utils/Errors.js";
-import { Payment } from "../db/models/payments.models.js";
+import { Payments } from "../db/models/payments.models.js";
 import reqBodyValidatorMiddleware from "../middleware/reqBodyValidator.middleware.js";
 import { z } from "zod/v4";
 import ApiResponse from "../utils/ApiResponse.js";
@@ -23,7 +23,7 @@ const router = express.Router();
 
 router.get("/", authenticateAccessTokenMiddleware, async (req, res) => {
   const userIdObjId = new mongoose.Types.ObjectId(req.userId);
-  const user = await User.findById(userIdObjId);
+  const user = await Users.findById(userIdObjId);
   if (!user) {
     throw new ApiError({
       statusCode: 400,
@@ -101,7 +101,7 @@ router.get("/", authenticateAccessTokenMiddleware, async (req, res) => {
     },
   });
 
-  const [result] = await Payment.aggregate(pipeline);
+  const [result] = await Payments.aggregate(pipeline);
   const payments = result.data;
   const total = result.count[0]?.total ?? 0;
 
@@ -146,8 +146,8 @@ router.post(
       session = await mongoose.startSession();
       const result = await session.withTransaction(async () => {
         const [sender, receiver] = await Promise.all([
-          User.findById(senderId).select("fullName balance").session(session),
-          User.findOne({ userName: receiverUserName })
+          Users.findById(senderId).select("fullName balance").session(session),
+          Users.findOne({ userName: receiverUserName })
             .select("_id userName fullName")
             .session(session),
         ]);
@@ -176,20 +176,20 @@ router.post(
         const receiverId = receiver._id;
 
         // Update sender balance
-        await User.findOneAndUpdate(
+        await Users.findOneAndUpdate(
           { _id: senderId },
           { $inc: { balance: -amount } },
           { session, runValidators: true }
         );
 
         // Update receiver balance
-        await User.findOneAndUpdate(
+        await Users.findOneAndUpdate(
           { _id: receiverId },
           { $inc: { balance: amount } },
           { session, runValidators: true }
         );
 
-        const payment = new Payment({
+        const payment = new Payments({
           senderId,
           receiverId,
           senderUserName,
@@ -205,7 +205,7 @@ router.post(
       });
 
       const formattedPayment = getFormattedPayment(result);
-      return new ApiResponse(res, 200, formattedPayment, "Payment successful");
+      return new ApiResponse(res, 200, formattedPayment, "Payments successful");
     } catch (err) {
       if (err instanceof ApiError) {
         throw err;
@@ -213,13 +213,13 @@ router.post(
 
       try {
         const [senderInfo, receiverInfo] = await Promise.all([
-          User.findById(senderId).select("fullName email").lean(),
-          User.findOne({ userName: receiverUserName })
+          Users.findById(senderId).select("fullName email").lean(),
+          Users.findOne({ userName: receiverUserName })
             .select("_id userName fullName email")
             .lean(),
         ]);
 
-        const failedPayment = new Payment({
+        const failedPayment = new Payments({
           senderId,
           receiverId: receiverInfo._id,
           senderUserName,

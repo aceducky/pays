@@ -10,13 +10,13 @@ const paymentSchema = new mongoose.Schema(
   {
     senderId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "Users",
       required: true,
       immutable: true,
     },
     receiverId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "Users",
       required: true,
       immutable: true,
     },
@@ -66,6 +66,6 @@ const paymentSchema = new mongoose.Schema(
   }
 );
 
-const Payment = mongoose.model("Payment", paymentSchema);
+const Payments = mongoose.model("Payments", paymentSchema);
 
-export { Payment };
+export { Payments };

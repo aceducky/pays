@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_mKN9LLb9kS
 createdAt: 2025-06-28T17:17:30.938548700
-updatedAt: 2025-07-20T07:17:05.606736
+updatedAt: 2025-07-23T17:53:21.478304900
 workspaceId: wk_6KezG4VDZ3
 folderId: null
 authentication:
@@ -19,12 +19,12 @@ headers:
   id: vnG9psf6uD
 - enabled: true
   name: Authorization
-  value: Bearer ${[ response.body.path(request='rq_BdqQEAoYUh', path=b64'JC5kYXRhLmFjY2Vzc1Rva2Vu', behavior='smart') ]}
+  value: Bearer ${[ response.body.path(request='rq_GQNttepnow', path=b64'JC5kYXRhLmFjY2Vzc1Rva2Vu', behavior='smart') ]}
   id: fafjjiaR5u
 - enabled: true
   name: ''
   value: ''
-  id: MR3eEhWwuu
+  id: u74SsaRICB
 method: POST
 name: user one /logout
 sortPriority: 12000.0

@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_Q3AwPo6kz5
 createdAt: 2025-07-02T08:30:56.395389700
-updatedAt: 2025-07-11T11:28:38.806528200
+updatedAt: 2025-07-24T14:47:50.617396300
 workspaceId: wk_6KezG4VDZ3
 folderId: null
 authentication: {}
@@ -10,9 +10,9 @@ authenticationType: none
 body:
   text: |-
     {
-      "fullName": "abcdefghi",
-      "oldPassword": "12345678",
-      "newPassword": "aaaaaaaaaaa"
+      "fullName": "user one",
+      "newPassword": "12345678",
+      "oldPassword": "aaaaaaaaaaa"
     }
 bodyType: application/json
 description: ''
@@ -21,16 +21,16 @@ headers:
   name: Content-Type
   value: application/json
   id: vw5TYKXv3u
-- enabled: true
-  name: Authorization
-  value: Bearer ${[ response.body.path(request='rq_GQNttepnow', path=b64'JC5kYXRhLmFjY2Vzc1Rva2Vu', behavior='smart') ]}
+- enabled: false
+  name: ''
+  value: ''
   id: FWzqjHyjxD
 - enabled: true
   name: ''
   value: ''
-  id: 664yavZCq2
+  id: qCNssyHkCq
 method: PUT
-name: user one /
-sortPriority: 13000.0
+name: user /
+sortPriority: 14000.0
 url: ${[ user ]}/
 urlParameters: []

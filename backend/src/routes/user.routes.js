@@ -5,13 +5,28 @@ import ApiResponse from "../utils/ApiResponse.js";
 import { ApiError } from "../utils/Errors.js";
 import logger from "../utils/logger.js";
 import jwt from "jsonwebtoken";
-import setAuthTokens from "../utils/tokenHelper.js";
+import {
+  clearRefreshTokenCookie,
+  revokeOldAccessToken,
+  setAuthTokens,
+} from "../utils/tokenHelper.js";
 import authenticateAccessTokenMiddleware from "../middleware/authenticateAccessToken.middleware.js";
-import { User } from "../db/models/user.model.js";
-import { getRefreshTokenSecret, isEnvDEVELOPMENT } from "../utils/envTeller.js";
-import { emailSchema, fullNameSchema, passwordSchema } from "../zodSchemas.js";
+import { Users } from "../db/models/users.models.js";
+import {
+  getAccessTokenSecret,
+  getRefreshTokenExpiry,
+  getRefreshTokenSecret,
+} from "../utils/envTeller.js";
+import {
+  changeUserInfoSchema,
+  emailSchema,
+  fullNameSchema,
+  passwordSchema,
+  userNameSchema,
+} from "../zodSchemas.js";
 import { verifyPassword } from "../utils/verifyPassword.js";
 import { getPaginationValues } from "../utils/reqQueryHelper.js";
+import { to2DecimalPlaces } from "../utils/numberHelpers.js";
 
 const router = Router();
 
@@ -21,33 +36,34 @@ router.post(
     z
       .object({
         email: emailSchema,
+        userName: userNameSchema,
         fullName: fullNameSchema,
         password: passwordSchema,
       })
       .strip()
   ),
   async (req, res) => {
-    const { email, fullName, password } = req.body;
+    const { email, userName, fullName, password } = req.body;
 
     try {
       //MongoDB will handle duplicate email error
-      const user = await User.create({
+      const user = await Users.create({
         email,
+        userName,
         fullName,
         password,
-        balance: Math.floor(Math.random() * 10000),
+        balance: to2DecimalPlaces(Math.floor(Math.random() * 10000)),
       });
 
-      const accessToken = await setAuthTokens(res, user);
+      await setAuthTokens(res, user);
 
       return new ApiResponse(
         res,
-        201,
+        201, // Created
         {
-          accessToken,
           user: {
-            _id: user._id,
             email: user.email,
+            userName: user.userName,
             fullName: user.fullName,
             balance: user.balance,
           },
@@ -57,11 +73,10 @@ router.post(
     } catch (err) {
       if (err.code === 11000) {
         throw new ApiError({
-          statusCode: 409,
+          statusCode: 409, // Conflict
           message: "User already exists",
         });
       }
-
       throw err;
     }
   }
@@ -80,10 +95,10 @@ router.post(
   async (req, res) => {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email }).lean();
+    const user = await Users.findOne({ email }).select("-refreshToken").lean();
     if (!user) {
       throw new ApiError({
-        statusCode: 401,
+        statusCode: 401, // Unauthorized
         message: "Invalid credentials",
       });
     }
@@ -91,21 +106,20 @@ router.post(
     const isPasswordValid = await verifyPassword(user.password, password);
     if (!isPasswordValid) {
       throw new ApiError({
-        statusCode: 401,
+        statusCode: 401, // Unauthorized
         message: "Invalid credentials",
       });
     }
 
-    const accessToken = await setAuthTokens(res, user);
+    await setAuthTokens(res, user, getRefreshTokenExpiry());
 
     return new ApiResponse(
       res,
-      200,
+      200, // OK
       {
-        accessToken,
         user: {
-          _id: user._id,
           email,
+          userName: user.userName,
           fullName: user.fullName,
           balance: user.balance,
         },
@@ -121,21 +135,21 @@ router.get("/bulk", authenticateAccessTokenMiddleware, async (req, res) => {
   let users, total;
   if (!filterQuery) {
     [users, total] = await Promise.all([
-      await User.find(
+      await Users.find(
         {},
         {
-          _id: 1,
-          email: 1,
+          _id: 0,
+          userName: 1,
           fullName: 1,
         }
       )
         .lean()
         .limit(limit)
         .skip(skip),
-      User.countDocuments(),
+      Users.countDocuments(),
     ]);
   } else {
-    const result = await User.aggregate([
+    users = await Users.aggregate([
       {
         $search: {
           text: {
@@ -146,8 +160,7 @@ router.get("/bulk", authenticateAccessTokenMiddleware, async (req, res) => {
       },
       {
         $project: {
-          _id: 1,
-          email: 1,
+          userName: 1,
           fullName: 1,
         },
       },
@@ -155,12 +168,11 @@ router.get("/bulk", authenticateAccessTokenMiddleware, async (req, res) => {
       { $limit: limit },
       { $skip: skip },
     ]);
-    users = result;
   }
 
   return new ApiResponse(
     res,
-    200,
+    200, // OK
     {
       users,
       pagination: {
@@ -175,154 +187,147 @@ router.get("/bulk", authenticateAccessTokenMiddleware, async (req, res) => {
 });
 
 router.get("/balance", authenticateAccessTokenMiddleware, async (req, res) => {
-  const balance = await User.findById(req.userId, {
+  const balance = await Users.findById(req.userId, {
     _id: 0,
     balance: 1,
   }).lean();
   return new ApiResponse(
     res,
-    200,
-    { balance },
+    200, // OK
+    balance,
     "User balance retrieved successfully"
   );
 });
 
 router.post("/refresh-token", async (req, res) => {
   const oldRefreshToken = req.cookies?.refreshToken;
+  const currentAccessToken = req.cookies?.accessToken;
+
   if (!oldRefreshToken) {
     throw new ApiError({
-      statusCode: 401,
+      statusCode: 401, // Unauthorized
       message: "Invalid or expired refresh token",
     });
   }
+
+  // Check if current access token is still valid
+  if (currentAccessToken) {
+    try {
+      jwt.verify(currentAccessToken, getAccessTokenSecret());
+      return new ApiResponse(res, 200, null, "Access token still valid"); // OK
+    } catch (err) {
+      if (!(err instanceof jwt.TokenExpiredError)) {
+        // Log and throw other errors (e.g., malformed token, invalid signature)
+        logger.error("/refresh-token", "Access token verification failed", {
+          error: err.message,
+          name: err.name,
+        });
+        throw new ApiError({
+          statusCode: 401, // Unauthorized
+          message: "Invalid access token",
+        });
+      }
+    }
+  }
+
   const refreshTokenSecret = getRefreshTokenSecret();
-  let userId, email;
+  let userId, userName, exp;
+
   try {
-    ({ userId, email } = jwt.verify(oldRefreshToken, refreshTokenSecret));
+    const decoded = jwt.verify(oldRefreshToken, refreshTokenSecret);
+    userId = decoded.userId;
+    userName = decoded.userName;
+    exp = decoded.exp;
   } catch (err) {
-    logger.error("/refresh-token", err);
+    logger.error("/refresh-token", "Refresh token verification failed", {
+      error: err.message,
+      name: err.name,
+    });
     throw new ApiError({
-      statusCode: 403,
+      statusCode: 403, // Forbidden
       message: "Invalid or expired refresh token",
     });
   }
 
-  if (!userId || !email || !emailSchema.safeParse(email).success) {
+  if (!userId || !userName || !exp) {
     throw new ApiError({
-      statusCode: 403,
+      statusCode: 403, // Forbidden
       message: "Invalid or expired refresh token",
     });
   }
 
-  const foundUser = await User.findOne({
+  // Calculate remaining time for refresh token
+  const now = Math.floor(Date.now() / 1000);
+  const remainingTimeMs = Math.max((exp - now) * 1000, 0);
+
+  // If token is expired, throw error
+  // this check is redundant because jwt.verify handles this
+  // but kept for clarity
+  if (remainingTimeMs <= 0) {
+    throw new ApiError({
+      statusCode: 403, // Forbidden
+      message: "Invalid or expired refresh token",
+    });
+  }
+
+  const foundUser = await Users.findOne({
     _id: userId,
-    email,
     refreshToken: oldRefreshToken,
   }).lean();
 
   if (!foundUser) {
     logger.warn(
       "refresh token",
-      `User not found or update failed for userId: ${userId}, email: ${email}`
+      `User not found or update failed for userId: ${userId}, userName: ${userName}`
     );
     throw new ApiError({
-      statusCode: 403,
+      statusCode: 403, // Forbidden
       message: "Invalid or expired refresh token",
     });
   }
 
-  const accessToken = await setAuthTokens(res, foundUser);
+  await revokeOldAccessToken(req);
+  await setAuthTokens(res, foundUser, remainingTimeMs);
 
-  return new ApiResponse(res, 200, { accessToken }, "Access token refreshed");
+  return new ApiResponse(res, 200, null, "Access token refreshed"); // OK
 });
 
 router.post("/logout", authenticateAccessTokenMiddleware, async (req, res) => {
-  const user = await User.findByIdAndUpdate(req.userId, {
+  const user = await Users.findByIdAndUpdate(req.userId, {
     $unset: { refreshToken: 1 },
   });
 
   if (!user) {
     logger.warn("logout", "User not found during logout", {
-      userId: req.user.userId,
+      userId: req.userId,
     });
   }
-  res.clearCookie("refreshToken", {
-    httpOnly: true,
-    sameSite: "strict",
-    secure: !isEnvDEVELOPMENT(),
-  });
 
-  return new ApiResponse(res, 200, null, "Logged out successfully");
+  await revokeOldAccessToken(req);
+  clearRefreshTokenCookie(res);
+  return new ApiResponse(res, 200, null, "Logged out successfully"); // OK
 });
 
 router.put(
   "/",
   authenticateAccessTokenMiddleware,
-  reqBodyValidatorMiddleware(
-    z
-      .object({
-        fullName: fullNameSchema.optional(),
-        oldPassword: passwordSchema.optional(),
-        newPassword: passwordSchema.optional(),
-      })
-      .check((ctx) => {
-        const { fullName, oldPassword, newPassword } = ctx.value;
-        if (!fullName && !oldPassword && !newPassword) {
-          ctx.issues.push({
-            code: "custom",
-            message:
-              "At least fullName or both oldPassword and newPassword or all of them must be provided",
-            path: [],
-          });
-        }
-        if (oldPassword || newPassword) {
-          if (!oldPassword) {
-            ctx.issues.push({
-              code: "custom",
-              message: "Old password must be provided",
-              path: ["oldPassword"],
-            });
-          }
-          if (!newPassword) {
-            ctx.issues.push({
-              code: "custom",
-              message: "New password must be provided",
-              path: ["newPassword"],
-            });
-          }
-          if (oldPassword && newPassword && oldPassword === newPassword) {
-            ctx.issues.push({
-              code: "custom",
-              message: "Old password and new password must be different",
-              path: ["newPassword"],
-            });
-          }
-        }
-      })
-  ),
+  reqBodyValidatorMiddleware(changeUserInfoSchema),
   async (req, res) => {
     const { fullName, oldPassword, newPassword } = req.body;
     const isPasswordChangeRequested = oldPassword && newPassword;
     const changedFields = [];
-    const projection = { email: 1 };
+    const projection = {};
     if (fullName) projection.fullName = 1;
     if (isPasswordChangeRequested) projection.password = 1;
-
-    const foundUser = await User.findOne(
-      {
-        _id: req.userId,
-        email: req.email,
-      },
-      projection
-    );
+    const foundUser = await Users.findById(req.userId, projection);
 
     if (!foundUser) {
       logger.warn(
         "access token",
-        `Valid access token but user not found in db , user id: ${req.userId}, user email: ${req.email}`
+        `Valid access token but user not found in db, user id: ${req.userId}`
       );
       throw new ApiError({
-        statusCode: 404,
+        statusCode: 404, // Not Found
         message: "User not found",
       });
     }
@@ -332,7 +337,6 @@ router.put(
       changedFields.push("fullName");
     }
 
-    let accessToken;
     if (isPasswordChangeRequested) {
       const isOldPasswordValid = await verifyPassword(
         foundUser.password,
@@ -340,7 +344,7 @@ router.put(
       );
       if (!isOldPasswordValid) {
         throw new ApiError({
-          statusCode: 400,
+          statusCode: 400, // Bad Request
           message: "Old password is incorrect",
         });
       }
@@ -350,36 +354,60 @@ router.put(
       );
       if (isNewPasswordSameAsOldPassword) {
         throw new ApiError({
-          statusCode: 400,
+          statusCode: 400, // Bad Request
           message: "Old password and new password must be different",
         });
       }
-      accessToken = await setAuthTokens(res, foundUser);
+
+      const userForToken = {
+        _id: foundUser._id,
+        userName: req.userName,
+      };
+
+      await revokeOldAccessToken(req);
+      await setAuthTokens(res, userForToken, getRefreshTokenExpiry());
       foundUser.password = newPassword;
       changedFields.push("password");
     }
 
     await foundUser.save();
+
+    let data = null;
+    if (changedFields.includes("fullName")) {
+      data = { user: { fullName } };
+    }
+
     return new ApiResponse(
       res,
-      200,
-      isPasswordChangeRequested
-        ? {
-            accessToken,
-            user: {
-              _id: foundUser._id,
-              email: foundUser.email,
-              fullName: foundUser.fullName,
-            },
-          }
-        : {
-            user: {
-              _id: foundUser._id,
-              email: foundUser.email,
-              fullName: foundUser.fullName,
-            },
-          },
-      `${changedFields.join(", ")} ${changedFields.length > 1 ? "are" : "is"} updated successfully`
+      changedFields.length > 0 ? 200 : 204, // OK if updated, No Content if nothing to update
+      data,
+      changedFields.length > 0
+        ? `${changedFields.join(", ")} ${
+            changedFields.length > 1 ? "are" : "is"
+          } updated successfully`
+        : "Nothing to update"
+    );
+  }
+);
+
+router.post(
+  "/get-curr-fullname",
+  authenticateAccessTokenMiddleware,
+  reqBodyValidatorMiddleware(
+    z.object({
+      userName: userNameSchema,
+    })
+  ),
+  async (req, res) => {
+    const { userName } = req.body;
+    const user = await Users.findOne({ userName })
+      .select("-_id fullName")
+      .lean();
+    return new ApiResponse(
+      res,
+      200, // OK
+      { currFullName: user.fullName },
+      "Full name retrieved successfully"
     );
   }
 );

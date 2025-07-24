@@ -1,6 +1,9 @@
 import jwt from "jsonwebtoken";
-import { ApiError, ServerError } from "./Errors.js";
+import { randomUUID } from "node:crypto";
+import { Users } from "../db/models/users.models.js";
+import { RevokedTokens } from "../db/models/revokedTokens.models.js";
 import logger from "./logger.js";
+import { ApiError, ServerError } from "./Errors.js";
 import {
   getAccessTokenExpiry,
   getAccessTokenSecret,
@@ -8,17 +11,17 @@ import {
   getRefreshTokenSecret,
   isEnvDEVELOPMENT,
 } from "./envTeller.js";
-import { User } from "../db/models/user.model.js";
 
-const generateToken = (payload, token_secret, token_expiry) => {
-  if (!token_secret || !token_expiry || !payload) {
-    logger.error("token", "Invalid inputs for generateToken");
+const signToken = (payload, secret, expiresIn) => {
+  if (!payload || !secret || !expiresIn) {
+    logger.error("authService", "Missing inputs for signToken");
     throw new ServerError();
   }
   try {
-    return jwt.sign(payload, token_secret, { expiresIn: token_expiry });
+    return jwt.sign(payload, secret, { expiresIn });
   } catch (err) {
     if (err instanceof jwt.JsonWebTokenError || err instanceof TypeError) {
+      logger.error("jwt token", "Error while signing token", err);
       throw new ApiError({
         statusCode: 400,
         message: "Invalid inputs",
@@ -27,55 +30,114 @@ const generateToken = (payload, token_secret, token_expiry) => {
     throw err;
   }
 };
-const getRefreshTokenAndAccessToken = (payload) => {
-  const accessToken = generateToken(
-    payload,
+
+const generateAuthTokens = ({ userId, userName }, refreshTokenExpiryMs) => {
+  const accessToken = signToken(
+    { userId, userName, jti: randomUUID() },
     getAccessTokenSecret(),
-    getAccessTokenExpiry(),
+    getAccessTokenExpiry()
   );
-  const refreshToken = generateToken(
-    payload,
+
+  const refreshToken = signToken(
+    { userId, userName },
     getRefreshTokenSecret(),
-    getRefreshTokenExpiry(),
+    refreshTokenExpiryMs
   );
-  return { refreshToken, accessToken };
+  return { accessToken, refreshToken };
 };
-const setAuthTokens = async (res, user) => {
-  const { refreshToken, accessToken } = getRefreshTokenAndAccessToken({
-    userId: user._id,
-    email: user.email,
-  });
 
-  let updatedUser;
-  try {
-    updatedUser = await User.findOneAndUpdate(
-      { _id: user._id, email: user.email },
-      { refreshToken },
-      { new: true, runValidators: true },
-    );
-  } catch (err) {
-    logger.error(
-      "refresh token",
-      "Error when setting refresh token in mongodb",
-      err,
-    );
-    throw err;
+const persistRefreshToken = async (userId, refreshToken) => {
+  const user = await Users.findByIdAndUpdate(
+    userId,
+    { refreshToken },
+    { new: true, runValidators: true }
+  ).lean();
+  if (!user) {
+    throw new ApiError({ statusCode: 404, message: "User not found" });
   }
+  return user;
+};
 
-  if (!updatedUser) {
-    throw new ApiError({
-      statusCode: 400,
-      message: "User not found or failed to update",
-    });
-  }
-
-  res.cookie("refreshToken", refreshToken, {
+const setRefreshCookie = (res, token, maxAge) => {
+  res.cookie("refreshToken", token, {
     httpOnly: true,
     sameSite: isEnvDEVELOPMENT() ? "lax" : "strict",
     secure: !isEnvDEVELOPMENT(),
-    maxAge: getRefreshTokenExpiry(),
+    maxAge,
   });
-
-  return accessToken;
 };
-export default setAuthTokens;
+
+const setAccessTokenCookie = (res, token, maxAge) => {
+  res.cookie("accessToken", token, {
+    httpOnly: true,
+    sameSite: isEnvDEVELOPMENT() ? "lax" : "strict",
+    secure: !isEnvDEVELOPMENT(),
+    maxAge,
+  });
+};
+
+export const setAuthTokens = async (res, user, refreshTokenExpiryMs) => {
+  const expiryMs = refreshTokenExpiryMs || getRefreshTokenExpiry();
+
+  const { accessToken, refreshToken } = generateAuthTokens(
+    {
+      userId: user._id,
+      userName: user.userName,
+    },
+    expiryMs
+  );
+
+  await persistRefreshToken(user._id, refreshToken);
+  setRefreshCookie(res, refreshToken, expiryMs);
+  setAccessTokenCookie(res, accessToken, getAccessTokenExpiry());
+};
+
+export const isRevokedToken = async (jti) => {
+  const found = await RevokedTokens.findById(jti).lean();
+  return Boolean(found);
+};
+
+export const clearRefreshTokenCookie = (res, options) => {
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    sameSite: "strict",
+    secure: !isEnvDEVELOPMENT(),
+    ...options,
+  });
+};
+
+export const revokeOldAccessToken = async (req) => {
+  const accessToken = req.cookies?.accessToken;
+  if (!accessToken) {
+    throw new ApiError({
+      statusCode: 400,
+      message: "Access token missing",
+    });
+  }
+
+  let decoded;
+  try {
+    decoded = jwt.decode(accessToken);
+    if (!decoded?.jti) {
+      throw new ApiError({ statusCode: 400, message: "Invalid token" });
+    }
+  } catch (err) {
+    logger.error("access token", err);
+    throw err;
+  }
+
+  const jti = decoded.jti;
+  await RevokedTokens.create({
+    _id: jti,
+  });
+};
+
+export const clearAuthCookies = (res, options = {}) => {
+  clearRefreshTokenCookie(res, options);
+  res.clearCookie("accessToken", {
+    httpOnly: true,
+    sameSite: "strict",
+    secure: !isEnvDEVELOPMENT(),
+    ...options,
+  });
+};

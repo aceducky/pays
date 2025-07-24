@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { fullNameField } from "./commonFields.js";
+import { fullNameField, userNameField } from "./commonFields.js";
 import { paymentSettings } from "../../settings/paymentSettings.js";
 import {
   isValidAmountFormat,
@@ -10,22 +10,26 @@ const paymentSchema = new mongoose.Schema(
   {
     senderId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "Users",
       required: true,
       immutable: true,
     },
     receiverId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "Users",
       required: true,
       immutable: true,
     },
-    senderFullNameSnapshot: fullNameField("Full name of Sender", {
+    // ---EMBEDDED FIELDS---
+    senderUserName: userNameField(),
+    receiverUserName: userNameField(),
+    senderFullNameSnapshot: fullNameField({
       immutable: true,
     }),
-    receiverFullNameSnapshot: fullNameField("Full name of Receiver", {
+    receiverFullNameSnapshot: fullNameField({
       immutable: true,
     }),
+    //---
     amount: {
       type: Number,
       required: [true, "Amount is required"],
@@ -58,11 +62,10 @@ const paymentSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+    strict: "throw",
   }
 );
 
-paymentSchema.index({ senderId: 1, receiverId: 1 });
-paymentSchema.index({ receiverId: 1 });
-const Payment = mongoose.model("Payment", paymentSchema);
+const Payments = mongoose.model("Payments", paymentSchema);
 
-export { Payment };
+export { Payments };

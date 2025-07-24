@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_muu3HqFa8M
 createdAt: 2025-07-09T12:02:32.184088600
-updatedAt: 2025-07-11T14:54:42.117953700
+updatedAt: 2025-07-20T07:17:05.523559600
 workspaceId: wk_6KezG4VDZ3
 folderId: null
 authentication: {}
@@ -11,6 +11,7 @@ body:
   text: |-
     {
       "email" : "a@a.com",
+      "userName": "abc",
       "fullName" : "user one",
       "password" : "12345678"
     }

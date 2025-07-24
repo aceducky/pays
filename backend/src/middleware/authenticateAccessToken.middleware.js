@@ -3,51 +3,51 @@ import { getAccessTokenSecret } from "../utils/envTeller.js";
 import jwt from "jsonwebtoken";
 import logger from "../utils/logger.js";
 import { setEmergencyOnAndBlockAllRequests } from "../utils/setEmergencyOnAndBlockAllRequests.js";
-import { emailSchema, userIdSchema } from "../zodSchemas.js";
+import { decodedJwtSchema } from "../zodSchemas.js";
+import { isRevokedToken } from "../utils/tokenHelper.js";
 
-const authenticateAccessTokenMiddleware = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader) {
+const authenticateAccessTokenMiddleware = async (req, res, next) => {
+  const accessToken = req.cookies?.accessToken;
+  if (!accessToken) {
     throw new ApiError({
       statusCode: 401,
-      message: "Authorization header missing",
-    });
-  }
-
-  const [scheme, token] = authHeader.split(" ");
-
-  if (scheme !== "Bearer" || !token) {
-    throw new ApiError({
-      statusCode: 401,
-      message: "Invalid Authorization header",
+      message: "Access token missing",
     });
   }
 
   const accessTokenSecret = getAccessTokenSecret();
-
   try {
-    const decoded = jwt.verify(token, accessTokenSecret);
-    if (
-      !userIdSchema.safeParse(decoded.userId).success ||
-      !emailSchema.safeParse(decoded.email).success
-    ) {
+    const decoded = jwt.verify(accessToken, accessTokenSecret);
+
+    if (!decodedJwtSchema.safeParse(decoded).success) {
       logger.error(
         "EMERGENCY",
-        "User id or email is invalid but the related access token is valid",
+        "User's name or email is invalid but the related access token is valid",
         "token info:",
         decoded
       );
       return setEmergencyOnAndBlockAllRequests(res);
     }
+
+    if (await isRevokedToken(decoded.jti)) {
+      throw new ApiError({
+        statusCode: 401,
+        message: "Invalid or expired token",
+      });
+    }
+
     req.userId = decoded.userId;
-    req.email = decoded.email;
+    req.userName = decoded.userName;
     next();
   } catch (err) {
+    if (err instanceof ApiError) {
+      throw err;
+    }
+
     logger.error("access token", err);
     throw new ApiError({
       statusCode: 401,
-      message: "Invalid or expired access token",
+      message: "Invalid or expired token",
     });
   }
 };

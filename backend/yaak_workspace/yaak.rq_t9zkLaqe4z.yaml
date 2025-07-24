@@ -12,16 +12,16 @@ body:
 bodyType: null
 description: ''
 headers:
+- enabled: false
+  name: ''
+  value: ''
+  id: 8EfZ53TBMR
 - enabled: true
   name: ''
   value: ''
-  id: eZkET9VmiQ
-- enabled: true
-  name: ''
-  value: ''
-  id: bqwGUXX5BJ
+  id: npf8IAgicE
 method: POST
 name: user/refresh-token
-sortPriority: 10000.0
+sortPriority: 11000.0
 url: ${[ user ]}/refresh-token
 urlParameters: []

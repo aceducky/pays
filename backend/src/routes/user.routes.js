@@ -59,7 +59,7 @@ router.post(
 
       return new ApiResponse(
         res,
-        201,
+        201, // Created
         {
           user: {
             email: user.email,
@@ -73,7 +73,7 @@ router.post(
     } catch (err) {
       if (err.code === 11000) {
         throw new ApiError({
-          statusCode: 409,
+          statusCode: 409, // Conflict
           message: "User already exists",
         });
       }
@@ -98,7 +98,7 @@ router.post(
     const user = await Users.findOne({ email }).select("-refreshToken").lean();
     if (!user) {
       throw new ApiError({
-        statusCode: 401,
+        statusCode: 401, // Unauthorized
         message: "Invalid credentials",
       });
     }
@@ -106,7 +106,7 @@ router.post(
     const isPasswordValid = await verifyPassword(user.password, password);
     if (!isPasswordValid) {
       throw new ApiError({
-        statusCode: 401,
+        statusCode: 401, // Unauthorized
         message: "Invalid credentials",
       });
     }
@@ -115,7 +115,7 @@ router.post(
 
     return new ApiResponse(
       res,
-      200,
+      200, // OK
       {
         user: {
           email,
@@ -172,7 +172,7 @@ router.get("/bulk", authenticateAccessTokenMiddleware, async (req, res) => {
 
   return new ApiResponse(
     res,
-    200,
+    200, // OK
     {
       users,
       pagination: {
@@ -193,7 +193,7 @@ router.get("/balance", authenticateAccessTokenMiddleware, async (req, res) => {
   }).lean();
   return new ApiResponse(
     res,
-    200,
+    200, // OK
     balance,
     "User balance retrieved successfully"
   );
@@ -205,7 +205,7 @@ router.post("/refresh-token", async (req, res) => {
 
   if (!oldRefreshToken) {
     throw new ApiError({
-      statusCode: 401,
+      statusCode: 401, // Unauthorized
       message: "Invalid or expired refresh token",
     });
   }
@@ -214,7 +214,7 @@ router.post("/refresh-token", async (req, res) => {
   if (currentAccessToken) {
     try {
       jwt.verify(currentAccessToken, getAccessTokenSecret());
-      return new ApiResponse(res, 200, null, "Access token still valid");
+      return new ApiResponse(res, 200, null, "Access token still valid"); // OK
     } catch (err) {
       if (!(err instanceof jwt.TokenExpiredError)) {
         // Log and throw other errors (e.g., malformed token, invalid signature)
@@ -223,7 +223,7 @@ router.post("/refresh-token", async (req, res) => {
           name: err.name,
         });
         throw new ApiError({
-          statusCode: 401,
+          statusCode: 401, // Unauthorized
           message: "Invalid access token",
         });
       }
@@ -244,14 +244,14 @@ router.post("/refresh-token", async (req, res) => {
       name: err.name,
     });
     throw new ApiError({
-      statusCode: 403,
+      statusCode: 403, // Forbidden
       message: "Invalid or expired refresh token",
     });
   }
 
   if (!userId || !userName || !exp) {
     throw new ApiError({
-      statusCode: 403,
+      statusCode: 403, // Forbidden
       message: "Invalid or expired refresh token",
     });
   }
@@ -265,7 +265,7 @@ router.post("/refresh-token", async (req, res) => {
   // but kept for clarity
   if (remainingTimeMs <= 0) {
     throw new ApiError({
-      statusCode: 403,
+      statusCode: 403, // Forbidden
       message: "Invalid or expired refresh token",
     });
   }
@@ -281,7 +281,7 @@ router.post("/refresh-token", async (req, res) => {
       `User not found or update failed for userId: ${userId}, userName: ${userName}`
     );
     throw new ApiError({
-      statusCode: 403,
+      statusCode: 403, // Forbidden
       message: "Invalid or expired refresh token",
     });
   }
@@ -289,7 +289,7 @@ router.post("/refresh-token", async (req, res) => {
   await revokeOldAccessToken(req);
   await setAuthTokens(res, foundUser, remainingTimeMs);
 
-  return new ApiResponse(res, 200, null, "Access token refreshed");
+  return new ApiResponse(res, 200, null, "Access token refreshed"); // OK
 });
 
 router.post("/logout", authenticateAccessTokenMiddleware, async (req, res) => {
@@ -305,7 +305,7 @@ router.post("/logout", authenticateAccessTokenMiddleware, async (req, res) => {
 
   await revokeOldAccessToken(req);
   clearRefreshTokenCookie(res);
-  return new ApiResponse(res, 200, null, "Logged out successfully");
+  return new ApiResponse(res, 200, null, "Logged out successfully"); // OK
 });
 
 router.put(
@@ -327,7 +327,7 @@ router.put(
         `Valid access token but user not found in db, user id: ${req.userId}`
       );
       throw new ApiError({
-        statusCode: 401,
+        statusCode: 404, // Not Found
         message: "User not found",
       });
     }
@@ -344,7 +344,7 @@ router.put(
       );
       if (!isOldPasswordValid) {
         throw new ApiError({
-          statusCode: 400,
+          statusCode: 400, // Bad Request
           message: "Old password is incorrect",
         });
       }
@@ -354,7 +354,7 @@ router.put(
       );
       if (isNewPasswordSameAsOldPassword) {
         throw new ApiError({
-          statusCode: 400,
+          statusCode: 400, // Bad Request
           message: "Old password and new password must be different",
         });
       }
@@ -379,7 +379,7 @@ router.put(
 
     return new ApiResponse(
       res,
-      200,
+      changedFields.length > 0 ? 200 : 204, // OK if updated, No Content if nothing to update
       data,
       changedFields.length > 0
         ? `${changedFields.join(", ")} ${
@@ -405,7 +405,7 @@ router.post(
       .lean();
     return new ApiResponse(
       res,
-      200,
+      200, // OK
       { currFullName: user.fullName },
       "Full name retrieved successfully"
     );

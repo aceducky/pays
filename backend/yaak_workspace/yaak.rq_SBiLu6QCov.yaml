@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_SBiLu6QCov
 createdAt: 2025-07-10T07:35:11.474235700
-updatedAt: 2025-07-20T10:50:13.312929800
+updatedAt: 2025-07-24T09:50:45.533667400
 workspaceId: wk_6KezG4VDZ3
 folderId: null
 authentication: {}
@@ -20,15 +20,7 @@ headers:
 - enabled: true
   name: Content-Type
   value: application/json
-  id: 8pXzztxSt3
-- enabled: true
-  name: Authorization
-  value: Bearer ${[ response.body.path(request='rq_fup3mJps4a', path=b64'JC5kYXRhLmFjY2Vzc1Rva2Vu', behavior='smart') ]}
-  id: 26t9qD4b9v
-- enabled: true
-  name: ''
-  value: ''
-  id: cTXZw5Bv8k
+  id: nNkhbGYnpA
 method: POST
 name: payment from user two to user one
 sortPriority: 8000.0

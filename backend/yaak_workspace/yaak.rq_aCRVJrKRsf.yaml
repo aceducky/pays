@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_aCRVJrKRsf
 createdAt: 2025-07-11T06:45:32.700824200
-updatedAt: 2025-07-20T07:17:05.670376700
+updatedAt: 2025-07-24T09:48:53.628271700
 workspaceId: wk_6KezG4VDZ3
 folderId: null
 authentication: {}
@@ -12,15 +12,15 @@ bodyType: null
 description: ''
 headers:
 - enabled: true
-  name: Authorization
-  value: Bearer ${[ response.body.path(request='rq_GQNttepnow', path=b64'JC5kYXRhLmFjY2Vzc1Rva2Vu', behavior='smart') ]}
-  id: jJ4IGg96n6
-- enabled: true
   name: ''
   value: ''
-  id: IfdEuU8EDB
+  id: 6N565KWiSr
+- enabled: false
+  name: ''
+  value: ''
+  id: jJ4IGg96n6
 method: GET
-name: user one payments/
+name: user payments/
 sortPriority: 5000.0
 url: ${[ payments ]}/
 urlParameters: []

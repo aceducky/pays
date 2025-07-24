@@ -67,6 +67,15 @@ const setRefreshCookie = (res, token, maxAge) => {
   });
 };
 
+const setAccessTokenCookie = (res, token, maxAge) => {
+  res.cookie("accessToken", token, {
+    httpOnly: true,
+    sameSite: isEnvDEVELOPMENT() ? "lax" : "strict",
+    secure: !isEnvDEVELOPMENT(),
+    maxAge,
+  });
+};
+
 export const setAuthTokens = async (res, user, refreshTokenExpiryMs) => {
   const expiryMs = refreshTokenExpiryMs || getRefreshTokenExpiry();
 
@@ -80,8 +89,7 @@ export const setAuthTokens = async (res, user, refreshTokenExpiryMs) => {
 
   await persistRefreshToken(user._id, refreshToken);
   setRefreshCookie(res, refreshToken, expiryMs);
-
-  return accessToken;
+  setAccessTokenCookie(res, accessToken, getAccessTokenExpiry());
 };
 
 export const isRevokedToken = async (jti) => {
@@ -97,14 +105,14 @@ export const clearRefreshTokenCookie = (res, options) => {
   });
 };
 export const revokeOldAccessToken = async (req) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) {
+  const accessToken = req.cookies?.accessToken;
+  if (!accessToken) {
     throw new ApiError({
       statusCode: 400,
-      message: "Invalid authorization header",
+      message: "Access token missing",
     });
   }
-  const accessToken = authHeader.split(" ")[1];
+
   let decoded;
   try {
     decoded = jwt.decode(accessToken);
@@ -118,5 +126,15 @@ export const revokeOldAccessToken = async (req) => {
   const jti = decoded.jti;
   await RevokedTokens.create({
     _id: jti,
+  });
+};
+
+export const clearAuthCookies = (res, options = {}) => {
+  clearRefreshTokenCookie(res, options);
+  res.clearCookie("accessToken", {
+    httpOnly: true,
+    sameSite: "strict",
+    secure: !isEnvDEVELOPMENT(),
+    ...options,
   });
 };

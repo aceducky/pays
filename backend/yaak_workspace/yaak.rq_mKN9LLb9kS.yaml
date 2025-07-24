@@ -2,7 +2,7 @@ type: http_request
 model: http_request
 id: rq_mKN9LLb9kS
 createdAt: 2025-06-28T17:17:30.938548700
-updatedAt: 2025-07-23T17:53:21.478304900
+updatedAt: 2025-07-24T09:53:26.435059800
 workspaceId: wk_6KezG4VDZ3
 folderId: null
 authentication:
@@ -17,16 +17,16 @@ headers:
   name: Content-Type
   value: application/json
   id: vnG9psf6uD
-- enabled: true
-  name: Authorization
-  value: Bearer ${[ response.body.path(request='rq_GQNttepnow', path=b64'JC5kYXRhLmFjY2Vzc1Rva2Vu', behavior='smart') ]}
+- enabled: false
+  name: ''
+  value: ''
   id: fafjjiaR5u
 - enabled: true
   name: ''
   value: ''
-  id: u74SsaRICB
+  id: KBfQVY3icW
 method: POST
-name: user one /logout
+name: user /logout
 sortPriority: 12000.0
 url: ${[ user ]}/logout
 urlParameters: []

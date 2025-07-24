@@ -96,6 +96,7 @@ export const isRevokedToken = async (jti) => {
   const found = await RevokedTokens.findById(jti).lean();
   return Boolean(found);
 };
+
 export const clearRefreshTokenCookie = (res, options) => {
   res.clearCookie("refreshToken", {
     httpOnly: true,
@@ -104,6 +105,7 @@ export const clearRefreshTokenCookie = (res, options) => {
     ...options,
   });
 };
+
 export const revokeOldAccessToken = async (req) => {
   const accessToken = req.cookies?.accessToken;
   if (!accessToken) {
@@ -123,6 +125,7 @@ export const revokeOldAccessToken = async (req) => {
     logger.error("access token", err);
     throw err;
   }
+
   const jti = decoded.jti;
   await RevokedTokens.create({
     _id: jti,

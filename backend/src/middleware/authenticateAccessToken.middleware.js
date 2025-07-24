@@ -7,25 +7,17 @@ import { decodedJwtSchema } from "../zodSchemas.js";
 import { isRevokedToken } from "../utils/tokenHelper.js";
 
 const authenticateAccessTokenMiddleware = async (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) {
+  const accessToken = req.cookies?.accessToken;
+  if (!accessToken) {
     throw new ApiError({
       statusCode: 401,
-      message: "Authorization header missing",
-    });
-  }
-
-  const [scheme, token] = authHeader.split(" ");
-  if (scheme !== "Bearer" || !token) {
-    throw new ApiError({
-      statusCode: 401,
-      message: "Invalid Authorization header",
+      message: "Access token missing",
     });
   }
 
   const accessTokenSecret = getAccessTokenSecret();
   try {
-    const decoded = jwt.verify(token, accessTokenSecret);
+    const decoded = jwt.verify(accessToken, accessTokenSecret);
 
     if (!decodedJwtSchema.safeParse(decoded).success) {
       logger.error(

@@ -205,7 +205,7 @@ router.post(
       });
 
       const formattedPayment = getFormattedPayment(result);
-      return new ApiResponse(res, 200, formattedPayment, "Payments successful");
+      return new ApiResponse(res, 200, formattedPayment, "Payment successful");
     } catch (err) {
       if (err instanceof ApiError) {
         throw err;

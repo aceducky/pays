@@ -7,6 +7,7 @@ export default function Field({
   id,
   isRequired,
   placeholder,
+  instructions,
 }) {
   return (
     <div className="grid gap-2">
@@ -19,6 +20,7 @@ export default function Field({
         placeholder={placeholder}
         required={isRequired}
       />
+      <div className="text-gray-400 text-[0.95rem]">{instructions}</div>
     </div>
   );
 }

@@ -4,14 +4,14 @@ import jwt from "jsonwebtoken";
 import logger from "../utils/logger.js";
 import { setEmergencyOnAndBlockAllRequests } from "../utils/setEmergencyOnAndBlockAllRequests.js";
 import { decodedJwtSchema } from "../zodSchemas.js";
-import { isRevokedToken } from "../utils/tokenHelper.js";
 
 const authenticateAccessTokenMiddleware = async (req, res, next) => {
   const accessToken = req.cookies?.accessToken;
   if (!accessToken) {
     throw new ApiError({
       statusCode: 401,
-      message: "Access token missing",
+      //Access token missing
+      message: "Login required to access this feature",
     });
   }
 
@@ -29,13 +29,6 @@ const authenticateAccessTokenMiddleware = async (req, res, next) => {
       return setEmergencyOnAndBlockAllRequests(res);
     }
 
-    if (await isRevokedToken(decoded.jti)) {
-      throw new ApiError({
-        statusCode: 401,
-        message: "Invalid or expired token",
-      });
-    }
-
     req.userId = decoded.userId;
     req.userName = decoded.userName;
     next();
@@ -47,7 +40,8 @@ const authenticateAccessTokenMiddleware = async (req, res, next) => {
     logger.error("access token", err);
     throw new ApiError({
       statusCode: 401,
-      message: "Invalid or expired token",
+      // "Invalid or expired token"
+      message: "Your session has expired or is invalid. Please log in",
     });
   }
 };

@@ -5,11 +5,7 @@ import ApiResponse from "../utils/ApiResponse.js";
 import { ApiError } from "../utils/Errors.js";
 import logger from "../utils/logger.js";
 import jwt from "jsonwebtoken";
-import {
-  clearRefreshTokenCookie,
-  revokeOldAccessToken,
-  setAuthTokens,
-} from "../utils/tokenHelper.js";
+import { clearAuthCookies, setAuthTokens } from "../utils/tokenHelper.js";
 import authenticateAccessTokenMiddleware from "../middleware/authenticateAccessToken.middleware.js";
 import { Users } from "../db/models/users.models.js";
 import {
@@ -200,76 +196,61 @@ router.get("/balance", authenticateAccessTokenMiddleware, async (req, res) => {
 });
 
 router.post("/refresh-token", async (req, res) => {
-  const oldRefreshToken = req.cookies?.refreshToken;
-  const currentAccessToken = req.cookies?.accessToken;
+  const { refreshToken: oldRefreshToken, accessToken: currentAccessToken } =
+    req.cookies || {};
 
-  if (!oldRefreshToken) {
-    throw new ApiError({
-      statusCode: 401, // Unauthorized
-      message: "Invalid or expired refresh token",
-    });
-  }
-
-  // Check if current access token is still valid
+  //First check if we even need to refresh
   if (currentAccessToken) {
+    const accessTokenSecret = getAccessTokenSecret();
     try {
-      jwt.verify(currentAccessToken, getAccessTokenSecret());
-      return new ApiResponse(res, 200, null, "Access token still valid"); // OK
+      jwt.verify(currentAccessToken, accessTokenSecret);
+      return new ApiResponse(res, 200, null, "Session still valid"); // OK
     } catch (err) {
+      // Only proceed with refresh if token is expired
       if (!(err instanceof jwt.TokenExpiredError)) {
-        // Log and throw other errors (e.g., malformed token, invalid signature)
         logger.error("/refresh-token", "Access token verification failed", {
           error: err.message,
           name: err.name,
         });
         throw new ApiError({
           statusCode: 401, // Unauthorized
-          message: "Invalid access token",
+          message: "Authentication required. Proceed to log in",
         });
       }
     }
   }
 
-  const refreshTokenSecret = getRefreshTokenSecret();
-  let userId, userName, exp;
-
-  try {
-    const decoded = jwt.verify(oldRefreshToken, refreshTokenSecret);
-    userId = decoded.userId;
-    userName = decoded.userName;
-    exp = decoded.exp;
-  } catch (err) {
-    logger.error("/refresh-token", "Refresh token verification failed", {
-      error: err.message,
-      name: err.name,
-    });
+  //Validate refresh token presence
+  if (!oldRefreshToken) {
     throw new ApiError({
-      statusCode: 403, // Forbidden
-      message: "Invalid or expired refresh token",
+      statusCode: 401, // Unauthorized
+      message: "Authentication required. Proceed to log in",
     });
   }
 
+  // Verify refresh token signature/expiry
+  let decoded;
+  const refreshTokenSecret = getRefreshTokenSecret();
+  try {
+    decoded = jwt.verify(oldRefreshToken, refreshTokenSecret);
+  } catch (err) {
+    logger.error("/refresh-token", "Refresh token verification failed", err);
+    throw new ApiError({
+      statusCode: 403, // Forbidden
+      message: "Authentication required. Proceed to log in",
+    });
+  }
+
+  // Validate decoded payload
+  const { userId, userName, exp } = decoded;
   if (!userId || !userName || !exp) {
     throw new ApiError({
       statusCode: 403, // Forbidden
-      message: "Invalid or expired refresh token",
+      message: "Authentication required. Proceed to log in",
     });
   }
 
-  // Calculate remaining time for refresh token
-  const now = Math.floor(Date.now() / 1000);
-  const remainingTimeMs = Math.max((exp - now) * 1000, 0);
-
-  // If token is expired, throw error
-  // this check is redundant because jwt.verify handles this
-  // but kept for clarity
-  if (remainingTimeMs <= 0) {
-    throw new ApiError({
-      statusCode: 403, // Forbidden
-      message: "Invalid or expired refresh token",
-    });
-  }
-
+  // Database lookup - verify user exists and token matches stored value
   const foundUser = await Users.findOne({
     _id: userId,
     refreshToken: oldRefreshToken,
@@ -278,18 +259,21 @@ router.post("/refresh-token", async (req, res) => {
   if (!foundUser) {
     logger.warn(
       "refresh token",
-      `User not found or update failed for userId: ${userId}, userName: ${userName}`
+      `User not found or token mismatch for userId: ${userId}, userName: ${userName}`
     );
     throw new ApiError({
       statusCode: 403, // Forbidden
-      message: "Invalid or expired refresh token",
+      message: "Authentication required. Proceed to log in",
     });
   }
 
-  await revokeOldAccessToken(req);
+  // Calculate remaining time and generate new tokens
+  const now = Math.floor(Date.now() / 1000);
+  const remainingTimeMs = (exp - now) * 1000;
+
   await setAuthTokens(res, foundUser, remainingTimeMs);
 
-  return new ApiResponse(res, 200, null, "Access token refreshed"); // OK
+  return new ApiResponse(res, 200, null, "Session refreshed successfully"); // OK
 });
 
 router.post("/logout", authenticateAccessTokenMiddleware, async (req, res) => {
@@ -303,8 +287,7 @@ router.post("/logout", authenticateAccessTokenMiddleware, async (req, res) => {
     });
   }
 
-  await revokeOldAccessToken(req);
-  clearRefreshTokenCookie(res);
+  clearAuthCookies(res);
   return new ApiResponse(res, 200, null, "Logged out successfully"); // OK
 });
 
@@ -364,7 +347,6 @@ router.put(
         userName: req.userName,
       };
 
-      await revokeOldAccessToken(req);
       await setAuthTokens(res, userForToken, getRefreshTokenExpiry());
       foundUser.password = newPassword;
       changedFields.push("password");

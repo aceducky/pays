@@ -1,7 +1,5 @@
 import jwt from "jsonwebtoken";
-import { randomUUID } from "node:crypto";
 import { Users } from "../db/models/users.models.js";
-import { RevokedTokens } from "../db/models/revokedTokens.models.js";
 import logger from "./logger.js";
 import { ApiError, ServerError } from "./Errors.js";
 import {
@@ -17,23 +15,25 @@ const signToken = (payload, secret, expiresIn) => {
     logger.error("authService", "Missing inputs for signToken");
     throw new ServerError();
   }
+
   try {
     return jwt.sign(payload, secret, { expiresIn });
   } catch (err) {
-    if (err instanceof jwt.JsonWebTokenError || err instanceof TypeError) {
+    if (err instanceof jwt.JsonWebTokenError) {
       logger.error("jwt token", "Error while signing token", err);
       throw new ApiError({
         statusCode: 400,
         message: "Invalid inputs",
       });
     }
-    throw err;
+    logger.error("jwt token", "Unexpected error while signing token", err);
+    throw new ServerError();
   }
 };
 
 const generateAuthTokens = ({ userId, userName }, refreshTokenExpiryMs) => {
   const accessToken = signToken(
-    { userId, userName, jti: randomUUID() },
+    { userId, userName },
     getAccessTokenSecret(),
     getAccessTokenExpiry()
   );
@@ -43,6 +43,7 @@ const generateAuthTokens = ({ userId, userName }, refreshTokenExpiryMs) => {
     getRefreshTokenSecret(),
     refreshTokenExpiryMs
   );
+
   return { accessToken, refreshToken };
 };
 
@@ -52,13 +53,15 @@ const persistRefreshToken = async (userId, refreshToken) => {
     { refreshToken },
     { new: true, runValidators: true }
   ).lean();
+
   if (!user) {
     throw new ApiError({ statusCode: 404, message: "User not found" });
   }
+
   return user;
 };
 
-const setRefreshCookie = (res, token, maxAge) => {
+const setRefreshTokenCookie = (res, token, maxAge) => {
   res.cookie("refreshToken", token, {
     httpOnly: true,
     sameSite: isEnvDEVELOPMENT() ? "lax" : "strict",
@@ -88,56 +91,25 @@ export const setAuthTokens = async (res, user, refreshTokenExpiryMs) => {
   );
 
   await persistRefreshToken(user._id, refreshToken);
-  setRefreshCookie(res, refreshToken, expiryMs);
+  setRefreshTokenCookie(res, refreshToken, expiryMs);
   setAccessTokenCookie(res, accessToken, getAccessTokenExpiry());
 };
 
-export const isRevokedToken = async (jti) => {
-  const found = await RevokedTokens.findById(jti).lean();
-  return Boolean(found);
-};
-
-export const clearRefreshTokenCookie = (res, options) => {
+export const clearAuthCookies = (
+  res,
+  refreshTokenCookieOptions = {},
+  accessTokenCookieOptions = {}
+) => {
   res.clearCookie("refreshToken", {
     httpOnly: true,
     sameSite: "strict",
     secure: !isEnvDEVELOPMENT(),
-    ...options,
+    ...refreshTokenCookieOptions,
   });
-};
-
-export const revokeOldAccessToken = async (req) => {
-  const accessToken = req.cookies?.accessToken;
-  if (!accessToken) {
-    throw new ApiError({
-      statusCode: 400,
-      message: "Access token missing",
-    });
-  }
-
-  let decoded;
-  try {
-    decoded = jwt.decode(accessToken);
-    if (!decoded?.jti) {
-      throw new ApiError({ statusCode: 400, message: "Invalid token" });
-    }
-  } catch (err) {
-    logger.error("access token", err);
-    throw err;
-  }
-
-  const jti = decoded.jti;
-  await RevokedTokens.create({
-    _id: jti,
-  });
-};
-
-export const clearAuthCookies = (res, options = {}) => {
-  clearRefreshTokenCookie(res, options);
   res.clearCookie("accessToken", {
     httpOnly: true,
     sameSite: "strict",
     secure: !isEnvDEVELOPMENT(),
-    ...options,
+    ...accessTokenCookieOptions,
   });
 };

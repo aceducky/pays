@@ -24,12 +24,10 @@ const getRefreshTokenSecret = () => getEnvVar("REFRESH_TOKEN_SECRET");
 const getRefreshTokenExpiry = () =>
   parseInt(getEnvVar("REFRESH_TOKEN_EXPIRY"), 10);
 const getMONGODB_URI = () => getEnvVar("MONGODB_URI");
-const getCORS_ORIGIN = () => getEnvVar("CORS_ORIGIN");
 
 export {
   getAccessTokenExpiry,
   getAccessTokenSecret,
-  getCORS_ORIGIN,
   getMONGODB_URI,
   getRefreshTokenExpiry,
   getRefreshTokenSecret,

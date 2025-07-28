@@ -68,9 +68,10 @@ router.post(
       );
     } catch (err) {
       if (err.code === 11000) {
+        const duplicateField = Object.keys(err.keyPattern)[0];
         throw new ApiError({
           statusCode: 409, // Conflict
-          message: "User already exists",
+          message: `User with ${duplicateField} already exists.`,
         });
       }
       throw err;
@@ -288,7 +289,7 @@ router.post("/logout", authenticateAccessTokenMiddleware, async (req, res) => {
   }
 
   clearAuthCookies(res);
-  return new ApiResponse(res, 200, null, "Logged out successfully"); // OK
+  return new ApiResponse(res, 200, { ok: true }, "Logged out successfully"); // OK
 });
 
 router.put(

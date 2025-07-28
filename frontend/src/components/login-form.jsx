@@ -38,8 +38,8 @@ export function LoginForm({ className, isSignup = true }) {
   const onSubmit = async (data) => {
     try {
       console.log("Form submitted:", data);
-      
-      isSignup ?  signup(data): login(data);
+
+      isSignup ? signup(data) : login(data);
     } catch (error) {
       console.error("Submission error:", error);
     }
@@ -76,7 +76,7 @@ export function LoginForm({ className, isSignup = true }) {
                     <FormControl>
                       <Input
                         type="email"
-                        placeholder="m@example.com"
+                        placeholder="email@example.com"
                         {...field}
                       />
                     </FormControl>

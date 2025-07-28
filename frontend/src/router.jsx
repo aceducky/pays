@@ -1,7 +1,9 @@
 import { createBrowserRouter } from "react-router";
 import Homepage from "./routes/Homepage.jsx";
 import { lazy } from "react";
-import { ProtectedRoute, PublicOnlyRoute } from "./auth/ProtectedRoute";
+import { PublicOnlyRoute } from "./auth/PublicOnlyRoute.jsx";
+import { ProtectedRoute } from "./auth/ProtectedRoute";
+import { AutoPublicPrivateRoute } from "./routes/AutoPublicPrivateRoute.jsx";
 
 const Dashboard = lazy(() => import("./routes/Dashboard.jsx"));
 const Signup = lazy(() => import("./routes/Signup.jsx"));
@@ -12,25 +14,25 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: (
-      <PublicOnlyRoute>
+      <AutoPublicPrivateRoute>
         <Homepage />
-      </PublicOnlyRoute>
+      </AutoPublicPrivateRoute>
     ),
   },
   {
     path: "/signup",
     element: (
-      <PublicOnlyRoute>
+      <AutoPublicPrivateRoute>
         <Signup />
-      </PublicOnlyRoute>
+      </AutoPublicPrivateRoute>
     ),
   },
   {
     path: "login",
     element: (
-      <PublicOnlyRoute>
+      <AutoPublicPrivateRoute>
         <Login />
-      </PublicOnlyRoute>
+      </AutoPublicPrivateRoute>
     ),
   },
   {
@@ -39,17 +41,17 @@ const router = createBrowserRouter([
       {
         index: true,
         element: (
-          <ProtectedRoute>
+          <AutoPublicPrivateRoute>
             <Dashboard />
-          </ProtectedRoute>
+          </AutoPublicPrivateRoute>
         ),
       },
       {
         path: "payments",
         element: (
-          <ProtectedRoute>
+          <AutoPublicPrivateRoute>
             <Payments />
-          </ProtectedRoute>
+          </AutoPublicPrivateRoute>
         ),
       },
     ],

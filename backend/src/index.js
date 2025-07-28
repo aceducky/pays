@@ -4,15 +4,21 @@ import cors from "cors";
 import { rootRouter } from "./routes/index.js";
 import cookieParser from "cookie-parser";
 import logger from "./utils/logger.js";
-import { getCORS_ORIGIN } from "./utils/envTeller.js";
 import { connectToMongoDB } from "./db/index.js";
 import { ApiError, ServerError } from "./utils/Errors.js";
 import { blockAllRequestsInEmergencyMiddleware } from "./middleware/blockAllRequestsInEmergency.middleware.js";
 
 const app = express();
+const allowedOrigins = ["http://localhost:5173","http://localhost:3000"];
 app.use(
   cors({
-    origin: getCORS_ORIGIN(),
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );

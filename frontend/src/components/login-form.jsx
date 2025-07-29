@@ -20,8 +20,8 @@ import {
 import { Input } from "@/src/components/ui/input.jsx";
 import { Button } from "@/src/components/ui/button.jsx";
 import { Link } from "react-router";
-import { useAuth } from "../auth/useAuth";
 import { Alert } from "@/src/components/ui/alert.jsx";
+import { useAuth } from "../auth/queryClient";
 
 export function LoginForm({ className, isSignup = true }) {
   const form = useForm({

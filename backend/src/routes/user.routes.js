@@ -5,12 +5,10 @@ import ApiResponse from "../utils/ApiResponse.js";
 import { ApiError } from "../utils/Errors.js";
 import logger from "../utils/logger.js";
 import jwt from "jsonwebtoken";
-import { clearAuthCookies, setAuthTokens } from "../utils/tokenHelper.js";
+import { clearAuthCookies, setNewAuthTokens } from "../utils/tokenHelper.js";
 import authenticateAccessTokenMiddleware from "../middleware/authenticateAccessToken.middleware.js";
 import { Users } from "../db/models/users.models.js";
 import {
-  getAccessTokenSecret,
-  getRefreshTokenExpiry,
   getRefreshTokenSecret,
 } from "../utils/envTeller.js";
 import {
@@ -51,7 +49,7 @@ router.post(
         balance: to2DecimalPlaces(Math.floor(Math.random() * 10000)),
       });
 
-      await setAuthTokens(res, user);
+      await setNewAuthTokens(res, user);
 
       return new ApiResponse(
         res,
@@ -108,7 +106,7 @@ router.post(
       });
     }
 
-    await setAuthTokens(res, user, getRefreshTokenExpiry());
+    await setNewAuthTokens(res, user);
 
     return new ApiResponse(
       res,
@@ -197,32 +195,12 @@ router.get("/balance", authenticateAccessTokenMiddleware, async (req, res) => {
 });
 
 router.post("/refresh-token", async (req, res) => {
-  const { refreshToken: oldRefreshToken, accessToken: currentAccessToken } =
+  const { refreshToken: oldRefreshToken } =
     req.cookies || {};
-
-  //First check if we even need to refresh
-  if (currentAccessToken) {
-    const accessTokenSecret = getAccessTokenSecret();
-    try {
-      jwt.verify(currentAccessToken, accessTokenSecret);
-      return new ApiResponse(res, 200, null, "Session still valid"); // OK
-    } catch (err) {
-      // Only proceed with refresh if token is expired
-      if (!(err instanceof jwt.TokenExpiredError)) {
-        logger.error("/refresh-token", "Access token verification failed", {
-          error: err.message,
-          name: err.name,
-        });
-        throw new ApiError({
-          statusCode: 401, // Unauthorized
-          message: "Authentication required. Proceed to log in",
-        });
-      }
-    }
-  }
 
   //Validate refresh token presence
   if (!oldRefreshToken) {
+    console.log("p1")
     throw new ApiError({
       statusCode: 401, // Unauthorized
       message: "Authentication required. Proceed to log in",
@@ -235,6 +213,7 @@ router.post("/refresh-token", async (req, res) => {
   try {
     decoded = jwt.verify(oldRefreshToken, refreshTokenSecret);
   } catch (err) {
+    console.log("p2")
     logger.error("/refresh-token", "Refresh token verification failed", err);
     throw new ApiError({
       statusCode: 403, // Forbidden
@@ -245,6 +224,7 @@ router.post("/refresh-token", async (req, res) => {
   // Validate decoded payload
   const { userId, userName, exp } = decoded;
   if (!userId || !userName || !exp) {
+    console.log("p3")
     throw new ApiError({
       statusCode: 403, // Forbidden
       message: "Authentication required. Proceed to log in",
@@ -262,6 +242,7 @@ router.post("/refresh-token", async (req, res) => {
       "refresh token",
       `User not found or token mismatch for userId: ${userId}, userName: ${userName}`
     );
+    console.log("p4")
     throw new ApiError({
       statusCode: 403, // Forbidden
       message: "Authentication required. Proceed to log in",
@@ -272,7 +253,7 @@ router.post("/refresh-token", async (req, res) => {
   const now = Math.floor(Date.now() / 1000);
   const remainingTimeMs = (exp - now) * 1000;
 
-  await setAuthTokens(res, foundUser, remainingTimeMs);
+  await setNewAuthTokens(res, foundUser, remainingTimeMs);
 
   return new ApiResponse(res, 200, null, "Session refreshed successfully"); // OK
 });
@@ -348,7 +329,7 @@ router.put(
         userName: req.userName,
       };
 
-      await setAuthTokens(res, userForToken, getRefreshTokenExpiry());
+      await setNewAuthTokens(res, userForToken);
       foundUser.password = newPassword;
       changedFields.push("password");
     }

@@ -7,8 +7,8 @@ export const AUTH_QUERY_KEY = ["auth"];
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: 1,
-      staleTime: 1 * 60 * 1000, 
+      retry: 2,
+      staleTime: 1 * 60 * 1000, // 1 minutes
     },
   },
 });
@@ -17,7 +17,20 @@ export function useAuth() {
   const [isAuthenticated, setIsAuthenticated] = useAtom(isAuthenticatedAtom);
   const login = useMutation({
     mutationFn: async (data) => {
-      return await api.post("/user/login", data);
+      let res;
+      try {
+        res = await api.post("/user/login", data);
+        return res?.data;
+      } catch (err) {
+        if (err.response?.status === 401) {
+          /* todo: implement
+              main apiRequest function and
+              wrapper functions: apiGet, apiPost,apiPut,apiDelete to handle 401 directly when we get a 401,
+               make a request to /refresh-token and redo the request,
+               its better this way*/
+          console.log("YET TO DO");
+        }
+      }
     },
     onSuccess: () => {
       setIsAuthenticated(true);

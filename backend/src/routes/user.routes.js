@@ -9,10 +9,12 @@ import { clearAuthCookies, setNewAuthTokens } from "../utils/tokenHelper.js";
 import authenticateAccessTokenMiddleware from "../middleware/authenticateAccessToken.middleware.js";
 import { Users } from "../db/models/users.models.js";
 import {
+  getAccessTokenSecret,
   getRefreshTokenSecret,
 } from "../utils/envTeller.js";
 import {
   changeUserInfoSchema,
+  decodedAccessTokenSchema,
   emailSchema,
   fullNameSchema,
   passwordSchema,
@@ -195,12 +197,33 @@ router.get("/balance", authenticateAccessTokenMiddleware, async (req, res) => {
 });
 
 router.post("/refresh-token", async (req, res) => {
-  const { refreshToken: oldRefreshToken } =
+  console.log(new Date(), "hit now");
+  const { refreshToken: oldRefreshToken, accessToken: currentAccessToken } =
     req.cookies || {};
+  const accessTokenSecret = getAccessTokenSecret();
 
-  //Validate refresh token presence
+  // Check if current access token is still valid
+  try {
+    const decoded = jwt.verify(currentAccessToken, accessTokenSecret);
+    const parseResult = decodedAccessTokenSchema.safeParse(decoded);
+    if (parseResult.success) {
+      return new ApiResponse(res, 200, null, "Session already valid");
+    }
+    // If schema validation fails, treat as expired and continue to refresh
+  } catch (err) {
+    // Only proceed to refresh if token is expired
+    if (err.name !== "TokenExpiredError") {
+      throw new ApiError({
+        statusCode: 401, // Unauthorized - invalid token format/signature
+        message: "Authentication required. Proceed to log in",
+      });
+    }
+    // Token is expired, continue with refresh flow
+  }
+
+  // Validate refresh token presence
   if (!oldRefreshToken) {
-    console.log("p1")
+    console.log("p1");
     throw new ApiError({
       statusCode: 401, // Unauthorized
       message: "Authentication required. Proceed to log in",
@@ -213,10 +236,10 @@ router.post("/refresh-token", async (req, res) => {
   try {
     decoded = jwt.verify(oldRefreshToken, refreshTokenSecret);
   } catch (err) {
-    console.log("p2")
+    console.log("p2");
     logger.error("/refresh-token", "Refresh token verification failed", err);
     throw new ApiError({
-      statusCode: 403, // Forbidden
+      statusCode: 401, // Unauthorized - invalid refresh token
       message: "Authentication required. Proceed to log in",
     });
   }
@@ -224,9 +247,9 @@ router.post("/refresh-token", async (req, res) => {
   // Validate decoded payload
   const { userId, userName, exp } = decoded;
   if (!userId || !userName || !exp) {
-    console.log("p3")
+    console.log("p3");
     throw new ApiError({
-      statusCode: 403, // Forbidden
+      statusCode: 401, // Unauthorized - malformed token payload
       message: "Authentication required. Proceed to log in",
     });
   }
@@ -242,9 +265,9 @@ router.post("/refresh-token", async (req, res) => {
       "refresh token",
       `User not found or token mismatch for userId: ${userId}, userName: ${userName}`
     );
-    console.log("p4")
+    console.log("p4");
     throw new ApiError({
-      statusCode: 403, // Forbidden
+      statusCode: 401, // Unauthorized - user not found or token mismatch
       message: "Authentication required. Proceed to log in",
     });
   }
@@ -255,7 +278,7 @@ router.post("/refresh-token", async (req, res) => {
 
   await setNewAuthTokens(res, foundUser, remainingTimeMs);
 
-  return new ApiResponse(res, 200, null, "Session refreshed successfully"); // OK
+  return new ApiResponse(res, 200, null, "Session refreshed successfully");
 });
 
 router.post("/logout", authenticateAccessTokenMiddleware, async (req, res) => {

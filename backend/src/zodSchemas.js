@@ -44,7 +44,7 @@ export const fullNameSchema = z
     }
   );
 
-export const decodedJwtSchema = z.object({
+export const decodedAccessTokenSchema = z.object({
   userId: userIdSchema,
   userName: userNameSchema,
 });

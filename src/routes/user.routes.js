@@ -93,7 +93,7 @@ router.get("/balance", authMiddleware, async (req, res) => {
   });
 });
 
-router.put(
+router.patch(
   "/fullName",
   authMiddleware,
   reqBodyValidatorMiddleware(

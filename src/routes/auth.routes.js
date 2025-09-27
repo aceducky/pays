@@ -168,7 +168,7 @@ router.post("/logout", authMiddleware, async (req, res) => {
   });
 });
 
-router.put(
+router.post(
   "/password",
   authMiddleware,
   criticalOperationMiddleware,

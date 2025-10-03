@@ -10,7 +10,7 @@ import {
   fullNameSchema,
   queryUsersSchema,
   userNameSchema,
-} from "../zodSchemas.js";
+} from "../zodSchemas/userZodSchema.js";
 import { getPaginationValues } from "../utils/reqQueryHelper.js";
 import mongoose from "mongoose";
 import { centsToDollars } from "../utils/amountHelpers.js";
@@ -34,7 +34,7 @@ router.get("/bulk", authMiddleware, async (req, res) => {
 
   if (filterQuery) {
     // Use regex search on userName field when filter is provided
-    const regex = new RegExp(filterQuery, "i");
+    const regex = new RegExp("^" + filterQuery, "i");
 
     [users, total] = await Promise.all([
       Users.find(
@@ -143,7 +143,7 @@ router.patch(
 );
 
 router.post(
-  "/get-curr-fullName",
+  "/get-current-fullname",
   authMiddleware,
   reqBodyValidatorMiddleware(
     z.object({
@@ -158,7 +158,7 @@ router.post(
     return new ApiResponse({
       res,
       statusCode: 200,
-      data: { currFullName: user.fullName },
+      data: { fullName: user.fullName },
       message: "Full name retrieved successfully",
     });
   }

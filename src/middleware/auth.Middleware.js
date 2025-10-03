@@ -1,7 +1,7 @@
 import { ApiError, ServerError } from "../utils/Errors.js";
 import { getAccessTokenSecret } from "../utils/envTeller.js";
 import { throwEmergencyError } from "../utils/setEmergencyOnAndBlockAllRequests.js";
-import { decodedAccessTokenSchema } from "../zodSchemas.js";
+import { decodedAccessTokenSchema } from "../zodSchemas/tokenZodSchema.js";
 import { attemptTokenRefreshAndBlackListOldToken } from "../utils/tokenHelper.js";
 import jwt from "jsonwebtoken";
 

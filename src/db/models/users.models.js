@@ -2,42 +2,50 @@ import argon2 from "argon2";
 import mongoose from "mongoose";
 import logger from "../../utils/logger.js";
 import { fullNameField, userNameField } from "./commonFields.js";
-import { dollarFormatter, isValidCentsFormat } from "../../utils/amountHelpers.js";
+import { isValidCentsFormat } from "../../utils/amountHelpers.js";
+import { dollarFormatter } from "../../utils/formatters.js";
 import { accountSettings } from "../../settings/accountSettings.js";
+
+const { MIN_EMAIL_LENGTH, MAX_EMAIL_LENGTH, MIN_BALANCE, MAX_BALANCE } =
+  accountSettings;
 
 const userSchema = new mongoose.Schema(
   {
-    userName: userNameField({ unique: true }),
     email: {
       type: String,
-      required: [true, "Email is required"],
+      required: [true, "Email is required."],
       unique: true,
       trim: true,
-      minLength: [6, "Email must be >= 6 and <= 30 characters"],
-      maxLength: [30, "Email must be >= 6 and <= 30 characters"],
+      minLength: [
+        MIN_EMAIL_LENGTH,
+        `Email must be at least ${MIN_EMAIL_LENGTH} characters long.`,
+      ],
+      maxLength: [
+        MAX_EMAIL_LENGTH,
+        `Email must be at most ${MAX_EMAIL_LENGTH} characters long.`,
+      ],
       lowercase: true,
       immutable: true,
     },
+    userName: userNameField({ unique: true }),
     fullName: fullNameField(),
     password: {
       type: String,
-      required: [true, "Password is required"],
+      required: [true, "Password is required."],
     },
     balance: {
       type: Number,
-      required: [true, "Balance is required"],
-      default: Math.round(1 + Math.random() * 10000),
-      min: [0, "Balance cannot be negative"],
+      required: [true, "Balance is required."],
+      min: [MIN_BALANCE, `Balance must be at least ${MIN_BALANCE}.`],
       max: [
-        accountSettings.MAX_BALANCE,
-        `Balance cannot be more than ${dollarFormatter(accountSettings.MAX_BALANCE)}`,
+        MAX_BALANCE,
+        `Balance cannot exceed ${dollarFormatter(MAX_BALANCE)}.`,
       ],
       validate: {
         validator: function (value) {
           return isValidCentsFormat(value);
         },
-        message:
-          "Balance must be a non negative number with at most 2 decimal places",
+        message: "Balance must be a number with at most 2 decimal places.",
       },
     },
     refreshToken: {
@@ -48,7 +56,7 @@ const userSchema = new mongoose.Schema(
 );
 
 // index for user search
-userSchema.index({ userName: 1, _id: 1, fullName: 1 });
+userSchema.index({ userName: 1, fullName: 1 });
 
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();

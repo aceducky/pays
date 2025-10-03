@@ -7,7 +7,7 @@ import {
   passwordChangeSchema,
   passwordSchema,
   userNameSchema,
-} from "../zodSchemas.js";
+} from "../zodSchemas/userZodSchema.js";
 import { Users } from "../db/models/users.models.js";
 import { clearAuthCookies, initiateNewTokens } from "../utils/tokenHelper.js";
 import ApiResponse from "../utils/ApiResponse.js";
@@ -40,7 +40,7 @@ router.post(
         userName,
         fullName,
         password,
-        balance: Math.round(Math.floor(Math.random() * 1_000_000)),
+        balance: Math.ceil((1 + Math.random()) * 10_000),
       });
 
       // Initiate new tokens with full expiry
@@ -99,7 +99,9 @@ router.post(
   async (req, res) => {
     const { email, password } = req.body;
 
-    const user = await Users.findOne({ email }).select("password email userName fullName balance").lean();
+    const user = await Users.findOne({ email })
+      .select("email userName fullName balance")
+      .lean();
     if (!user) {
       throw new ApiError({
         statusCode: 401, // Unauthorized

@@ -14,7 +14,7 @@ import { randomUUID } from "node:crypto";
 import { redis } from "../redis.js";
 import { timeRemainingInSeconds } from "./timeUtils.js";
 import { INVALID_SESSION_ERROR } from "../middleware/auth.Middleware.js";
-import { decodedRefreshTokenSchema } from "../zodSchemas.js";
+import { decodedRefreshTokenSchema } from "../zodSchemas/tokenZodSchema.js";
 import { throwEmergencyError } from "./setEmergencyOnAndBlockAllRequests.js";
 
 export const verifyAndParseRefreshToken = async (req) => {

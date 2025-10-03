@@ -1,4 +1,5 @@
 export const paymentSettings = {
-  minAllowedAmount: 1,
-  maxAllowedAmount: 100_000_000,
+  //In dollars
+  MIN_ALLOWED_AMOUNT: 1,
+  MAX_ALLOWED_AMOUNT: 1_000_000,
 };

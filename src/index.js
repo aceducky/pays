@@ -9,9 +9,9 @@ import { ApiError, ServerError } from "./utils/Errors.js";
 import { blockAllRequestsInEmergencyMiddleware } from "./middleware/blockAllRequestsInEmergency.middleware.js";
 
 const app = express();
-app.disable('x-powered-by');
+app.disable("x-powered-by");
 
-const allowedOrigins = ["http://localhost:5173","http://localhost:3000"];
+const allowedOrigins = ["http://localhost:5173", "http://localhost:3000"];
 app.use(
   cors({
     origin: function (origin, callback) {
@@ -32,8 +32,8 @@ app.use(
 );
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
-app.use("/api/v1", rootRouter);
 
+app.use("/api/v1", rootRouter);
 
 //Not found
 // eslint-disable-next-line no-unused-vars

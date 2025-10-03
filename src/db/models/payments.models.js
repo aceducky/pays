@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
 import { fullNameField, userNameField } from "./commonFields.js";
 import { paymentSettings } from "../../settings/paymentSettings.js";
-import { paymentAmountStrSchema } from "../../zodSchemas.js";
-import { dollarFormatter } from "../../utils/amountHelpers.js";
+import { paymentAmountStrSchema } from "../../zodSchemas/paymentZodSchema.js";
+import { dollarFormatter } from "../../utils/formatters.js";
 
 const paymentSchema = new mongoose.Schema(
   {
@@ -39,12 +39,16 @@ const paymentSchema = new mongoose.Schema(
           const cleanValue = value.replace(/[$,]/g, "");
           return paymentAmountStrSchema.safeParse(cleanValue).success;
         },
-        message: `Amount must be a valid currency amount between ${dollarFormatter(paymentSettings.minAllowedAmount)} and ${dollarFormatter(paymentSettings.maxAllowedAmount)}`,
+        message: `Amount must be a valid currency amount between ${dollarFormatter(paymentSettings.MIN_ALLOWED_AMOUNT)} and ${dollarFormatter(paymentSettings.MAX_ALLOWED_AMOUNT)}`,
       },
       immutable: true,
     },
 
-    description: { type: String, maxLength: 255, immutable: true },
+    description: {
+      type: String,
+      maxLength: [255, "Description cannot be more than 255 characters"],
+      immutable: true,
+    },
   },
   {
     timestamps: true,

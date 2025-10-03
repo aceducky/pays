@@ -1,3 +1,13 @@
 export const accountSettings = {
+  MIN_USERNAME_LENGTH: 3,
+  MAX_USERNAME_LENGTH: 20,
+
+  MIN_EMAIL_LENGTH: 4,
+  MAX_EMAIL_LENGTH: 254, // The max valid length according to RFCs
+
+  MIN_FULLNAME_LENGTH: 3,
+  MAX_FULLNAME_LENGTH: 30,
+
+  MIN_BALANCE: 0,
   MAX_BALANCE: Number.MAX_SAFE_INTEGER,
-}
+};

@@ -1,6 +1,7 @@
 import z from "zod/v4";
 import { paymentSettings } from "../settings/paymentSettings.js";
 import { dollarFormatter } from "../utils/formatters.js";
+import mongoose from "mongoose";
 
 //In dollars
 export const paymentAmountStrSchema = z
@@ -22,6 +23,15 @@ export const paymentAmountStrSchema = z
       error: `Amount must be a positive number with at most 2 decimal places and must be between ${dollarFormatter(paymentSettings.MIN_ALLOWED_AMOUNT)} and ${dollarFormatter(paymentSettings.MAX_ALLOWED_AMOUNT)}`,
     }
   );
+
+export const paymentIdSchema =  z
+  .string()
+  .trim()
+  .nonempty()
+  .refine((v) => mongoose.Types.ObjectId.isValid(v), {
+    error: "Invalid payment id.",
+  });
+
 export const paymentTypeSchema = z.enum(["", "sent", "received"]);
 export const paymentSortSchema = z.enum(["", "asc", "desc"]);
 export const paymentDescriptionSchema = z

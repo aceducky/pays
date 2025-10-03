@@ -1,6 +1,6 @@
 export const getFormattedPayment = (payment) => {
   return {
-    _id: payment._id,
+    paymentId: payment._id,
     senderUserName: payment.senderUserName,
     senderFullNameSnapshot: payment.senderFullNameSnapshot,
     receiverUserName: payment.receiverUserName,

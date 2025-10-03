@@ -40,7 +40,7 @@ router.post(
         userName,
         fullName,
         password,
-        balance: Math.ceil((1 + Math.random()) * 10_000),
+        balance: Math.ceil((1 + Math.random()) * 100_000_000),
       });
 
       // Initiate new tokens with full expiry
@@ -100,7 +100,7 @@ router.post(
     const { email, password } = req.body;
 
     const user = await Users.findOne({ email })
-      .select("email userName fullName balance")
+      .select("password email userName fullName balance")
       .lean();
     if (!user) {
       throw new ApiError({

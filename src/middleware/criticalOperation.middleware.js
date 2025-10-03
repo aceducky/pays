@@ -11,4 +11,3 @@ export const criticalOperationMiddleware = async (req, res, next) => {
   }
   next();
 };
-

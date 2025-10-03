@@ -55,12 +55,19 @@ const signToken = (payload, secret, expiresIn) => {
 };
 
 const signAccessToken = (payload) => {
-  return signToken(payload, getAccessTokenSecret(), getAccessTokenExpiryForToken_s());
+  return signToken(
+    payload,
+    getAccessTokenSecret(),
+    getAccessTokenExpiryForToken_s()
+  );
 };
 
 const signRefreshToken = (payload, expiresIn) => {
   if (!expiresIn) {
-    logger.error("jwt token", "Missing expiresIn parameter for signRefreshToken");
+    logger.error(
+      "jwt token",
+      "Missing expiresIn parameter for signRefreshToken"
+    );
     throw new ServerError();
   }
 
@@ -69,7 +76,7 @@ const signRefreshToken = (payload, expiresIn) => {
   payload.jti = jti;
   return {
     token: signToken(payload, getRefreshTokenSecret(), expiresIn),
-    jti
+    jti,
   };
 };
 
@@ -124,10 +131,7 @@ const removeRefreshTokenFromWhitelist = async (userId) => {
   }
 };
 
-export const clearAuthCookies = async (
-  req,
-  res,
-) => {
+export const clearAuthCookies = async (req, res) => {
   const refreshTokenCookie = req.cookies?.refreshToken;
 
   if (refreshTokenCookie) {
@@ -136,7 +140,7 @@ export const clearAuthCookies = async (
       const parsedResult = decodedRefreshTokenSchema.safeParse(decoded);
 
       if (!parsedResult.success) {
-        throwEmergencyError({req, parsedResult, decoded});
+        throwEmergencyError({ req, parsedResult, decoded });
       } else {
         const { userId } = parsedResult.data;
         // Remove from whitelist instead of blacklisting
@@ -146,7 +150,9 @@ export const clearAuthCookies = async (
       if (err instanceof ApiError || err instanceof ServerError) {
         throw err;
       }
-      logger.error("clearAuthCookies - Invalid or expired refresh token", { err });
+      logger.error("clearAuthCookies - Invalid or expired refresh token", {
+        err,
+      });
     }
   }
 
@@ -157,7 +163,7 @@ export const clearAuthCookies = async (
   };
 
   res.clearCookie("accessToken", baseCookieOptions);
-  res.clearCookie("refreshToken",baseCookieOptions);
+  res.clearCookie("refreshToken", baseCookieOptions);
 };
 
 export const attemptTokenRefreshAndBlackListOldToken = async (req, res) => {
@@ -166,8 +172,11 @@ export const attemptTokenRefreshAndBlackListOldToken = async (req, res) => {
   const remainingTime_s = timeRemainingInSeconds(exp);
 
   // Generate new tokens - refresh token with remaining time
-  const accessToken = signAccessToken({userId, userName});
-  const { token: refreshToken, jti: newJti } = signRefreshToken({userId, userName}, remainingTime_s);
+  const accessToken = signAccessToken({ userId, userName });
+  const { token: refreshToken, jti: newJti } = signRefreshToken(
+    { userId, userName },
+    remainingTime_s
+  );
 
   // Store new JTI in whitelist with remaining time as expiry
   if (remainingTime_s > 0) {
@@ -185,14 +194,21 @@ export const attemptTokenRefreshAndBlackListOldToken = async (req, res) => {
 export const initiateNewTokens = async ({ res, userId, userName }) => {
   const refreshTokenExpirySeconds = getRefreshTokenExpiryForToken_s();
   const accessToken = signAccessToken({ userId, userName });
-  const { token: refreshToken, jti } = signRefreshToken({ userId, userName }, refreshTokenExpirySeconds);
+  const { token: refreshToken, jti } = signRefreshToken(
+    { userId, userName },
+    refreshTokenExpirySeconds
+  );
 
   try {
     // Store JTI in whitelist with full refresh token expiry
     await storeRefreshTokenJti(userId, jti, refreshTokenExpirySeconds);
 
     // Set cookies with full expiry times
-    setRefreshTokenCookie(res, refreshToken, getRefreshTokenExpiryForCookie_ms());
+    setRefreshTokenCookie(
+      res,
+      refreshToken,
+      getRefreshTokenExpiryForCookie_ms()
+    );
     setAccessTokenCookie(res, accessToken, getAccessTokenExpiryForCookie_ms());
   } catch (err) {
     if (err instanceof ApiError || err instanceof ServerError) {

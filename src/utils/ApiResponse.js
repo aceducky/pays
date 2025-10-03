@@ -3,7 +3,7 @@ class ApiResponse {
     return res.status(statusCode).json({
       message: message,
       data: data,
-      success: statusCode < 400
+      success: statusCode < 400,
     });
   }
 }

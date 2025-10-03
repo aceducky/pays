@@ -10,7 +10,12 @@ export const blockAllRequestsInEmergencyMiddleware = async (req, res, next) => {
       "Server is blocking all requests because EMERGENCY_STATE is enabled and it should be fixed immediately"
     );
     await clearAuthCookies(req, res);
-    return new ApiResponse({ res, statusCode: 503, data: null, message: "Server is unavailable" });
+    return new ApiResponse({
+      res,
+      statusCode: 503,
+      data: null,
+      message: "Server is unavailable",
+    });
   }
   next();
 };

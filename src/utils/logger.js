@@ -6,11 +6,17 @@ const bold = "\x1b[1m";
 const reset = "\x1b[0m";
 
 const info = (context, ...args) => {
-  console.log(`${bold}${bgGreen}${fgWhite}[INFO] [${context}]${reset}`, ...args);
+  console.log(
+    `${bold}${bgGreen}${fgWhite}[INFO] [${context}]${reset}`,
+    ...args
+  );
 };
 
 const warn = (context, ...args) => {
-  console.log(`${bold}${bgYellow}${fgWhite}[WARN] [${context}]${reset}`, ...args);
+  console.log(
+    `${bold}${bgYellow}${fgWhite}[WARN] [${context}]${reset}`,
+    ...args
+  );
 };
 
 const error = (context, ...args) => {

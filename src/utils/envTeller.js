@@ -37,6 +37,5 @@ export {
   getRefreshTokenExpiryForCookie_ms,
   getRefreshTokenExpiryForToken_s,
   getRefreshTokenSecret,
-  isEnvDEVELOPMENT
+  isEnvDEVELOPMENT,
 };
-

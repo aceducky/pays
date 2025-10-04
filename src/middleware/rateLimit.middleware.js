@@ -1,4 +1,5 @@
 import logger from "../utils/logger.js";
+import { formatDuration } from "../utils/timeUtils.js";
 
 export const rateLimitMiddleware = ({ limiter, category }) => {
   return async (req, res, next) => {
@@ -15,6 +16,7 @@ export const rateLimitMiddleware = ({ limiter, category }) => {
       if (!success) {
         const retryAfterSec = Math.ceil((reset - Date.now()) / 1000);
         res.set("Retry-After", String(retryAfterSec));
+
         logger.warn("rate-limited", {
           key,
           ip: req.ip,
@@ -22,12 +24,13 @@ export const rateLimitMiddleware = ({ limiter, category }) => {
           cookies: JSON.stringify(req.cookies),
           path: req.url,
         });
+
         return res.status(429).json({
           statusCode: 429,
           message:
             category === "not-found"
               ? "Too many requests. Please try later."
-              : `Too many ${category} requests, please try after ${new Date(reset).toLocaleString()}.`,
+              : `Too many ${category} requests, please try after ${formatDuration(retryAfterSec)}.`,
         });
       }
 

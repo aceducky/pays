@@ -1,9 +1,9 @@
+import jwt from "jsonwebtoken";
 import { ApiError, ServerError } from "../utils/Errors.js";
 import { getAccessTokenSecret } from "../utils/envTeller.js";
 import { throwEmergencyError } from "../utils/setEmergencyOnAndBlockAllRequests.js";
-import { decodedAccessTokenSchema } from "../zodSchemas/tokenZodSchema.js";
 import { attemptTokenRefreshAndBlackListOldToken } from "../utils/tokenHelper.js";
-import jwt from "jsonwebtoken";
+import { decodedAccessTokenSchema } from "../zodSchemas/token.zodSchema.js";
 
 export const INVALID_SESSION_ERROR = new ApiError({
   statusCode: 401,

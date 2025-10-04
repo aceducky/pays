@@ -1,7 +1,7 @@
+import mongoose from "mongoose";
 import z from "zod/v4";
 import { paymentSettings } from "../settings/paymentSettings.js";
 import { dollarFormatter } from "../utils/formatters.js";
-import mongoose from "mongoose";
 
 //In dollars
 export const paymentAmountStrSchema = z
@@ -24,7 +24,7 @@ export const paymentAmountStrSchema = z
     }
   );
 
-export const paymentIdSchema =  z
+export const paymentIdSchema = z
   .string()
   .trim()
   .nonempty()

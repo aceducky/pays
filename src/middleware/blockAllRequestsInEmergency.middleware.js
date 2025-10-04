@@ -1,6 +1,6 @@
-import logger from "../utils/logger.js";
-import ApiResponse from "../utils/ApiResponse.js";
 import { appSettings } from "../settings/appSettings.js";
+import ApiResponse from "../utils/ApiResponse.js";
+import logger from "../utils/logger.js";
 import { clearAuthCookies } from "../utils/tokenHelper.js";
 
 export const blockAllRequestsInEmergencyMiddleware = async (req, res, next) => {

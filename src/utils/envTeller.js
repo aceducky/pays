@@ -1,5 +1,5 @@
-import logger from "./logger.js";
 import { ServerError } from "./Errors.js";
+import logger from "./logger.js";
 
 const isEnvDEVELOPMENT = () => {
   if (!process.env.NODE_ENV) {
@@ -19,14 +19,14 @@ const getEnvVar = (key) => {
 
 const getAccessTokenSecret = () => getEnvVar("ACCESS_TOKEN_SECRET");
 const getAccessTokenExpiryForCookie_ms = () =>
-  parseInt(getEnvVar("ACCESS_TOKEN_EXPIRY"), 10); // in ms
+  parseInt(getEnvVar("ACCESS_TOKEN_EXPIRY_MS"), 10); // in ms
 const getAccessTokenExpiryForToken_s = () =>
-  Math.floor(parseInt(getEnvVar("ACCESS_TOKEN_EXPIRY"), 10) / 1000); // in s
+  Math.floor(parseInt(getEnvVar("ACCESS_TOKEN_EXPIRY_MS"), 10) / 1000); // in s
 const getRefreshTokenSecret = () => getEnvVar("REFRESH_TOKEN_SECRET");
 const getRefreshTokenExpiryForCookie_ms = () =>
-  parseInt(getEnvVar("REFRESH_TOKEN_EXPIRY"), 10); // in ms
+  parseInt(getEnvVar("REFRESH_TOKEN_EXPIRY_MS"), 10); // in ms
 const getRefreshTokenExpiryForToken_s = () =>
-  Math.floor(parseInt(getEnvVar("REFRESH_TOKEN_EXPIRY"), 10) / 1000); // in s
+  Math.floor(parseInt(getEnvVar("REFRESH_TOKEN_EXPIRY_MS"), 10) / 1000); // in s
 const getMONGODB_URI = () => getEnvVar("MONGODB_URI");
 
 export {
@@ -37,5 +37,6 @@ export {
   getRefreshTokenExpiryForCookie_ms,
   getRefreshTokenExpiryForToken_s,
   getRefreshTokenSecret,
-  isEnvDEVELOPMENT,
+  isEnvDEVELOPMENT
 };
+

@@ -1,7 +1,7 @@
-import { ApiError } from "../utils/Errors.js";
 import z from "zod/v4";
+import { ApiError } from "../utils/Errors.js";
 export default function reqBodyValidatorMiddleware(schema) {
-  return (req, res, next) => {
+  return (req, _res, next) => {
     const result = schema.safeParse(req.body);
     if (!result.success) {
       throw new ApiError({

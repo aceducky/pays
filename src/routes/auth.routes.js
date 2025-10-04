@@ -1,28 +1,36 @@
+import argon2 from "argon2";
 import { Router } from "express";
-import reqBodyValidatorMiddleware from "../middleware/reqBodyValidator.middleware.js";
 import z from "zod/v4";
+import { Users } from "../db/models/users.models.js";
+import authMiddleware from "../middleware/auth.middleware.js";
+import { criticalOperationMiddleware } from "../middleware/criticalOperation.middleware.js";
+import { rateLimitMiddleware } from "../middleware/rateLimit.middleware.js";
+import reqBodyValidatorMiddleware from "../middleware/reqBodyValidator.middleware.js";
+import {
+  loginLimiter,
+  passwordChangeLimiter,
+  selfProfileLimiter,
+  signupLimiter,
+} from "../rateLimiters.js";
+import { centsToDollars } from "../utils/amountHelpers.js";
+import ApiResponse from "../utils/ApiResponse.js";
+import { ApiError, ServerError } from "../utils/Errors.js";
+import logger from "../utils/logger.js";
+import { clearAuthCookies, initiateNewTokens } from "../utils/tokenHelper.js";
+import { verifyPassword } from "../utils/verifyPassword.js";
 import {
   emailSchema,
   fullNameSchema,
   passwordChangeSchema,
   passwordSchema,
   userNameSchema,
-} from "../zodSchemas/userZodSchema.js";
-import { Users } from "../db/models/users.models.js";
-import { clearAuthCookies, initiateNewTokens } from "../utils/tokenHelper.js";
-import ApiResponse from "../utils/ApiResponse.js";
-import { centsToDollars } from "../utils/amountHelpers.js";
-import { ApiError, ServerError } from "../utils/Errors.js";
-import logger from "../utils/logger.js";
-import { verifyPassword } from "../utils/verifyPassword.js";
-import authMiddleware from "../middleware/auth.Middleware.js";
-import { criticalOperationMiddleware } from "../middleware/criticalOperation.middleware.js";
-import argon2 from "argon2";
+} from "../zodSchemas/user.zodSchema.js";
 
 const router = Router();
 
 router.post(
   "/signup",
+  rateLimitMiddleware(signupLimiter),
   reqBodyValidatorMiddleware(
     z.object({
       email: emailSchema,
@@ -90,6 +98,7 @@ router.post(
 
 router.post(
   "/login",
+  rateLimitMiddleware(loginLimiter),
   reqBodyValidatorMiddleware(
     z.object({
       email: emailSchema,
@@ -142,23 +151,28 @@ router.post(
   }
 );
 
-router.get("/my-profile", authMiddleware, async (req, res) => {
-  const user = await Users.findById(req.userId).select(
-    "-_id email userName fullName balance"
-  );
-  return new ApiResponse({
-    res,
-    statusCode: 200,
-    data: {
-      user: {
-        email: user.email,
-        userName: user.userName,
-        fullName: user.fullName,
-        balance: centsToDollars(user.balance),
+router.get(
+  "/my-profile",
+  rateLimitMiddleware(selfProfileLimiter),
+  authMiddleware,
+  async (req, res) => {
+    const user = await Users.findById(req.userId).select(
+      "-_id email userName fullName balance"
+    );
+    return new ApiResponse({
+      res,
+      statusCode: 200,
+      data: {
+        user: {
+          email: user.email,
+          userName: user.userName,
+          fullName: user.fullName,
+          balance: centsToDollars(user.balance),
+        },
       },
-    },
-  });
-});
+    });
+  }
+);
 
 router.post("/logout", authMiddleware, async (req, res) => {
   await clearAuthCookies(req, res);
@@ -172,6 +186,7 @@ router.post("/logout", authMiddleware, async (req, res) => {
 
 router.post(
   "/password",
+  rateLimitMiddleware(passwordChangeLimiter),
   authMiddleware,
   criticalOperationMiddleware,
   reqBodyValidatorMiddleware(passwordChangeSchema),

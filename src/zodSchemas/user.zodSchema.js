@@ -1,5 +1,5 @@
-import z from "zod/v4";
 import mongoose from "mongoose";
+import z from "zod/v4";
 import { accountSettings } from "../settings/accountSettings.js";
 const {
   MIN_USERNAME_LENGTH,

@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@upstash/ratelimit": "^2.0.6",
     "@upstash/redis": "^1.35.4",
     "argon2": "^0.43.1",
     "cookie-parser": "^1.4.7",

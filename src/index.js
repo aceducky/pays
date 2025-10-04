@@ -1,12 +1,14 @@
+import cookieParser from "cookie-parser";
+import cors from "cors";
 import "dotenv/config";
 import express from "express";
-import cors from "cors";
-import { rootRouter } from "./routes/index.js";
-import cookieParser from "cookie-parser";
-import logger from "./utils/logger.js";
 import { connectToMongoDB } from "./db/index.js";
-import { ApiError, ServerError } from "./utils/Errors.js";
 import { blockAllRequestsInEmergencyMiddleware } from "./middleware/blockAllRequestsInEmergency.middleware.js";
+import { rateLimitMiddleware } from "./middleware/rateLimit.middleware.js";
+import { notFoundLimiter } from "./rateLimiters.js";
+import { rootRouter } from "./routes/index.js";
+import { ApiError, ServerError } from "./utils/Errors.js";
+import logger from "./utils/logger.js";
 
 const app = express();
 app.disable("x-powered-by");
@@ -34,10 +36,8 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/v1", rootRouter);
-
 //Not found
-// eslint-disable-next-line no-unused-vars
-app.all("/{*splat}", (req, res) => {
+app.all("/{*splat}", rateLimitMiddleware(notFoundLimiter), (req, _res) => {
   logger.error(
     "not-found",
     `Invalid Request: Could not ${req.method} ${req.url}`
@@ -48,8 +48,7 @@ app.all("/{*splat}", (req, res) => {
   });
 });
 
-// eslint-disable-next-line no-unused-vars
-app.use((err, req, res, next) => {
+app.use((err, _req, res, _next) => {
   if (err instanceof SyntaxError && "body" in err) {
     logger.error("json parsing", err);
     return res.status(400).json({

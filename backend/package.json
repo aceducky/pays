@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "node --trace-warnings --watch src/index.js"
+    "dev": "node --trace-warnings --watch api/index.js"
   },
   "type": "module",
   "keywords": [],

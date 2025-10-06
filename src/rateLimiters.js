@@ -99,7 +99,7 @@ export const paymentReceiptLimiter = makeLimiter({
 });
 
 export const notFoundLimiter = makeLimiter({
-  tokens: 5,
+  tokens: 10,
   refillInterval: "1 h",
   refillRate: 1,
   category: "not-found",

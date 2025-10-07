@@ -175,7 +175,12 @@ router.get(
 );
 
 router.post("/logout", authMiddleware, async (req, res) => {
-  await clearAuthCookies(req, res);
+  try {
+    await clearAuthCookies(req, res);
+  } catch (err) {
+    logger.error("logout", "Error clearing auth cookies", err);
+  }
+  // show logout success even if there was an error
   return new ApiResponse({
     res,
     statusCode: 200,

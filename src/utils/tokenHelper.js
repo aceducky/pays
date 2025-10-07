@@ -153,17 +153,18 @@ export const clearAuthCookies = async (req, res) => {
       logger.error("clearAuthCookies - Invalid or expired refresh token", {
         err,
       });
+    } finally {
+      // Clear cookies regardless of errors above
+      const baseCookieOptions = {
+        httpOnly: true,
+        sameSite: "strict",
+        secure: !isEnvDEVELOPMENT(),
+      };
+
+      res.clearCookie("accessToken", baseCookieOptions);
+      res.clearCookie("refreshToken", baseCookieOptions);
     }
   }
-
-  const baseCookieOptions = {
-    httpOnly: true,
-    sameSite: "strict",
-    secure: !isEnvDEVELOPMENT(),
-  };
-
-  res.clearCookie("accessToken", baseCookieOptions);
-  res.clearCookie("refreshToken", baseCookieOptions);
 };
 
 export const attemptTokenRefreshAndBlackListOldToken = async (req, res) => {

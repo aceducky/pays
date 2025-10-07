@@ -81,6 +81,14 @@ app.use((err, _req, res, _next) => {
     return res.status(err.statusCode).json(err.toJSON());
   }
 
+  if(err.message.includes("CORS")){
+    return res.status(403).json({
+      success: false,
+      message: err.message,
+      data: null,
+    });
+  }
+
   logger.error("Global unhandled error", err);
   return res.status(500).json({
     success: false,

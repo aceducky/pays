@@ -37,6 +37,14 @@ app.use(
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
+app.use((req, _res, next) => {
+  console.log("\n________________");
+  console.log(`${req.method}: ${req.url}`);
+  console.log("  Params: ", req.params);
+  console.log("  Body: ", JSON.stringify(req.body));
+  console.log("________________\n");
+  next();
+});
 app.use("/api/v1", rootRouter);
 
 const publicDir = path.join(import.meta.dirname, "..", "public");

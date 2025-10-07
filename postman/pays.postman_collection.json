@@ -161,6 +161,49 @@
 			"response": []
 		},
 		{
+			"name": "user3_signup_success",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableCookies": false
+			},
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\" : \"user3@example.com\",\r\n    \"userName\": \"user_three\",\r\n    \"fullName\": \"User three\",\r\n    \"password\": \"abcd1234\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{u3SubDomain}}/auth/signup",
+					"host": [
+						"{{u3SubDomain}}"
+					],
+					"path": [
+						"auth",
+						"signup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "user1_login_success",
 			"request": {
 				"method": "POST",
@@ -245,7 +288,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"oldPassword\" : \"12345678\",\r\n    \"newPassword\" : \"12345678\"\r\n}",
+					"raw": "{\r\n    \"oldPassword\" : \"12345678\",\r\n    \"newPassword\" : \"abcdefgh\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -305,11 +348,12 @@
 					}
 				},
 				"url": {
-					"raw": "{{user1}}/get-current-fullname",
+					"raw": "{{u1SubDomain}}/user/get-current-fullname",
 					"host": [
-						"{{user1}}"
+						"{{u1SubDomain}}"
 					],
 					"path": [
+						"user",
 						"get-current-fullname"
 					]
 				}
@@ -331,11 +375,12 @@
 					}
 				},
 				"url": {
-					"raw": "{{user1}}/fullName",
+					"raw": "{{u1SubDomain}}/user/fullName",
 					"host": [
-						"{{user1}}"
+						"{{u1SubDomain}}"
 					],
 					"path": [
+						"user",
 						"fullName"
 					]
 				}
@@ -357,11 +402,12 @@
 					}
 				},
 				"url": {
-					"raw": "{{user2}}/fullName",
+					"raw": "{{u2SubDomain}}/user/fullName",
 					"host": [
-						"{{user2}}"
+						"{{u2SubDomain}}"
 					],
 					"path": [
+						"user",
 						"fullName"
 					]
 				}
@@ -374,11 +420,12 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{user1}}/bulk",
+					"raw": "{{u1SubDomain}}/user/bulk",
 					"host": [
-						"{{user1}}"
+						"{{u1SubDomain}}"
 					],
 					"path": [
+						"user",
 						"bulk"
 					]
 				}
@@ -391,11 +438,12 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{user1}}/bulk?filter=user",
+					"raw": "{{u1SubDomain}}/user/bulk?filter=user",
 					"host": [
-						"{{user1}}"
+						"{{u1SubDomain}}"
 					],
 					"path": [
+						"user",
 						"bulk"
 					],
 					"query": [
@@ -414,11 +462,12 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{user1}}/bulk?filter=not-valid-user-name",
+					"raw": "{{u1SubDomain}}/user/bulk?filter=not-valid-user-name",
 					"host": [
-						"{{user1}}"
+						"{{u1SubDomain}}"
 					],
 					"path": [
+						"user",
 						"bulk"
 					],
 					"query": [
@@ -437,11 +486,12 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{user1}}/balance",
+					"raw": "{{u1SubDomain}}/user/balance",
 					"host": [
-						"{{user1}}"
+						"{{u1SubDomain}}"
 					],
 					"path": [
+						"user",
 						"balance"
 					]
 				}
@@ -454,11 +504,12 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{user2}}/balance",
+					"raw": "{{u2SubDomain}}/user/balance",
 					"host": [
-						"{{user2}}"
+						"{{u2SubDomain}}"
 					],
 					"path": [
+						"user",
 						"balance"
 					]
 				}
@@ -467,6 +518,20 @@
 		},
 		{
 			"name": "user1_pays_to_user2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonRes = pm.response.json();\r",
+							"pm.environment.set(\"u1_u2_paymentId\",jsonRes.data.paymentId);"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
 			"request": {
 				"method": "POST",
 				"header": [],
@@ -548,6 +613,48 @@
 			"response": []
 		},
 		{
+			"name": "paymentReceipt",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{user1Pay}}/{{u1_u2_paymentId}}",
+					"host": [
+						"{{user1Pay}}"
+					],
+					"path": [
+						"{{u1_u2_paymentId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "paymentReceipt_fail",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{u3SubDomain}}/payments/{{u1_u2_paymentId}}",
+					"host": [
+						"{{u3SubDomain}}"
+					],
+					"path": [
+						"payments",
+						"{{u1_u2_paymentId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "pay_to_max_balance_fail",
 			"request": {
 				"method": "POST",
@@ -562,9 +669,12 @@
 					}
 				},
 				"url": {
-					"raw": "{{user1Pay}}",
+					"raw": "{{user1Pay}}/",
 					"host": [
 						"{{user1Pay}}"
+					],
+					"path": [
+						""
 					]
 				}
 			},
@@ -647,6 +757,24 @@
 						"{{user2Auth}}"
 					],
 					"path": [
+						"logout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "user3_logout",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{u3SubDomain}}/auth/logout",
+					"host": [
+						"{{u3SubDomain}}"
+					],
+					"path": [
+						"auth",
 						"logout"
 					]
 				}

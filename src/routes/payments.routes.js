@@ -62,7 +62,7 @@ router.get(
 
     pipeline.push({ $match: typeFilter });
 
-    let sortFilter = sort === "asc" ? 1 : -1;
+    const sortFilter = sort === "asc" ? 1 : -1;
     pipeline.push({
       $facet: {
         data: [

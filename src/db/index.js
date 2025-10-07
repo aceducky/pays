@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { getMONGODB_URI } from "../utils/envTeller.js";
 import logger from "../utils/logger.js";
+import process from "node:process";
 
 async function connectToMongoDB() {
   try {

@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "node --trace-warnings --watch api/index.js",
-    "start": "node api/index.js"
+    "dev": "deno run --watch-hmr -P src/index.js",
+    "start": "deno run -P src/index.js",
+    "lint": "deno lint"
   },
   "type": "module",
   "keywords": [],

@@ -9,6 +9,7 @@ import { notFoundLimiter } from "./rateLimiters.js";
 import { rootRouter } from "./routes/index.js";
 import { ApiError, ServerError } from "./utils/Errors.js";
 import logger from "./utils/logger.js";
+import process from "node:process";
 
 const app = express();
 app.disable("x-powered-by");

@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "default": {
+      "sys": true,
+      "net": true,
+      "read": true,
+      "env": true,
+      "ffi": true
+    }
+  }
+}

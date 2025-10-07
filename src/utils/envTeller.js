@@ -1,5 +1,6 @@
 import { ServerError } from "./Errors.js";
 import logger from "./logger.js";
+import process  from "node:process";
 
 const isEnvDEVELOPMENT = () => {
   if (!process.env.NODE_ENV) {

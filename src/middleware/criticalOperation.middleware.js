@@ -1,6 +1,6 @@
 import { verifyAndParseRefreshToken } from "../utils/tokenHelper.js";
 
-export const criticalOperationMiddleware = async (req, res, next) => {
+export const criticalOperationMiddleware = async (req, _res, next) => {
   /**
    * Only to be used after using authMiddleware
    * Ensures refresh token is valid for critical operations

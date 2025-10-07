@@ -33,7 +33,7 @@ const getLimit = (req, minLimit = 1, maxLimit = 10) =>
   );
 
 const getQueryParam = (req, param, paramSchema, defaultIfUndefined) => {
-  let got = req.query[param]?.trim() ?? defaultIfUndefined;
+  const got = req.query[param]?.trim() ?? defaultIfUndefined;
   if (got === undefined) {
     logger.error(
       "query param",

@@ -10,6 +10,7 @@ import { rootRouter } from "./routes/index.js";
 import { ApiError, ServerError } from "./utils/Errors.js";
 import logger from "./utils/logger.js";
 import process from "node:process";
+import path from "node:path";
 
 const app = express();
 app.disable("x-powered-by");
@@ -37,6 +38,10 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/v1", rootRouter);
+
+const publicDir = path.join(import.meta.dirname, "..", "public");
+app.use(express.static(publicDir));
+
 //Not found
 app.all("/{*splat}", rateLimitMiddleware(notFoundLimiter), (req, _res) => {
   logger.error(

@@ -23,7 +23,7 @@ export const makeLimiter = ({
 
 export const signupLimiter = makeLimiter({
   tokens: 5,
-  refillInterval: "1 h",
+  refillInterval: "2 m",
   refillRate: 1,
   category: "signup",
 });

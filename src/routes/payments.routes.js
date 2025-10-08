@@ -275,7 +275,7 @@ router.get(
       !payment ||
       //check if user is related to the payment or not
       (req.userName !== payment.senderUserName &&
-        req.userId !== payment.receiverUserName)
+        req.userName !== payment.receiverUserName)
     ) {
       throw new ApiError({
         statusCode: 404,

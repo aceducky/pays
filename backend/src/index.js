@@ -62,7 +62,7 @@ app.all("/{*splat}", rateLimitMiddleware(notFoundLimiter), (req, _res) => {
   });
 });
 
-app.use((err, _req, res, _next) => {
+app.use((err, req, res, _next) => {
   if (err instanceof SyntaxError && "body" in err) {
     logger.error("json parsing", err);
     return res.status(400).json({
@@ -93,6 +93,20 @@ app.use((err, _req, res, _next) => {
 
   if (err instanceof ServerError) {
     return res.status(err.statusCode).json(err.toJSON());
+  }
+
+  if(err.message?.includes("CORS")){
+    logger.error("cors",{
+      Headers: req.headers?.origin,
+      Referrer: req.headers?.referrer,
+      url: req.originalUrl,
+      IP: req.ip,
+    })
+    return res.status(403).json({
+      success: false,
+      message: "CORS Error: Not allowed by CORS",
+      data: null,
+    })
   }
 
   logger.error("Global unhandled error", err);

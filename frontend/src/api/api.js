@@ -15,7 +15,7 @@ api.interceptors.response.use(
 
     // Skip interceptor logic for logout endpoint
     if (originalRequest.url?.includes("/auth/logout")) {
-      return Promise.reject(error);
+      throw error;
     }
 
     if (!originalRequest._retryCount) {
@@ -39,19 +39,10 @@ api.interceptors.response.use(
       // Clear user from cache immediately
       queryClient.setQueryData(USER_QUERY_KEY, null);
 
-      try {
-        // Call logout API directly (don't use the hook)
-        await api.post("/auth/logout");
-        console.log("Logout successful");
-      } catch {
-        // It's okay if logout fails - user is already cleared from cache
-        console.error("Logout API failed (user already cleared)");
-      }
-
       isLoggingOut = false;
     }
 
-    return Promise.reject(error);
+  throw error;
   }
 );
 

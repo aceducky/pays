@@ -12,7 +12,7 @@ export const useUserQuery = () => {
         const userData = res.data.data.user;
         return userData;
       } catch (err) {
-        console.log(err);
+        console.log(err.response?.data?.message || err.message);
         return null;
       }
     },

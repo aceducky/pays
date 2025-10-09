@@ -2,6 +2,8 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import "dotenv/config";
 import express from "express";
+import path from "node:path";
+import process from "node:process";
 import { connectToMongoDB } from "./db/index.js";
 import { blockAllRequestsInEmergencyMiddleware } from "./middleware/blockAllRequestsInEmergency.middleware.js";
 import { rateLimitMiddleware } from "./middleware/rateLimit.middleware.js";
@@ -9,8 +11,6 @@ import { notFoundLimiter } from "./rateLimiters.js";
 import { rootRouter } from "./routes/index.js";
 import { ApiError, ServerError } from "./utils/Errors.js";
 import logger from "./utils/logger.js";
-import process from "node:process";
-import path from "node:path";
 
 const app = express();
 app.disable("x-powered-by");

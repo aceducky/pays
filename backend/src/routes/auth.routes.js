@@ -1,6 +1,5 @@
 import argon2 from "argon2";
 import { Router } from "express";
-import z from "zod/v4";
 import { Users } from "../db/models/users.models.js";
 import authMiddleware from "../middleware/auth.middleware.js";
 import { criticalOperationMiddleware } from "../middleware/criticalOperation.middleware.js";
@@ -19,26 +18,17 @@ import logger from "../utils/logger.js";
 import { clearAuthCookies, initiateNewTokens } from "../utils/tokenHelper.js";
 import { verifyPassword } from "../utils/verifyPassword.js";
 import {
-  emailSchema,
-  fullNameSchema,
   passwordChangeSchema,
-  passwordSchema,
-  userNameSchema,
-} from "../zodSchemas/user.zodSchema.js";
+  userSignupSchema,
+  userLoginSchema,
+} from "../../../shared/zodSchemas/user.zodSchema.js";
 
 const router = Router();
 
 router.post(
   "/signup",
   rateLimitMiddleware(signupLimiter),
-  reqBodyValidatorMiddleware(
-    z.object({
-      email: emailSchema,
-      userName: userNameSchema,
-      fullName: fullNameSchema,
-      password: passwordSchema,
-    })
-  ),
+  reqBodyValidatorMiddleware(userSignupSchema),
   async (req, res) => {
     const { email, userName, fullName, password } = req.body;
     try {
@@ -99,12 +89,7 @@ router.post(
 router.post(
   "/login",
   rateLimitMiddleware(loginLimiter),
-  reqBodyValidatorMiddleware(
-    z.object({
-      email: emailSchema,
-      password: passwordSchema,
-    })
-  ),
+  reqBodyValidatorMiddleware(userLoginSchema),
   async (req, res) => {
     const { email, password } = req.body;
 

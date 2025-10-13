@@ -4,9 +4,8 @@ import { lazy } from "react";
 import { AutoPublicProtectedRoute } from "./routes/AutoPublicPrivateRoute.jsx";
 
 const Dashboard = lazy(() => import("./routes/Dashboard.jsx"));
-const Signup = lazy(() => import("./routes/Signup.jsx"));
-const Login = lazy(() => import("./routes/Login.jsx"));
 const Payments = lazy(() => import("./routes/Payments.jsx"));
+const AuthForm = lazy(() => import("./routes/AuthForm.jsx"));
 
 const router = createBrowserRouter([
   {
@@ -18,12 +17,8 @@ const router = createBrowserRouter([
         element: <Homepage />,
       },
       {
-        path: "login",
-        element: <Login />,
-      },
-      {
-        path: "signup",
-        element: <Signup />,
+        path:"/auth",
+        element:<AuthForm/>,
       },
       {
         path: "dashboard",

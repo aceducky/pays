@@ -1,4 +1,4 @@
-import { accountSettings } from "../../settings/accountSettings.js";
+import { accountSettings } from "../../../../shared/settings/accountSettings.js";
 
 const {
   MIN_USERNAME_LENGTH,

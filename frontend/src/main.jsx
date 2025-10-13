@@ -8,10 +8,10 @@ import { router } from "./router.jsx";
 import { RouterProvider } from "react-router";
 
 createRoot(document.getElementById("root")).render(
-  // <StrictMode>
+  <StrictMode>
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
-  // </StrictMode>
+  </StrictMode>
 );

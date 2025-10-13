@@ -1,8 +1,8 @@
 import argon2 from "argon2";
 import mongoose from "mongoose";
-import { accountSettings } from "../../settings/accountSettings.js";
+import { accountSettings } from "../../../../shared/settings/accountSettings.js";
 import { isValidCentsFormat } from "../../utils/amountHelpers.js";
-import { dollarFormatter } from "../../utils/formatters.js";
+import { dollarFormatter } from "../../../../shared/formatters/dollarFormatter.js";
 import logger from "../../utils/logger.js";
 import { fullNameField, userNameField } from "./commonFields.js";
 

@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
-import { paymentSettings } from "../../settings/paymentSettings.js";
-import { dollarFormatter } from "../../utils/formatters.js";
-import { paymentAmountStrSchema } from "../../zodSchemas/payment.zodSchema.js";
+import { paymentSettings } from "../../../../shared/settings/paymentSettings.js";
+import { dollarFormatter } from "../../../../shared/formatters/dollarFormatter.js";
+import { paymentAmountStrSchema } from "../../../../shared/zodSchemas/payment.zodSchema.js";
 import { fullNameField, userNameField } from "./commonFields.js";
 
 const paymentSchema = new mongoose.Schema(

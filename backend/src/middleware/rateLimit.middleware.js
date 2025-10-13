@@ -1,8 +1,13 @@
+import { isEnvDEVELOPMENT } from "../utils/envTeller.js";
 import logger from "../utils/logger.js";
 import { formatDuration } from "../utils/timeUtils.js";
 
 export const rateLimitMiddleware = ({ limiter, category }) => {
   return async (req, res, next) => {
+    // skip rate limiting in development mode
+    if(isEnvDEVELOPMENT()) {
+      return next();
+    }
     const key = category === "not-found" ? `${req.ip}` : `${req.ip}:${req.url}`;
     try {
       const { success, limit, remaining, reset } = await limiter.limit(key);

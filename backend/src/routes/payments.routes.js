@@ -12,7 +12,7 @@ import {
   paymentReceiptLimiter,
   paymentWriteLimiter,
 } from "../rateLimiters.js";
-import { accountSettings } from "../settings/accountSettings.js";
+import { accountSettings } from "../../../shared/settings/accountSettings.js";
 import { paymentDollarsStrToCents } from "../utils/amountHelpers.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import { ApiError, ServerError } from "../utils/Errors.js";
@@ -22,11 +22,11 @@ import { getPaginationValues, getQueryParam } from "../utils/reqQueryHelper.js";
 import {
   paymentAmountStrSchema,
   paymentDescriptionSchema,
-  paymentIdSchema,
-  paymentSortSchema,
-  paymentTypeSchema,
-} from "../zodSchemas/payment.zodSchema.js";
-import { userNameSchema } from "../zodSchemas/user.zodSchema.js";
+} from "../../../shared/zodSchemas/payment.zodSchema.js";
+import { paymentSortSchema } from "../zodSchemas/payment.zodSchema.js";
+import { paymentTypeSchema } from "../zodSchemas/payment.zodSchema.js";
+import { paymentIdSchema } from "../zodSchemas/payment.zodSchema.js";
+import { userNameSchema } from "../../../shared/zodSchemas/user.zodSchema.js";
 
 const router = express.Router();
 

@@ -17,10 +17,10 @@ import { ApiError, ServerError } from "../utils/Errors.js";
 import logger from "../utils/logger.js";
 import { getPaginationValues } from "../utils/reqQueryHelper.js";
 import {
-  fullNameSchema,
+  userFullNameChangeSchema,
   queryUsersSchema,
   userNameSchema,
-} from "../zodSchemas/user.zodSchema.js";
+} from "../../../shared/zodSchemas/user.zodSchema.js";
 
 const router = Router();
 
@@ -114,11 +114,7 @@ router.patch(
   "/fullName",
   rateLimitMiddleware(fullNameChangeLimiter),
   authMiddleware,
-  reqBodyValidatorMiddleware(
-    z.object({
-      fullName: fullNameSchema,
-    })
-  ),
+  reqBodyValidatorMiddleware(userFullNameChangeSchema),
   async (req, res) => {
     const { fullName: newFullName } = req.body;
     const user = await Users.findById(req.userId)

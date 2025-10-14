@@ -28,7 +28,7 @@ export const userNameSchema = z
 export const queryUsersSchema = userNameSchema.or(z.literal(""));
 
 export const emailSchema = z
-  .email("Invalid email")
+  .email("Email is required.")
   .trim()
   .min(
     MIN_EMAIL_LENGTH,
@@ -61,7 +61,7 @@ export const fullNameSchema = z
   );
 
 export const passwordSchema = z
-  .string()
+  .string("Password is required.")
   .min(8, "Password must be at least 8 characters long.")
   .max(30, "Password must be at most 30 characters long.");
 

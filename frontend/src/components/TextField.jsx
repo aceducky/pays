@@ -8,7 +8,7 @@ export default function TextField({
   placeholder,
 }) {
   return (
-    <label className="w-4/5">
+    <label className="w-5/6">
       <span className="label mb-1">{label}</span>
       <input
         type={type}

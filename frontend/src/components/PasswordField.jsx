@@ -8,7 +8,6 @@ export default function PasswordField({
   register,
   error,
   placeholder = "********",
-  isLogin = false,
 }) {
   const [type, setType] = useState("password");
 
@@ -17,9 +16,13 @@ export default function PasswordField({
   };
 
   return (
-    <label className="w-4/5">
+    <label className="w-5/6">
       <span className="label mb-1">{label}</span>
-      <label className="peer input focus-within:outline-none flex items-center gap-2">
+      <label
+        className={`peer input focus-within:outline-none flex items-center gap-2 w-full ${
+          error ? "input-error" : ""
+        }`}
+      >
         <input
           type={type}
           placeholder={placeholder || label}
@@ -33,17 +36,20 @@ export default function PasswordField({
             e.preventDefault();
             toggleType();
           }}
+          title={type === "password" ? "Show password" : "Hide password"}
           aria-label={type === "password" ? "Show password" : "Hide password"}
         >
           {type === "password" ? <Eye size={18} /> : <EyeOff size={18} />}
         </button>
       </label>
       <div className="grid grid-rows-[0fr] peer-focus-within:grid-rows-[1fr] transition-[grid-template-rows] duration-300 ease-in-out">
-        {!isLogin && !error && hint && (
+        {!error && hint && (
           <span className="text-wrap text-sm overflow-hidden">{hint}</span>
         )}
       </div>
-      {error && <span className="label text-error">{error.message}</span>}
+      {error && (
+        <span className="label text-error text-wrap">{error.message}</span>
+      )}
     </label>
   );
 }

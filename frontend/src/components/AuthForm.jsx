@@ -1,0 +1,93 @@
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import PasswordField from "./PasswordField";
+import TextField from "./TextField";
+
+export default function AuthForm({
+  title,
+  schema,
+  fields,
+  onSubmit,
+  isSubmitting,
+  submitButtonText,
+  footerText,
+  footerLinkText,
+  onFooterLinkClick,
+  serverError,
+}) {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(schema),
+  });
+
+  return (
+    <main className="grid place-items-center h-screen">
+      <div className="flex flex-col w-full px-2 max-w-sm">
+        <h2 className="text-2xl mb-4">{title}</h2>
+
+        {serverError && (
+          <div className="alert alert-error mb-4">
+            <span>{serverError}</span>
+          </div>
+        )}
+
+        <form
+          className="card py-5 px-2 rounded-lg bg-base-300 grid place-items-center gap-2 w-full"
+          onSubmit={handleSubmit(onSubmit)}
+        >
+          {fields.map((field) => {
+            if (field.type === "password") {
+              return (
+                <PasswordField
+                  key={field.name}
+                  label={field.label}
+                  name={field.name}
+                  hint={field.hint}
+                  register={register}
+                  error={errors[field.name]}
+                />
+              );
+            }
+            return (
+              <TextField
+                key={field.name}
+                label={field.label}
+                name={field.name}
+                type={field.type || "text"}
+                hint={field.hint}
+                register={register}
+                placeholder={field.placeholder}
+                error={errors[field.name]}
+              />
+            );
+          })}
+
+          <button
+            disabled={isSubmitting}
+            className="btn py-4 my-2 w-2/3 border-accent hover:shadow-lg hover:bg-accent/20 active:bg-accent/85 disabled:bg-accent/85 disabled:cursor-not-allowed"
+            type="submit"
+          >
+            {submitButtonText}
+          </button>
+
+          <div className="mx-6">
+            <span>
+              {footerText}{" "}
+              <button
+                type="button"
+                className="underline cursor-pointer"
+                disabled={isSubmitting}
+                onClick={onFooterLinkClick}
+              >
+                {footerLinkText}
+              </button>
+            </span>
+          </div>
+        </form>
+      </div>
+    </main>
+  );
+}

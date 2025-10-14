@@ -5,7 +5,8 @@ import { AutoPublicProtectedRoute } from "./routes/AutoPublicPrivateRoute.jsx";
 
 const Dashboard = lazy(() => import("./routes/Dashboard.jsx"));
 const Payments = lazy(() => import("./routes/Payments.jsx"));
-const AuthForm = lazy(() => import("./routes/AuthForm.jsx"));
+const Signup = lazy(() => import("./routes/Signup.jsx"));
+const Login = lazy(() => import("./routes/Login.jsx"));
 
 const router = createBrowserRouter([
   {
@@ -13,12 +14,21 @@ const router = createBrowserRouter([
     element: <AutoPublicProtectedRoute />,
     children: [
       {
-        index:true,
+        index: true,
         element: <Homepage />,
       },
       {
-        path:"/auth",
-        element:<AuthForm/>,
+        path: "/auth",
+        children: [
+          {
+            path: "signup",
+            element: <Signup />,
+          },
+          {
+            path: "login",
+            element: <Login />,
+          },
+        ],
       },
       {
         path: "dashboard",
@@ -32,4 +42,4 @@ const router = createBrowserRouter([
   },
 ]);
 
-export  {router};
+export { router };

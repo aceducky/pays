@@ -7,12 +7,12 @@ export default function Homepage() {
       <section className="absolute top-5 right-5 flex gap-3">
         <AuthButton
           className="btn btn-accent btn-md shadow-md"
-          to="/auth?mode=signup"
+          to="/auth/signup"
           label="Sign up"
         />
         <AuthButton
           className="btn btn-outline btn-primary btn-md"
-          to="/auth?mode=login"
+          to="/auth/login"
           label="Log in"
         />
       </section>
@@ -22,12 +22,12 @@ export default function Homepage() {
         <p className="text-lg opacity-80 max-w-lg">
           Virtual payment system. Transfer virtual money to your friends.
         </p>
-        <Link
-          to="/auth?mode=signup"
-          className="btn btn-primary text-2xl px-12 py-6 shadow-lg hover:scale-105 transition-all duration-300"
-        >
-          Get Started
-        </Link>
+          <Link
+            to="/auth/signup"
+            className="btn w-3xs btn-primary text-2xl px-12 py-6 shadow-lg hover:scale-105 transition-all duration-300"
+          >
+            Get Started
+          </Link>
       </section>
     </main>
   );

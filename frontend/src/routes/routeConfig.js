@@ -1,3 +1,3 @@
-const PUBLIC_ROUTES = ["/", "/auth"];
+const PUBLIC_ROUTES = ["/", "/auth/login", "/auth/signup"];
 
-export const isPublicRoute = (path) => PUBLIC_ROUTES.includes(path);
+export const checkIsPublicRoute = (path) => PUBLIC_ROUTES.includes(path);

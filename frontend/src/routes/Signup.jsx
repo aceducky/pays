@@ -50,7 +50,9 @@ export default function Signup() {
       submitButtonText={`Sign up${isSigningUp ? "ing" : ""}`}
       footerText="Already have an account?"
       footerLinkText="Login"
-      onFooterLinkClick={() => navigate("/auth/login")}
+      onFooterLinkClick={() =>
+        navigate("/auth/login", { viewTransition: true })
+      }
       serverError={signupError}
     />
   );

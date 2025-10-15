@@ -17,9 +17,9 @@ export default function PasswordField({
 
   return (
     <label className="w-5/6">
-      <span className="label mb-1">{label}</span>
+      <span className="label mb-1 text-white">{label}</span>
       <label
-        className={`peer input focus-within:outline-none flex items-center gap-2 w-full ${
+        className={`peer input flex items-center gap-2 w-full ${
           error ? "input-error" : ""
         }`}
       >

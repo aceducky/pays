@@ -35,10 +35,12 @@ export default function Login() {
       fields={loginFields}
       onSubmit={onSubmit}
       isSubmitting={isLoggingIn}
-      submitButtonText={`Login${isLoggingIn ? "ing" : ""}`}
+      submitButtonText={`Log${isLoggingIn ? "gin in" : "in"}`}
       footerText="Don't have an account?"
       footerLinkText="Signup"
-      onFooterLinkClick={() => navigate("/auth/signup")}
+      onFooterLinkClick={() =>
+        navigate("/auth/signup", { viewTransition: true })
+      }
       serverError={loginError}
     />
   );

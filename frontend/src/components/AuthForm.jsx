@@ -28,12 +28,6 @@ export default function AuthForm({
       <div className="flex flex-col w-full px-2 max-w-sm">
         <h2 className="text-2xl mb-4">{title}</h2>
 
-        {serverError && (
-          <div className="alert alert-error mb-4">
-            <span>{serverError}</span>
-          </div>
-        )}
-
         <form
           className="card py-5 px-2 rounded-lg bg-base-300 grid place-items-center gap-2 w-full"
           onSubmit={handleSubmit(onSubmit)}
@@ -64,15 +58,18 @@ export default function AuthForm({
               />
             );
           })}
-
+          {serverError && (
+            <div className="alert alert-error mb-4 text-center text-wrap grid">
+              {serverError}
+            </div>
+          )}
           <button
             disabled={isSubmitting}
-            className="btn py-4 my-2 w-2/3 border-accent hover:shadow-lg hover:bg-accent/20 active:bg-accent/85 disabled:bg-accent/85 disabled:cursor-not-allowed"
+            className="btn py-4 my-2 w-2/3 border-accent hover:shadow-lg hover:bg-accent/20 active:bg-accent/85"
             type="submit"
           >
             {submitButtonText}
           </button>
-
           <div className="mx-6">
             <span>
               {footerText}{" "}

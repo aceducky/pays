@@ -9,12 +9,12 @@ export default function TextField({
 }) {
   return (
     <label className="w-5/6">
-      <span className="label mb-1">{label}</span>
+      <span className="label mb-1 text-white">{label}</span>
       <input
         type={type}
         placeholder={placeholder || label}
         {...register(name)}
-        className={`peer input focus:outline-none w-full ${
+        className={`peer input w-full ${
           error ? "input-error" : ""
         }`}
       />

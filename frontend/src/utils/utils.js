@@ -1,4 +1,9 @@
 export function normalizeError(error) {
   if (!error) return null;
-  return error.response?.data?.message || "An unexpected error occurred";
+  console.log(error);
+  return (
+    error.response?.data?.message ??
+    error.message ??
+    "An unexpected error occurred"
+  );
 }

@@ -11,6 +11,7 @@ import { notFoundLimiter } from "./rateLimiters.js";
 import { rootRouter } from "./routes/index.js";
 import { ApiError, ServerError } from "./utils/Errors.js";
 import logger from "./utils/logger.js";
+import { STATUS_CODES } from "node:http";
 
 const app = express();
 app.disable("x-powered-by");
@@ -67,7 +68,7 @@ app.use((err, req, res, _next) => {
     logger.error("json parsing", err);
     return res.status(400).json({
       success: false,
-      message: "Bad request. Invalid JSON or input",
+      message: "Invalid JSON or input",
       data: null,
     });
   }
@@ -95,24 +96,34 @@ app.use((err, req, res, _next) => {
     return res.status(err.statusCode).json(err.toJSON());
   }
 
-  if(err.message?.includes("CORS")){
-    logger.error("cors",{
+  if (err.message?.includes("CORS")) {
+    logger.error("cors", {
       Headers: req.headers?.origin,
       Referrer: req.headers?.referrer,
       url: req.originalUrl,
       IP: req.ip,
-    })
+    });
     return res.status(403).json({
       success: false,
       message: "CORS Error: Not allowed by CORS",
       data: null,
-    })
+    });
+  }
+
+  // any other client errors uncaught above but handled by express automatically
+  if (err.status >= 400 && err.status <= 499) {
+    logger.error("Client error", err.status, err.message);
+    return res.status(err.status).json({
+      success: false,
+      message: STATUS_CODES[err.status] ?? "Client Error",
+      data: null,
+    });
   }
 
   logger.error("Global unhandled error", err);
-  return res.status(500).json({
+  return res.status(err.status ?? 500).json({
     success: false,
-    message: "Internal server error",
+    message: STATUS_CODES[err.status] ?? "Internal server error",
     data: null,
   });
 });

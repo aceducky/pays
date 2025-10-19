@@ -56,6 +56,8 @@ const paymentSchema = new mongoose.Schema(
   }
 );
 
+paymentSchema.index({ createdAt: -1 });
+
 const Payments = mongoose.model("Payments", paymentSchema);
 
 export { Payments };

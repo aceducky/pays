@@ -1,6 +1,12 @@
 import express from "express";
 import mongoose from "mongoose";
 import z from "zod/v4";
+import { accountSettings } from "../../../shared/settings/accountSettings.js";
+import {
+  paymentAmountStrSchema,
+  paymentDescriptionSchema,
+} from "../../../shared/zodSchemas/payment.zodSchema.js";
+import { userNameSchema } from "../../../shared/zodSchemas/user.zodSchema.js";
 import { Payments } from "../db/models/payments.models.js";
 import { Users } from "../db/models/users.models.js";
 import authMiddleware from "../middleware/auth.middleware.js";
@@ -12,7 +18,6 @@ import {
   paymentReceiptLimiter,
   paymentWriteLimiter,
 } from "../rateLimiters.js";
-import { accountSettings } from "../../../shared/settings/accountSettings.js";
 import { paymentDollarsStrToCents } from "../utils/amountHelpers.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import { ApiError, ServerError } from "../utils/Errors.js";
@@ -20,13 +25,10 @@ import { getFormattedPayment } from "../utils/formatters.js";
 import logger from "../utils/logger.js";
 import { getPaginationValues, getQueryParam } from "../utils/reqQueryHelper.js";
 import {
-  paymentAmountStrSchema,
-  paymentDescriptionSchema,
-} from "../../../shared/zodSchemas/payment.zodSchema.js";
-import { paymentSortSchema } from "../zodSchemas/payment.zodSchema.js";
-import { paymentTypeSchema } from "../zodSchemas/payment.zodSchema.js";
-import { paymentIdSchema } from "../zodSchemas/payment.zodSchema.js";
-import { userNameSchema } from "../../../shared/zodSchemas/user.zodSchema.js";
+  paymentIdSchema,
+  paymentSortSchema,
+  paymentTypeSchema,
+} from "../zodSchemas/payment.zodSchema.js";
 
 const router = express.Router();
 
@@ -35,8 +37,8 @@ router.get(
   rateLimitMiddleware(paymentListingLimiter),
   authMiddleware,
   async (req, res) => {
-    const userIdObjId = new mongoose.Types.ObjectId(req.userId);
-    const user = await Users.findById(userIdObjId);
+    const userIdObj = new mongoose.Types.ObjectId(req.userId);
+    const user = await Users.findById(userIdObj);
     if (!user) {
       throw new ApiError({
         statusCode: 400,
@@ -52,17 +54,28 @@ router.get(
 
     if (type === "") {
       typeFilter = {
-        $or: [{ senderId: userIdObjId }, { receiverId: userIdObjId }],
+        $or: [{ senderId: userIdObj }, { receiverId: userIdObj }],
       };
     } else if (type === "sent") {
-      typeFilter = { senderId: userIdObjId };
+      typeFilter = { senderId: userIdObj };
     } else if (type === "received") {
-      typeFilter = { receiverId: userIdObjId };
+      typeFilter = { receiverId: userIdObj };
     }
 
     pipeline.push({ $match: typeFilter });
 
     const sortFilter = sort === "asc" ? 1 : -1;
+    pipeline.push({
+      $addFields: {
+        isSender: { $eq: ["$senderId", userIdObj] },
+        isReceiver: { $eq: ["$receiverId", userIdObj] },
+      },
+    });
+
+    const removeIfTrue = (flagField, valueField) => ({
+      $cond: [flagField, "$$REMOVE", valueField],
+    });
+
     pipeline.push({
       $facet: {
         data: [
@@ -70,12 +83,20 @@ router.get(
             $project: {
               _id: 0,
               paymentId: "$_id",
-              senderUserName: 1,
-              senderFullNameSnapshot: 1,
-              receiverUserName: 1,
-              receiverFullNameSnapshot: 1,
+              senderUserName: removeIfTrue("$isSender", "$senderUserName"),
+              senderFullNameSnapshot: removeIfTrue(
+                "$isSender",
+                "$senderFullNameSnapshot"
+              ),
+              receiverUserName: removeIfTrue(
+                "$isReceiver",
+                "$receiverUserName"
+              ),
+              receiverFullNameSnapshot: removeIfTrue(
+                "$isReceiver",
+                "$receiverFullNameSnapshot"
+              ),
               amount: 1,
-              status: 1,
               description: 1,
               timestamp: "$createdAt",
             },
@@ -217,7 +238,6 @@ router.post(
         await payment.save({ session });
         return payment;
       });
-
       const formattedPayment = getFormattedPayment(result);
       return new ApiResponse({
         res,
@@ -279,7 +299,7 @@ router.get(
     ) {
       throw new ApiError({
         statusCode: 404,
-        message: "No payment found for the provided ID.",
+        message: "Payment not found or unauthorized to access it.",
       });
     }
 
@@ -292,3 +312,4 @@ router.get(
 );
 
 export { router as paymentRouter };
+

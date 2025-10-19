@@ -1,23 +1,26 @@
 {
   "version": "5",
   "specifiers": {
-    "npm:@eslint/js@^9.37.0": "9.37.0",
-    "npm:@upstash/ratelimit@^2.0.6": "2.0.6_@upstash+redis@1.35.4",
-    "npm:@upstash/redis@^1.35.4": "1.35.4",
-    "npm:argon2@~0.43.1": "0.43.1",
+    "npm:@eslint/js@^9.38.0": "9.38.0",
+    "npm:@upstash/ratelimit@^2.0.6": "2.0.6_@upstash+redis@1.35.6",
+    "npm:@upstash/redis@^1.35.6": "1.35.6",
+    "npm:argon2@0.44": "0.44.0",
     "npm:cookie-parser@^1.4.7": "1.4.7",
     "npm:cors@^2.8.5": "2.8.5",
-    "npm:dotenv@^16.6.1": "16.6.1",
-    "npm:eslint@^9.37.0": "9.37.0",
+    "npm:dotenv@^17.2.3": "17.2.3",
+    "npm:eslint@^9.38.0": "9.38.0",
     "npm:express@^5.1.0": "5.1.0",
     "npm:globals@^16.4.0": "16.4.0",
     "npm:jsonwebtoken@^9.0.2": "9.0.2",
-    "npm:mongoose@^8.19.0": "8.19.0",
+    "npm:mongoose@8.18.3": "8.18.3",
     "npm:prettier@^3.6.2": "3.6.2",
-    "npm:zod@^3.25.76": "3.25.76"
+    "npm:zod@^4.1.12": "4.1.12"
   },
   "npm": {
-    "@eslint-community/eslint-utils@4.9.0_eslint@9.37.0": {
+    "@epic-web/invariant@1.0.0": {
+      "integrity": "sha512-lrTPqgvfFQtR/eY/qkIzp98OGdNJu0m5ji3q/nJI8v3SXkRKEnWiOxMmbvcSoAIzv/cGiuvRy57k4suKQSAdwA=="
+    },
+    "@eslint-community/eslint-utils@4.9.0_eslint@9.38.0": {
       "integrity": "sha512-ayVFHdtZ+hsq1t2Dy24wCmGXGe4q9Gu3smhLYALJrr473ZH27MsnSL+LKUlimp4BWJqMDMLmPpx/Q9R3OAlL4g==",
       "dependencies": [
         "eslint",
@@ -27,16 +30,16 @@
     "@eslint-community/regexpp@4.12.1": {
       "integrity": "sha512-CCZCDJuduB9OUkFkY2IgppNZMi2lBQgD2qzwXkEia16cge2pijY/aXi96CJMquDMn3nJdlPV1A5KrJEXwfLNzQ=="
     },
-    "@eslint/config-array@0.21.0": {
-      "integrity": "sha512-ENIdc4iLu0d93HeYirvKmrzshzofPw6VkZRKQGe9Nv46ZnWUzcF1xV01dcvEg/1wXUR61OmmlSfyeyO7EvjLxQ==",
+    "@eslint/config-array@0.21.1": {
+      "integrity": "sha512-aw1gNayWpdI/jSYVgzN5pL0cfzU02GT3NBpeT/DXbx1/1x7ZKxFPd9bwrzygx/qiwIQiJ1sw/zD8qY/kRvlGHA==",
       "dependencies": [
         "@eslint/object-schema",
         "debug",
         "minimatch"
       ]
     },
-    "@eslint/config-helpers@0.4.0": {
-      "integrity": "sha512-WUFvV4WoIwW8Bv0KeKCIIEgdSiFOsulyN0xrMu+7z43q/hkOLXjvb5u7UC9jDxvRzcrbEmuZBX5yJZz1741jog==",
+    "@eslint/config-helpers@0.4.1": {
+      "integrity": "sha512-csZAzkNhsgwb0I/UAV6/RGFTbiakPCf0ZrGmrIxQpYvGZ00PhTkSnyKNolphgIvmnJeGw6rcGVEXfTzUnFuEvw==",
       "dependencies": [
         "@eslint/core"
       ]
@@ -61,11 +64,11 @@
         "strip-json-comments"
       ]
     },
-    "@eslint/js@9.37.0": {
-      "integrity": "sha512-jaS+NJ+hximswBG6pjNX0uEJZkrT0zwpVi3BA3vX22aFGjJjmgSTSmPpZCRKmoBL5VY/M6p0xsSJx7rk7sy5gg=="
+    "@eslint/js@9.38.0": {
+      "integrity": "sha512-UZ1VpFvXf9J06YG9xQBdnzU+kthors6KjhMAl6f4gH4usHyh31rUf2DLGInT8RFYIReYXNSydgPY0V2LuWgl7A=="
     },
-    "@eslint/object-schema@2.1.6": {
-      "integrity": "sha512-RBMg5FRL0I0gs51M/guSAj5/e14VQ4tpZnQNWwuDT66P14I43ItmPfIZRhO9fUVIPOAQXU47atlywZ/czoqFPA=="
+    "@eslint/object-schema@2.1.7": {
+      "integrity": "sha512-VtAOaymWVfZcmZbp6E2mympDIHvyjXs/12LqWYjVw6qjrfF+VK+fyG33kChz3nnK+SU5/NeHOqrTEHS8sXO3OA=="
     },
     "@eslint/plugin-kit@0.4.0": {
       "integrity": "sha512-sB5uyeq+dwCWyPi31B2gQlVlo+j5brPlWx4yZBrEaRo/nhdDE8Xke1gsGgtiBdaBTxuTkceLVuVt/pclrasb0A==",
@@ -90,8 +93,8 @@
     "@humanwhocodes/retry@0.4.3": {
       "integrity": "sha512-bV0Tgo9K4hfPCek+aMAn81RppFKv2ySDQeMoSZuvTASywNTnVJCArCZE2FWqpvIatKu7VMRLWlR1EazvVhDyhQ=="
     },
-    "@mongodb-js/saslprep@1.3.1": {
-      "integrity": "sha512-6nZrq5kfAz0POWyhljnbWQQJQ5uT8oE2ddX303q1uY0tWsivWKgBDXBBvuFPwOqRRalXJuVO9EjOdVtuhLX0zg==",
+    "@mongodb-js/saslprep@1.3.2": {
+      "integrity": "sha512-QgA5AySqB27cGTXBFmnpifAi7HxoGUeezwo6p9dI03MuDB6Pp33zgclqVb6oVK3j6I9Vesg0+oojW2XxB59SGg==",
       "dependencies": [
         "sparse-bitfield"
       ]
@@ -120,15 +123,15 @@
         "@upstash/redis"
       ]
     },
-    "@upstash/ratelimit@2.0.6_@upstash+redis@1.35.4": {
+    "@upstash/ratelimit@2.0.6_@upstash+redis@1.35.6": {
       "integrity": "sha512-Uak5qklMfzFN5RXltxY6IXRENu+Hgmo9iEgMPOlUs2etSQas2N+hJfbHw37OUy4vldLRXeD0OzL+YRvO2l5acg==",
       "dependencies": [
         "@upstash/core-analytics",
         "@upstash/redis"
       ]
     },
-    "@upstash/redis@1.35.4": {
-      "integrity": "sha512-WE1ZnhFyBiIjTDW13GbO6JjkiMVVjw5VsvS8ENmvvJsze/caMQ5paxVD44+U68IUVmkXcbsLSoE+VIYsHtbQEw==",
+    "@upstash/redis@1.35.6": {
+      "integrity": "sha512-aSEIGJgJ7XUfTYvhQcQbq835re7e/BXjs8Janq6Pvr6LlmTZnyqwT97RziZLO/8AVUL037RLXqqiQC6kCt+5pA==",
       "dependencies": [
         "uncrypto"
       ]
@@ -165,10 +168,11 @@
         "color-convert"
       ]
     },
-    "argon2@0.43.1": {
-      "integrity": "sha512-TfOzvDWUaQPurCT1hOwIeFNkgrAJDpbBGBGWDgzDsm11nNhImc13WhdGdCU6K7brkp8VpeY07oGtSex0Wmhg8w==",
+    "argon2@0.44.0": {
+      "integrity": "sha512-zHPGN3S55sihSQo0dBbK0A5qpi2R31z7HZDZnry3ifOyj8bZZnpZND2gpmhnRGO1V/d555RwBqIK5W4Mrmv3ig==",
       "dependencies": [
         "@phc/format",
+        "cross-env",
         "node-addon-api",
         "node-gyp-build"
       ],
@@ -278,6 +282,14 @@
         "vary"
       ]
     },
+    "cross-env@10.1.0": {
+      "integrity": "sha512-GsYosgnACZTADcmEyJctkJIoqAhHjttw7RsFrVoJNXbsWWqaq6Ym+7kZjq6mS45O0jij6vtiReppKQEtqWy6Dw==",
+      "dependencies": [
+        "@epic-web/invariant",
+        "cross-spawn"
+      ],
+      "bin": true
+    },
     "cross-spawn@7.0.6": {
       "integrity": "sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==",
       "dependencies": [
@@ -298,8 +310,8 @@
     "depd@2.0.0": {
       "integrity": "sha512-g7nH6P6dyDioJogAAGprGpCtVImJhpPk/roCzdb3fIh61/s/nPsfR6onyMwkCAR/OlC3yBC0lESvUoQEAssIrw=="
     },
-    "dotenv@16.6.1": {
-      "integrity": "sha512-uBq4egWHTcTt33a72vpSG0z3HnPuIl6NqYcTrKEg2azoEyl2hpW0zqlxysq2pK9HlDIHyHyakeYaYnSAwd8bow=="
+    "dotenv@17.2.3": {
+      "integrity": "sha512-JVUnt+DUIzu87TABbhPmNfVdBDt18BLOWjMUFJMSi/Qqg7NTYtabbvSNJGOJ7afbRuv9D/lngizHtP7QyLQ+9w=="
     },
     "dunder-proto@1.0.1": {
       "integrity": "sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==",
@@ -352,8 +364,8 @@
     "eslint-visitor-keys@4.2.1": {
       "integrity": "sha512-Uhdk5sfqcee/9H/rCOJikYz67o0a2Tw2hGRPOG2Y1R2dg7brRe1uG0yaNQDHu+TO/uQPF/5eCapvYSmHUjt7JQ=="
     },
-    "eslint@9.37.0": {
-      "integrity": "sha512-XyLmROnACWqSxiGYArdef1fItQd47weqB7iwtfr9JHwRrqIXZdcFMvvEcL9xHCmL0SNsOvF0c42lWyM1U5dgig==",
+    "eslint@9.38.0": {
+      "integrity": "sha512-t5aPOpmtJcZcz5UJyY2GbvpDlsK5E8JqRqoKtfiKE3cNh437KIqfJr3A3AKf5k64NPx6d0G3dno6XDY05PqPtw==",
       "dependencies": [
         "@eslint-community/eslint-utils",
         "@eslint-community/regexpp",
@@ -367,7 +379,6 @@
         "@humanwhocodes/module-importer",
         "@humanwhocodes/retry",
         "@types/estree",
-        "@types/json-schema",
         "ajv",
         "chalk",
         "cross-spawn",
@@ -737,16 +748,16 @@
         "whatwg-url"
       ]
     },
-    "mongodb@6.20.0": {
-      "integrity": "sha512-Tl6MEIU3K4Rq3TSHd+sZQqRBoGlFsOgNrH5ltAcFBV62Re3Fd+FcaVf8uSEQFOJ51SDowDVttBTONMfoYWrWlQ==",
+    "mongodb@6.18.0": {
+      "integrity": "sha512-fO5ttN9VC8P0F5fqtQmclAkgXZxbIkYRTUi1j8JO6IYwvamkhtYDilJr35jOPELR49zqCJgXZWwCtW7B+TM8vQ==",
       "dependencies": [
         "@mongodb-js/saslprep",
         "bson",
         "mongodb-connection-string-url"
       ]
     },
-    "mongoose@8.19.0": {
-      "integrity": "sha512-Z4iRiBkC7aR7a/rxQxtUAUBasFdiXkBuv3EY4NwkRbs92xKA4pwzi1Q4D+odFBe+ChahMNAYg2JP+7tWzZM0sQ==",
+    "mongoose@8.18.3": {
+      "integrity": "sha512-5kuHl9IYD19xItCBKl0gtp7WKRH0X9Vm95pSRUml/Qv6uYAqDvGvKqEufluIBNextU22nB7w67N+UTmQxDA3RQ==",
       "dependencies": [
         "bson",
         "kareem",
@@ -895,8 +906,8 @@
     "safer-buffer@2.1.2": {
       "integrity": "sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg=="
     },
-    "semver@7.7.2": {
-      "integrity": "sha512-RF0Fw+rO5AMf9MAyaRXI4AV0Ulj5lMHqVxxdSgiVbixSCXoEmmX/jk0CuJw4+3SqroYO9VoUh+HcuJivvtJemA==",
+    "semver@7.7.3": {
+      "integrity": "sha512-SdsKMrI9TdgjdweUSR9MweHA4EJ8YxHn8DFaDisvhVlUOe4BF1tLD7GAj0lIqWVl+dPb/rExr0Btby5loQm20Q==",
       "bin": true
     },
     "send@1.2.0": {
@@ -1060,27 +1071,27 @@
     "yocto-queue@0.1.0": {
       "integrity": "sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q=="
     },
-    "zod@3.25.76": {
-      "integrity": "sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ=="
+    "zod@4.1.12": {
+      "integrity": "sha512-JInaHOamG8pt5+Ey8kGmdcAcg3OL9reK8ltczgHTAwNhMys/6ThXHityHxVV2p3fkw/c+MAvBHFVYHFZDmjMCQ=="
     }
   },
   "workspace": {
     "packageJson": {
       "dependencies": [
-        "npm:@eslint/js@^9.37.0",
+        "npm:@eslint/js@^9.38.0",
         "npm:@upstash/ratelimit@^2.0.6",
-        "npm:@upstash/redis@^1.35.4",
-        "npm:argon2@~0.43.1",
+        "npm:@upstash/redis@^1.35.6",
+        "npm:argon2@0.44",
         "npm:cookie-parser@^1.4.7",
         "npm:cors@^2.8.5",
-        "npm:dotenv@^16.6.1",
-        "npm:eslint@^9.37.0",
+        "npm:dotenv@^17.2.3",
+        "npm:eslint@^9.38.0",
         "npm:express@^5.1.0",
         "npm:globals@^16.4.0",
         "npm:jsonwebtoken@^9.0.2",
-        "npm:mongoose@^8.19.0",
+        "npm:mongoose@8.18.3",
         "npm:prettier@^3.6.2",
-        "npm:zod@^3.25.76"
+        "npm:zod@^4.1.12"
       ]
     }
   }

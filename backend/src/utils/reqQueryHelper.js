@@ -59,7 +59,7 @@ const getQueryParam = (req, param, paramSchema, defaultIfUndefined) => {
   return got;
 };
 
-const getPaginationValues = (req, minLimit = 1, maxLimit = 10) => {
+const getPaginationValues = (req, minLimit = 1, maxLimit = 20) => {
   const page = getPage(req);
   const limit = getLimit(req, minLimit, maxLimit);
   const skip = (page - 1) * limit;

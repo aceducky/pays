@@ -7,6 +7,7 @@ const Dashboard = lazy(() => import("./routes/Dashboard.jsx"));
 const Payments = lazy(() => import("./routes/Payments.jsx"));
 const Signup = lazy(() => import("./routes/Signup.jsx"));
 const Login = lazy(() => import("./routes/Login.jsx"));
+const PaymentReceipt = lazy(() => import("./routes/PaymentReceipt.jsx"));
 const SignedInRootLayout = lazy(() =>
   import("./components/SignedInRootLayout.jsx")
 );
@@ -43,6 +44,10 @@ const router = createBrowserRouter([
           {
             path: "payments",
             element: <Payments />,
+          },
+          {
+            path: "payments/:id",
+            element: <PaymentReceipt />,
           },
         ],
       },

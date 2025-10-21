@@ -6,7 +6,7 @@ import {
   paymentAmountStrSchema,
   paymentDescriptionSchema,
 } from "../../../shared/zodSchemas/payment.zodSchema.js";
-import { userNameSchema } from "../../../shared/zodSchemas/user.zodSchema.js";
+import { userNameSchema, queryUsersSchema } from "../../../shared/zodSchemas/user.zodSchema.js";
 import { Payments } from "../db/models/payments.models.js";
 import { Users } from "../db/models/users.models.js";
 import authMiddleware from "../middleware/auth.middleware.js";
@@ -27,7 +27,6 @@ import { getPaginationValues, getQueryParam } from "../utils/reqQueryHelper.js";
 import {
   paymentIdSchema,
   paymentSortSchema,
-  paymentTypeSchema,
 } from "../zodSchemas/payment.zodSchema.js";
 
 const router = express.Router();
@@ -38,42 +37,43 @@ router.get(
   authMiddleware,
   async (req, res) => {
     const userIdObj = new mongoose.Types.ObjectId(req.userId);
-    const user = await Users.findById(userIdObj);
-    if (!user) {
+
+    const userName = getQueryParam(req, "username", queryUsersSchema, "");
+    if (userName.toLowerCase() === req.userName) {
       throw new ApiError({
         statusCode: 400,
-        message: "User not found",
+        message: "Cannot search for your own username",
       });
     }
-
-    const type = getQueryParam(req, "type", paymentTypeSchema, "");
     const { page, limit, skip } = getPaginationValues(req, 1, 10);
     const sort = getQueryParam(req, "sort", paymentSortSchema, "desc");
+
     const pipeline = [];
-    let typeFilter = {};
 
-    if (type === "") {
-      typeFilter = {
-        $or: [{ senderId: userIdObj }, { receiverId: userIdObj }],
-      };
-    } else if (type === "sent") {
-      typeFilter = { senderId: userIdObj };
-    } else if (type === "received") {
-      typeFilter = { receiverId: userIdObj };
-    }
-
-    pipeline.push({ $match: typeFilter });
-
-    const sortFilter = sort === "asc" ? 1 : -1;
     pipeline.push({
-      $addFields: {
-        isSender: { $eq: ["$senderId", userIdObj] },
-        isReceiver: { $eq: ["$receiverId", userIdObj] },
+      $match: {
+        $or: [{ senderId: userIdObj }, { receiverId: userIdObj }],
       },
     });
 
-    const removeIfTrue = (flagField, valueField) => ({
-      $cond: [flagField, "$$REMOVE", valueField],
+    if (userName) {
+      const userNameRegex = new RegExp("^" + userName, "i");
+      pipeline.push({
+        $match: {
+          $or: [
+            { senderId: userIdObj, receiverUserName: userNameRegex },
+            { receiverId: userIdObj, senderUserName: userNameRegex },
+          ],
+        },
+      });
+    }
+
+    const sortFilter = sort === "asc" ? 1 : -1;
+
+    pipeline.push({
+      $addFields: {
+        isSender: { $eq: ["$senderId", userIdObj] },
+      },
     });
 
     pipeline.push({
@@ -83,22 +83,20 @@ router.get(
             $project: {
               _id: 0,
               paymentId: "$_id",
-              senderUserName: removeIfTrue("$isSender", "$senderUserName"),
-              senderFullNameSnapshot: removeIfTrue(
-                "$isSender",
-                "$senderFullNameSnapshot"
-              ),
-              receiverUserName: removeIfTrue(
-                "$isReceiver",
-                "$receiverUserName"
-              ),
-              receiverFullNameSnapshot: removeIfTrue(
-                "$isReceiver",
-                "$receiverFullNameSnapshot"
-              ),
+              otherUserName: {
+                $cond: ["$isSender", "$receiverUserName", "$senderUserName"],
+              },
+              otherFullName: {
+                $cond: [
+                  "$isSender",
+                  "$receiverFullNameSnapshot",
+                  "$senderFullNameSnapshot",
+                ],
+              },
               amount: 1,
               description: 1,
               timestamp: "$createdAt",
+              isSender: 1,
             },
           },
           {
@@ -312,4 +310,3 @@ router.get(
 );
 
 export { router as paymentRouter };
-

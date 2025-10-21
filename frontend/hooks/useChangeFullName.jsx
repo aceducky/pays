@@ -9,7 +9,7 @@ export default function useChangeFullName() {
   const changeFullName = useMutation({
     mutationKey: ["change-fullname"],
     mutationFn: async (data) => {
-      const res = await api.put("/user/fullname", data);
+      const res = await api.patch("/user/fullName", data);
       return res.data;
     },
     onSuccess: (data) => {

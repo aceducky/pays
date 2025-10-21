@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import PasswordField from "./PasswordField";
-import TextField from "./TextField";
+import PasswordField from "./PasswordField.jsx";
+import TextField from "./TextField.jsx";
 
 export default function AuthForm({
   title,
@@ -21,6 +21,8 @@ export default function AuthForm({
     formState: { errors },
   } = useForm({
     resolver: zodResolver(schema),
+    mode: "onTouched",
+    reValidateMode: "onChange",
   });
 
   return (
@@ -59,13 +61,16 @@ export default function AuthForm({
             );
           })}
           {serverError && (
-            <div className="alert alert-error mb-4 text-center text-wrap grid">
+            <div className="alert alert-error mb-4 text-center text-wrap">
               {serverError}
             </div>
           )}
           <button
             disabled={isSubmitting}
-            className="btn py-4 my-2 w-2/3 border-accent hover:shadow-lg hover:bg-accent/20 active:bg-accent/85"
+            className="btn py-4 my-2 w-2/3 border-accent hover:shadow-lg hover:bg-accent/20 active:bg-accent/85
+            disabled:bg-accent
+            disabled:text-accent-content
+            "
             type="submit"
           >
             {submitButtonText}
@@ -75,7 +80,7 @@ export default function AuthForm({
               {footerText}{" "}
               <button
                 type="button"
-                className="underline cursor-pointer"
+                className="underline cursor-pointer disabled:cursor-not-allowed"
                 disabled={isSubmitting}
                 onClick={onFooterLinkClick}
               >

@@ -24,7 +24,6 @@ export default function Login() {
   ];
 
   const onSubmit = async (data) => {
-    console.log(data);
     await loginAsync(data);
   };
 
@@ -39,7 +38,7 @@ export default function Login() {
       footerText="Don't have an account?"
       footerLinkText="Signup"
       onFooterLinkClick={() =>
-        navigate("/auth/signup", { viewTransition: true })
+        navigate("/auth/signup")
       }
       serverError={loginError}
     />

@@ -6,15 +6,16 @@ const api = axios.create({
   withCredentials: true,
 });
 
-let isLoggingOut = false;
-
 api.interceptors.response.use(
   (response) => response,
-  async (error) => {
+  (error) => {
     const originalRequest = error.config;
 
-    // Skip interceptor logic for logout endpoint
-    if (originalRequest.url?.includes("/auth/logout")) {
+    if (
+      originalRequest.url?.includes("/auth/logout") &&
+      error.response?.status === 401
+    ) {
+      queryClient.setQueryData(USER_QUERY_KEY, null);
       throw error;
     }
 
@@ -22,27 +23,17 @@ api.interceptors.response.use(
       originalRequest._retryCount = 0;
     }
 
-    // First 401: retry
+    // Retry once
     if (error.response?.status === 401 && originalRequest._retryCount < 1) {
       originalRequest._retryCount++;
       return api(originalRequest);
     }
 
-    // Second 401: logout
-    if (
-      error.response?.status === 401 &&
-      originalRequest._retryCount >= 1 &&
-      !isLoggingOut
-    ) {
-      isLoggingOut = true;
-
-      // Clear user from cache immediately
+    if (error.response?.status === 401) {
       queryClient.setQueryData(USER_QUERY_KEY, null);
-
-      isLoggingOut = false;
     }
 
-  throw error;
+    throw error;
   }
 );
 

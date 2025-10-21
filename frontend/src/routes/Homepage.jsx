@@ -1,5 +1,5 @@
+import { AuthButton } from "../components/AuthButton.jsx";
 import { Link } from "react-router";
-import { AuthButton } from "../components/AuthButton";
 
 export default function Homepage() {
   return (
@@ -22,12 +22,12 @@ export default function Homepage() {
         <p className="text-lg opacity-80 max-w-lg">
           Virtual payment system. Transfer virtual money to your friends.
         </p>
-          <Link
-            to="/auth/signup"
-            className="btn w-3xs btn-primary text-2xl px-12 py-6 shadow-lg hover:scale-105 transition-all duration-300"
-          >
-            Get Started
-          </Link>
+        <Link
+          to="/auth/signup"
+          className="btn w-3xs btn-primary text-2xl px-12 py-6 shadow-lg hover:scale-105 transition-all duration-300"
+        >
+          Get started
+        </Link>
       </section>
     </main>
   );

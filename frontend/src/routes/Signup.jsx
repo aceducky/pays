@@ -36,7 +36,6 @@ export default function Signup() {
   ];
 
   const onSubmit = async (data) => {
-    console.log(data);
     await signupAsync(data);
   };
 
@@ -47,11 +46,11 @@ export default function Signup() {
       fields={signupFields}
       onSubmit={onSubmit}
       isSubmitting={isSigningUp}
-      submitButtonText={`Sign up${isSigningUp ? "ing" : ""}`}
+      submitButtonText={`Sign${isSigningUp ? "ing " : " "}up`}
       footerText="Already have an account?"
       footerLinkText="Login"
       onFooterLinkClick={() =>
-        navigate("/auth/login", { viewTransition: true })
+        navigate("/auth/login")
       }
       serverError={signupError}
     />

@@ -2,15 +2,16 @@ import { Navigate, Outlet, useLocation } from "react-router";
 import { useAuth } from "../auth/hooks/useAuth.js";
 import Loading from "../components/Loading.jsx";
 import { checkIsPublicRoute } from "./routeConfig.js";
+import { Toaster } from "sonner";
 
-export const AutoPublicProtectedRoute = () => {
+export default function AutoPublicProtectedRoute() {
   const { pathname } = useLocation();
   const { user, isUserLoading } = useAuth();
 
   if (isUserLoading) return <Loading />;
-
-  const isPublicRoute = checkIsPublicRoute(pathname);
   
+  const isPublicRoute = checkIsPublicRoute(pathname);
+
   if (isPublicRoute && user) {
     return <Navigate to="/dashboard" replace />;
   }
@@ -19,5 +20,10 @@ export const AutoPublicProtectedRoute = () => {
     return <Navigate to="/" replace />;
   }
 
-  return <Outlet />;
-};
+  return (
+    <>
+      <Toaster />
+      <Outlet />
+    </>
+  );
+}

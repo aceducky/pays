@@ -1,7 +1,7 @@
 import { createBrowserRouter } from "react-router";
 import Homepage from "./routes/Homepage.jsx";
 import { lazy } from "react";
-import { AutoPublicProtectedRoute } from "./routes/AutoPublicPrivateRoute.jsx";
+import AutoPublicProtectedRoute from "./routes/AutoPublicPrivateRoute.jsx";
 
 const Dashboard = lazy(() => import("./routes/Dashboard.jsx"));
 const Payments = lazy(() => import("./routes/Payments.jsx"));

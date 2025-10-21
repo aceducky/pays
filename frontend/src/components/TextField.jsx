@@ -14,7 +14,7 @@ export default function TextField({
         type={type}
         placeholder={placeholder || label}
         {...register(name)}
-        className={`peer input w-full ${
+        className={`peer input w-full focus-within:outline-none focus-within:border-2 focus-within:border-base-content/80 ${
           error ? "input-error" : ""
         }`}
       />

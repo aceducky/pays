@@ -1,6 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "../../api/api.js";
 import { USER_QUERY_KEY } from "../queryClient.jsx";
+import { toast } from "sonner";
+import { normalizeError } from "../../utils/utils.js";
 
 export function useLogoutMutation() {
   const queryClient = useQueryClient();
@@ -15,7 +17,8 @@ export function useLogoutMutation() {
       console.log("Logout successful");
     },
     onError: (error) => {
-      console.error("Logout failed", error);
+      toast.error(normalizeError(error));
+      console.error("Logout failed", error.response?.data?.message ?? error.message);
     },
   });
 }

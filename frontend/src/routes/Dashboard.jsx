@@ -1,12 +1,13 @@
 import { useAuth } from "../auth/hooks/useAuth.js";
+import UserBulkSearch from "../components/UserBulkSearch.jsx";
 
 export default function Dashboard() {
-  const { logoutAsync } = useAuth();
+  const { user } = useAuth();
   return (
     <>
-      <button onClick={logoutAsync} className="btn btn-error">
-        Logout
-      </button>
+      Dashboard
+      {JSON.stringify(user, null, 2)}
+      <UserBulkSearch />
     </>
   );
 }

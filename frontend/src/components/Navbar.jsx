@@ -1,39 +1,20 @@
-export default function Navbar({links}) {
+import { User } from "lucide-react";
+import NavigationLink from "./NavLink.jsx";
+
+export default function Navbar({ links }) {
   return (
-    <div className="navbar bg-base-300 w-full">
-      <div className="flex-none lg:hidden">
-        <label
-          htmlFor="my-drawer-2"
-          aria-label="open sidebar"
-          className="btn btn-square btn-ghost"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            className="inline-block h-6 w-6 stroke-current"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M4 6h16M4 12h16M4 18h16"
-            ></path>
-          </svg>
-        </label>
-      </div>
-      <div className="mx-2 flex-1 px-2">Navbar Title</div>
-      <div className="hidden flex-none lg:block">
-        <ul className="menu menu-horizontal">
-            {links.map(link=>link)}
-          <li>
-            <a>Navbar Item 1</a>
-          </li>
-          <li>
-            <a>Navbar Item 2</a>
-          </li>
-        </ul>
-      </div>
-    </div>
+    <header className="flex items-baseline border-b border-b-white pt-2">
+      <h3 className="mx-4 text-2xl font-semibold">Pays</h3>
+      <ul className="menu menu-horizontal">
+        {links.map((link) => {
+          return (
+            <li key={link.to}>
+              <NavigationLink to={link.to} label={link.label} />
+            </li>
+          );
+        })}
+      </ul>
+      <User />
+    </header>
   );
 }

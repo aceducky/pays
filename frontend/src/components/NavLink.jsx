@@ -1,6 +1,6 @@
 import { NavLink } from "react-router";
 
-export default function NavigationLink({ to, text }) {
+export default function NavigationLink({ to, label }) {
   return (
     <NavLink
       to={to}
@@ -10,7 +10,7 @@ export default function NavigationLink({ to, text }) {
         }`
       }
     >
-      {text}
+      {label}
     </NavLink>
   );
 }

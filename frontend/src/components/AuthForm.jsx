@@ -2,6 +2,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import PasswordField from "./PasswordField.jsx";
 import TextField from "./TextField.jsx";
+import { CircleX } from "lucide-react";
 
 export default function AuthForm({
   title,
@@ -21,7 +22,7 @@ export default function AuthForm({
     formState: { errors },
   } = useForm({
     resolver: zodResolver(schema),
-    mode: "onTouched",
+    mode: "onBlur",
     reValidateMode: "onChange",
   });
 
@@ -62,6 +63,7 @@ export default function AuthForm({
           })}
           {serverError && (
             <div className="alert alert-error mb-4 text-center text-wrap">
+              <CircleX />
               {serverError}
             </div>
           )}

@@ -1,14 +1,7 @@
 import express from "express";
 import mongoose from "mongoose";
-import z from "zod/v4";
 import { accountSettings } from "../../../shared/settings/accountSettings.js";
-import {
-  paymentAmountStrSchema,
-  paymentDescriptionSchema,
-} from "../../../shared/zodSchemas/payment.zodSchema.js";
-import {
-  userNameSchema,
-} from "../../../shared/zodSchemas/user.zodSchema.js";
+import { paymentSchema } from "../../../shared/zodSchemas/payment.zodSchema.js";
 import { Payments } from "../db/models/payments.models.js";
 import { Users } from "../db/models/users.models.js";
 import authMiddleware from "../middleware/auth.middleware.js";
@@ -114,13 +107,7 @@ router.post(
   rateLimitMiddleware(paymentWriteLimiter),
   authMiddleware,
   criticalOperationMiddleware,
-  reqBodyValidatorMiddleware(
-    z.object({
-      receiverUserName: userNameSchema,
-      amountStr: paymentAmountStrSchema,
-      description: paymentDescriptionSchema,
-    })
-  ),
+  reqBodyValidatorMiddleware(paymentSchema),
   async (req, res) => {
     const senderId = req.userId;
     const senderUserName = req.userName;
@@ -288,3 +275,4 @@ router.get(
 );
 
 export { router as paymentRouter };
+

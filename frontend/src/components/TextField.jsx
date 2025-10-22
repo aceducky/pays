@@ -6,11 +6,13 @@ export default function TextField({
   error,
   type = "text",
   placeholder,
+  disabled = false
 }) {
   return (
     <label className="w-5/6">
       <span className="label mb-1 text-white">{label}</span>
       <input
+      disabled={disabled}
         type={type}
         placeholder={placeholder || label}
         {...register(name)}

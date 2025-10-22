@@ -1,4 +1,5 @@
 import LoadingText from "./LoadingText.jsx";
+import { Link } from "react-router";
 
 export default function PaymentsList({
   payments = [],
@@ -12,7 +13,7 @@ export default function PaymentsList({
   showPagination = true,
 }) {
   if (isLoading) return <LoadingText />;
-  
+
   if (isError) {
     return (
       <div className="alert alert-error">
@@ -28,8 +29,9 @@ export default function PaymentsList({
   return (
     <div className="flex flex-col gap-4 mb-6">
       {payments.map((p) => (
-        <div
+        <Link
           key={p.paymentId}
+          to={`/payments/${p.paymentId}`}
           className="card bg-base-200 shadow p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-2"
         >
           <div className="flex-1">
@@ -43,15 +45,13 @@ export default function PaymentsList({
               {p.description}
             </div>
           </div>
-          
-          <div className="font-bold text-lg whitespace-nowrap">
-            {p.amount}
-          </div>
-          
+
+          <div className="font-bold text-lg whitespace-nowrap">{p.amount}</div>
+
           <div className="text-xs text-base-content/60 whitespace-nowrap">
             {new Date(p.timestamp).toLocaleString()}
           </div>
-        </div>
+        </Link>
       ))}
 
       {showPagination && pageCount > 1 && (

@@ -22,8 +22,8 @@ export default function useChangeFullName() {
       }
       console.log("Change name successful");
     },
-    onError: (error) => {
-      console.error("Failed to change name", error);
+    onError: () => {
+      console.error("Failed to change name");
     },
   });
   return {

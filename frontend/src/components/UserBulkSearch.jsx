@@ -5,6 +5,7 @@ import { api } from "../api/api.js";
 import { USERS_BULK_QUERY_KEY } from "../auth/queryClient.jsx";
 import { normalizeError } from "../utils/utils.js";
 import LoadingText from "./LoadingText.jsx";
+import { useNavigate } from "react-router/internal/react-server-client";
 
 export default function UserBulkSearch() {
   const [filter, setFilter] = useState("");
@@ -12,6 +13,7 @@ export default function UserBulkSearch() {
   const [page, setPage] = useState(1);
   const [searchRequested, setSearchRequested] = useState(false);
   const debounceTimeout = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!searchRequested && filter === "" && page === 1) {
@@ -50,20 +52,21 @@ export default function UserBulkSearch() {
     setDebouncedFilter(filter);
     refetch();
   };
-  const handlePay = (userName)=>{
-    console.log("Yet to be implemented",userName)
-  }
+  const handlePay = (userName) => {
+    navigate("/payment", { state: { receiverUserName: userName } });
+  };
+
   return (
     <div className="w-full max-w-2xl mx-auto h-full flex flex-col">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-xl font-bold">Search users</h3>
       </div>
 
-      {/* Search bar */}
       <div className="mb-4 flex gap-2 w-full">
         <label className="input w-full focus-within:outline-none">
           @
           <input
+            autoFocus
             className="w-full focus-within:outline-none"
             placeholder="Search users by username..."
             value={filter}
@@ -84,7 +87,6 @@ export default function UserBulkSearch() {
         </button>
       </div>
 
-      {/* Loading / Error states */}
       {isLoading && <LoadingText />}
       {isError && (
         <div className="alert alert-error">
@@ -93,7 +95,6 @@ export default function UserBulkSearch() {
         </div>
       )}
 
-      {/* User list */}
       {!isLoading && !isError && searchRequested && (
         <div className="flex flex-col gap-4 mb-6">
           {users.length === 0 && (

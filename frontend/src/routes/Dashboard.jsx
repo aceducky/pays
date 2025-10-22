@@ -1,12 +1,12 @@
 import PaymentsList from "../components/PaymentsList.jsx";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { usePaymentsQuery } from "../hooks/usePaymentsQuery.js";
 import BalanceCard from "../components/BalanceCard.jsx";
 import LatestPaymentCard from "../components/LatestPaymentCard.jsx";
 
 export default function Dashboard() {
   const { data, isLoading, isError, error } = usePaymentsQuery({ limit: 5 });
-
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen flex flex-col gap-8 p-4 md:p-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl mx-auto">
@@ -15,7 +15,10 @@ export default function Dashboard() {
       </div>
 
       <div className="flex justify-center">
-        <button className="btn btn-primary px-8 py-4 text-lg shadow-lg">
+        <button
+          className="btn btn-primary px-8 py-4 text-lg shadow-lg"
+          onClick={() => navigate("/users")}
+        >
           Make new payment
         </button>
       </div>

@@ -4,6 +4,7 @@ import { lazy } from "react";
 import AutoPublicProtectedRoute from "./routes/AutoPublicPrivateRoute.jsx";
 import UserBulkSearch from "./components/UserBulkSearch.jsx";
 import Profile from "./routes/Profile.jsx";
+import Payment from "./routes/Payment.jsx";
 
 const Dashboard = lazy(() => import("./routes/Dashboard.jsx"));
 const Payments = lazy(() => import("./routes/Payments.jsx"));
@@ -58,6 +59,10 @@ const router = createBrowserRouter([
           {
             path: "profile",
             element: <Profile />,
+          },
+          {
+            path: "payment",
+            element: <Payment />,
           },
         ],
       },

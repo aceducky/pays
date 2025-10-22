@@ -37,7 +37,7 @@ export default function Payments() {
         <div className="flex gap-2 items-center">
           <label className="label">Sort:</label>
           <select
-            className="select select-bordered select-sm"
+            className="select select-bordered select-sm w-20"
             value={sort}
             onChange={(e) => updateParams({ sort: e.target.value, page: 1 })}
           >

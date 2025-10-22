@@ -2,6 +2,8 @@ import { createBrowserRouter } from "react-router";
 import Homepage from "./routes/Homepage.jsx";
 import { lazy } from "react";
 import AutoPublicProtectedRoute from "./routes/AutoPublicPrivateRoute.jsx";
+import UserBulkSearch from "./components/UserBulkSearch.jsx";
+import Profile from "./routes/Profile.jsx";
 
 const Dashboard = lazy(() => import("./routes/Dashboard.jsx"));
 const Payments = lazy(() => import("./routes/Payments.jsx"));
@@ -48,6 +50,14 @@ const router = createBrowserRouter([
           {
             path: "payments/:id",
             element: <PaymentReceipt />,
+          },
+          {
+            path: "users",
+            element: <UserBulkSearch />,
+          },
+          {
+            path: "profile",
+            element: <Profile />,
           },
         ],
       },

@@ -6,7 +6,7 @@ export function usePasswordMutation() {
     mutationKey: ["change-password"],
     retry:false,
     mutationFn: async (data) => {
-      const res = await api.put("/auth/password", data);
+      const res = await api.post("/auth/password", data);
       return res.data;
     },
     onError: (error) => {

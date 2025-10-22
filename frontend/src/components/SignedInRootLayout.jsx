@@ -1,37 +1,21 @@
-import { Outlet, useNavigate } from "react-router";
-import { useState } from "react";
-import { useAuth } from "../auth/hooks/useAuth.js";
+import { Outlet } from "react-router";
 import Navbar from "./Navbar.jsx";
-import BottomNav from "./BottomNav.jsx";
-import ProfileModal from "./ProfileModal.jsx";
-import { toast } from "sonner";
-import { normalize } from "zod";
+import Sidebar from "./Sidebar.jsx"; // New import
 
 export default function SignedInRootLayout() {
-  const [profileOpen, setProfileOpen] = useState(false);
-  const navigate = useNavigate();
-  const { logoutAsync } = useAuth();
-
-  const handleLogout = async () => {
-    try {
-      await logoutAsync();
-    } catch (e) {
-      toast.error(normalize(e));
-    }
-    navigate("/auth/login");
-  };
-
   return (
-    <>
-      <Navbar
-        onProfileClick={() => setProfileOpen(true)}
-        onLogout={handleLogout}
-      />
-      <ProfileModal open={profileOpen} onClose={() => setProfileOpen(false)} />
-      <main className="container mx-auto px-2 pb-24">
-        <Outlet />
-      </main>
-      <BottomNav onProfileClick={() => setProfileOpen(true)} />
-    </>
+    <div className="drawer lg:drawer-open min-h-screen">
+      <input id="main-drawer" type="checkbox" className="drawer-toggle" />
+      <div className="drawer-content flex flex-col">
+        <Navbar />
+        <main className="container mx-auto px-2 flex-1">
+          <Outlet />
+        </main>
+      </div>
+      <div className="drawer-side">
+        <label htmlFor="main-drawer" aria-label="close sidebar" className="drawer-overlay" />
+        <Sidebar />
+      </div>
+    </div>
   );
 }

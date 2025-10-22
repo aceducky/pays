@@ -1,6 +1,6 @@
 
 import { useParams } from "react-router";
-import { usePaymentReceiptQuery } from "../../hooks/usePaymentReceiptQuery.js";
+import { usePaymentReceiptQuery } from "../hooks/usePaymentReceiptQuery.js";
 import LoadingText from "../components/LoadingText.jsx";
 
 export default function PaymentReceipt() {

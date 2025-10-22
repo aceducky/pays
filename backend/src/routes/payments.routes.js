@@ -6,7 +6,9 @@ import {
   paymentAmountStrSchema,
   paymentDescriptionSchema,
 } from "../../../shared/zodSchemas/payment.zodSchema.js";
-import { userNameSchema, queryUsersSchema } from "../../../shared/zodSchemas/user.zodSchema.js";
+import {
+  userNameSchema,
+} from "../../../shared/zodSchemas/user.zodSchema.js";
 import { Payments } from "../db/models/payments.models.js";
 import { Users } from "../db/models/users.models.js";
 import authMiddleware from "../middleware/auth.middleware.js";
@@ -38,15 +40,9 @@ router.get(
   async (req, res) => {
     const userIdObj = new mongoose.Types.ObjectId(req.userId);
 
-    const userName = getQueryParam(req, "username", queryUsersSchema, "");
-    if (userName.toLowerCase() === req.userName) {
-      throw new ApiError({
-        statusCode: 400,
-        message: "Cannot search for your own username",
-      });
-    }
     const { page, limit, skip } = getPaginationValues(req, 1, 10);
     const sort = getQueryParam(req, "sort", paymentSortSchema, "desc");
+    const sortFilter = sort === "asc" ? 1 : -1;
 
     const pipeline = [];
 
@@ -55,20 +51,6 @@ router.get(
         $or: [{ senderId: userIdObj }, { receiverId: userIdObj }],
       },
     });
-
-    if (userName) {
-      const userNameRegex = new RegExp("^" + userName, "i");
-      pipeline.push({
-        $match: {
-          $or: [
-            { senderId: userIdObj, receiverUserName: userNameRegex },
-            { receiverId: userIdObj, senderUserName: userNameRegex },
-          ],
-        },
-      });
-    }
-
-    const sortFilter = sort === "asc" ? 1 : -1;
 
     pipeline.push({
       $addFields: {
@@ -79,6 +61,9 @@ router.get(
     pipeline.push({
       $facet: {
         data: [
+          { $sort: { createdAt: sortFilter } },
+          { $skip: skip },
+          { $limit: limit },
           {
             $project: {
               _id: 0,
@@ -99,13 +84,6 @@ router.get(
               isSender: 1,
             },
           },
-          {
-            $sort: {
-              timestamp: sortFilter,
-            },
-          },
-          { $skip: skip },
-          { $limit: limit },
         ],
         count: [{ $count: "total" }],
       },

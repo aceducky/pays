@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { api } from "../src/api/api.js";
-import { USER_QUERY_KEY } from "../src/auth/queryClient.jsx";
-import { normalizeError } from "../src/utils/utils.js";
+import { api } from "../api/api.js";
+import { USER_QUERY_KEY } from "../auth/queryClient.jsx";
+import { normalizeError } from "../utils/utils.js";
 
 export default function useChangeFullName() {
   const queryClient = useQueryClient();

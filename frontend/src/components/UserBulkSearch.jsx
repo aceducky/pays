@@ -7,7 +7,6 @@ import LoadingText from "./LoadingText.jsx";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useState, useEffect, useRef } from "react";
-
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 import {
@@ -15,14 +14,17 @@ import {
   paymentDescriptionSchema,
 } from "../../../shared/zodSchemas/payment.zodSchema.js";
 import { toast } from "sonner";
+import { PAYMENTS_QUERY_KEY } from "../hooks/usePaymentsQuery.js";
 
 const paymentFormSchema = z.object({
   amountStr: paymentAmountStrSchema,
   description: paymentDescriptionSchema.optional(),
 });
 
+
 function PaymentModal({ open, onClose, receiverUserName }) {
   const queryClient = useQueryClient();
+
   const {
     register,
     handleSubmit,
@@ -34,7 +36,6 @@ function PaymentModal({ open, onClose, receiverUserName }) {
   });
 
   const mutation = useMutation({
-    mutationKey: ["pay-user", receiverUserName],
     mutationFn: async (data) => {
       const res = await api.post("/payments", {
         receiverUserName,
@@ -44,7 +45,10 @@ function PaymentModal({ open, onClose, receiverUserName }) {
     },
     onSuccess: () => {
       toast.success("Payment sent!");
-      queryClient.invalidateQueries({ queryKey: ["payments"] });
+      queryClient.invalidateQueries({
+        queryKey: PAYMENTS_QUERY_KEY(),
+        exact: false,
+      });
       reset();
       onClose();
     },
@@ -54,10 +58,16 @@ function PaymentModal({ open, onClose, receiverUserName }) {
   });
 
   if (!open) return null;
+
+  const handleBackgroundClick = () => {
+    if (mutation.isPending) return;
+    onClose();
+  };
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
-      onClick={onClose}
+      onClick={handleBackgroundClick}
     >
       <div
         className="bg-base-100 rounded-2xl shadow-xl max-w-md w-full p-8 relative"
@@ -67,16 +77,19 @@ function PaymentModal({ open, onClose, receiverUserName }) {
           <h2 className="text-xl font-bold">Send Payment</h2>
           <button
             type="button"
-            className="btn btn-ghost btn-circle text-xl"
+            className="btn btn-error btn-circle text-xl"
             onClick={onClose}
             aria-label="Close"
+            disabled={mutation.isPending}
           >
-            ×
+            close
           </button>
         </div>
+
         <div className="mb-4">
           To: <span className="font-semibold">@{receiverUserName}</span>
         </div>
+
         <form onSubmit={handleSubmit(mutation.mutate)}>
           <div className="form-control mb-3">
             <label className="label font-semibold">Amount</label>
@@ -94,6 +107,7 @@ function PaymentModal({ open, onClose, receiverUserName }) {
               </span>
             )}
           </div>
+
           <div className="form-control mb-3">
             <label className="label font-semibold">Description</label>
             <input
@@ -108,18 +122,22 @@ function PaymentModal({ open, onClose, receiverUserName }) {
               </span>
             )}
           </div>
+
           <button
-            className="btn btn-primary w-full mt-2"
+            className={`btn btn-primary w-full mt-2 ${
+              mutation.isPending ? "loading" : ""
+            }`}
             type="submit"
             disabled={mutation.isPending}
           >
-            Send
+            {mutation.isPending ? "Sending..." : "Send"}
           </button>
         </form>
       </div>
     </div>
   );
 }
+
 
 export default function UserBulkSearch() {
   const [filter, setFilter] = useState("");

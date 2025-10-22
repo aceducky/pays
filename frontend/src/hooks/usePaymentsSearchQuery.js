@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { api } from "../src/api/api.js";
+import { api } from "../api/api.js";
 
 export const PAYMENTS_SEARCH_QUERY_KEY = (params) => ["payments-search", params];
 

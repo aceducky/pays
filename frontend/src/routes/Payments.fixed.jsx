@@ -1,5 +1,5 @@
 import React from "react";
-import { usePaymentsQuery } from "../../hooks/usePaymentsQuery.js";
+import { usePaymentsQuery } from "../hooks/usePaymentsQuery.js";
 import { useSearchParams } from "react-router";
 
 export default function Payments() {

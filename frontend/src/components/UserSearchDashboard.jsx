@@ -1,11 +1,10 @@
 import { useState } from "react";
-import PayUserModal from "./PayUserModal.jsx";
 import { useDebounce } from "../hooks/useDebounce.js";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../api/api.js";
 import LoadingText from "./LoadingText.jsx";
 
-export default function UserSearchDashboard({ onUserSelect }) {
+export default function UserSearchDashboard() {
   const [query, setQuery] = useState("");
   const debouncedQuery = useDebounce(query, 400);
   const [page, setPage] = useState(1);
@@ -26,7 +25,6 @@ export default function UserSearchDashboard({ onUserSelect }) {
   const pageCount = data?.pagination?.pages || 1;
   const currentPage = data?.pagination?.page || 1;
 
-  const [payUser, setPayUser] = useState(null);
 
   return (
     <div className="w-full max-w-2xl mx-auto bg-base-100 rounded-2xl shadow p-4 flex flex-col" style={{ height: 340 }}>
@@ -63,7 +61,6 @@ export default function UserSearchDashboard({ onUserSelect }) {
                 </div>
                 <button
                   className="btn btn-primary btn-sm"
-                  onClick={() => setPayUser(user)}
                   type="button"
                 >
                   Pay
@@ -71,7 +68,6 @@ export default function UserSearchDashboard({ onUserSelect }) {
               </div>
             ))}
             {/* DaisyUI Pay Modal */}
-            <PayUserModal user={payUser} open={!!payUser} onClose={() => setPayUser(null)} />
           </div>
         )}
       </div>

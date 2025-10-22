@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { USERS_BULK_QUERY_KEY } from "../src/auth/queryClient.jsx";
-import { api } from "../src/api/api.js";
+import { USERS_BULK_QUERY_KEY } from "../auth/queryClient.jsx";
+import { api } from "../api/api.js";
 
 export const useUserBulkSearch = () => {
   return useQuery({

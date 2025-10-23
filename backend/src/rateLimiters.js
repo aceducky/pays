@@ -98,9 +98,3 @@ export const paymentReceiptLimiter = makeLimiter({
   category: "payment receipt",
 });
 
-export const notFoundLimiter = makeLimiter({
-  tokens: 10,
-  refillInterval: "1 h",
-  refillRate: 1,
-  category: "not-found",
-});

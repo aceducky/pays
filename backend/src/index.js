@@ -6,8 +6,6 @@ import path from "node:path";
 import process from "node:process";
 import { connectToMongoDB } from "./db/index.js";
 import { blockAllRequestsInEmergencyMiddleware } from "./middleware/blockAllRequestsInEmergency.middleware.js";
-import { rateLimitMiddleware } from "./middleware/rateLimit.middleware.js";
-import { notFoundLimiter } from "./rateLimiters.js";
 import { rootRouter } from "./routes/index.js";
 import { ApiError, ServerError } from "./utils/Errors.js";
 import logger from "./utils/logger.js";
@@ -52,8 +50,8 @@ app.use("/api/v1", rootRouter);
 const publicDir = path.join(import.meta.dirname, "..", "public");
 app.use(express.static(publicDir));
 
-//Not found
-app.all("/{*splat}", rateLimitMiddleware(notFoundLimiter), (_req, res) => {
+//Serving files
+app.all("/{*splat}", (_req, res) => {
   res.sendFile(path.join(publicDir, "index.html"));
 });
 

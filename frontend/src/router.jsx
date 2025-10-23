@@ -5,6 +5,7 @@ import AutoPublicProtectedRoute from "./routes/AutoPublicPrivateRoute.jsx";
 import UserBulkSearch from "./components/UserBulkSearch.jsx";
 import Profile from "./routes/Profile.jsx";
 import Payment from "./routes/Payment.jsx";
+import NotFound from "./components/NotFound.jsx";
 
 const Dashboard = lazy(() => import("./routes/Dashboard.jsx"));
 const Payments = lazy(() => import("./routes/Payments.jsx"));
@@ -65,6 +66,10 @@ const router = createBrowserRouter([
             element: <Payment />,
           },
         ],
+      },
+      {
+        path: "*",
+        element: <NotFound />,
       },
     ],
   },

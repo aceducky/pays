@@ -2,6 +2,7 @@ import { useParams } from "react-router";
 import { usePaymentReceiptQuery } from "../hooks/usePaymentReceiptQuery.js";
 import LoadingText from "../components/LoadingText.jsx";
 import { toast } from "sonner";
+import { normalizeError } from "../utils/utils.js";
 
 export default function PaymentReceipt() {
   const { id } = useParams();
@@ -9,11 +10,7 @@ export default function PaymentReceipt() {
 
   if (isLoading) return <LoadingText />;
   if (isError)
-    return (
-      <div className="alert alert-error">
-        {error?.message || "Failed to load payment receipt"}
-      </div>
-    );
+    return <div className="alert alert-error">{normalizeError(error)}</div>;
   if (!data) return <div className="alert alert-info">No payment found.</div>;
 
   return (
@@ -45,7 +42,7 @@ export default function PaymentReceipt() {
           </div>
           <div className="flex justify-between">
             <span className="font-semibold">Amount:</span>
-            <span className="text-success font-bold">{data.amount}</span>
+            <span className="font-bold">{data.amount}</span>
           </div>
           <div className="flex justify-between">
             <span className="font-semibold">Description:</span>

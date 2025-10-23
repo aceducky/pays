@@ -1,5 +1,5 @@
 import axios from "axios";
-import { queryClient, USER_QUERY_KEY } from "../auth/queryClient.jsx";
+import { queryClient, USER_QUERY_KEY } from "../utils/queryClient.jsx";
 
 const api = axios.create({
   baseURL: "http://localhost:3000/api/v1",

@@ -1,5 +1,5 @@
 import { Home, Users, CreditCard, User, LogOut } from "lucide-react";
-import { useAuth } from "../auth/hooks/useAuth.js";
+import { useAuth } from "../auth/hooks/useAuth.jsx";
 import { toast } from "sonner";
 import NavigationLink from "./NavigationLink.jsx";
 

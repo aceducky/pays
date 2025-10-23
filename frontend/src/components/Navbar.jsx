@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 import { Menu, User, LogOut } from "lucide-react"; // Added Menu and LogOut
-import { useAuth } from "../auth/hooks/useAuth.js";
+import { useAuth } from "../auth/hooks/useAuth.jsx";
 import { toast } from "sonner";
 
 export default function Navbar() {

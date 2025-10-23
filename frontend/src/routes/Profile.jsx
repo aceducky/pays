@@ -8,8 +8,8 @@ import {
   userFullNameChangeSchema,
   passwordChangeSchema,
 } from "../../../shared/zodSchemas/index.js";
-import { useAuth } from "../auth/hooks/useAuth.js";
-import { usePasswordMutation } from "../auth/hooks/usePasswordMutation.js";
+import { useAuth } from "../auth/hooks/useAuth.jsx";
+import { usePasswordMutation } from "../auth/hooks/usePasswordMutation.jsx";
 import { toast } from "sonner";
 import { useNavigate } from "react-router/internal/react-server-client";
 
@@ -52,7 +52,6 @@ export default function Profile() {
   });
 
   const onSubmitFullName = async (data) => {
-    console.log(data);
     try {
       const response = await changeFullNameAsync({ fullName: data.fullName });
       resetNameForm({ fullName: data.fullName });
@@ -64,7 +63,6 @@ export default function Profile() {
   };
 
   const onSubmitPassword = async (data) => {
-    console.log(data);
     try {
       const response = await passwordMutationAsync({
         oldPassword: data.oldPassword,

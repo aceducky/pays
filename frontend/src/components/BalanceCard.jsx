@@ -1,4 +1,4 @@
-import { useAuth } from "../auth/hooks/useAuth.js";
+import { useAuth } from "../auth/hooks/useAuth.jsx";
 
 export default function BalanceCard() {
   const { user } = useAuth();

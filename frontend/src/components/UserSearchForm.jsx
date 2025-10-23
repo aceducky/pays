@@ -5,7 +5,6 @@ import TextField from "./TextField.jsx";
 
 export default function UserSearchForm() {
   const onSubmit = async (data) => {
-    console.log(data);
   };
   const {
     register,

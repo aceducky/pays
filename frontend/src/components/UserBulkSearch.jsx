@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { CircleX } from "lucide-react";
 import { api } from "../api/api.js";
-import { USERS_BULK_QUERY_KEY } from "../auth/queryClient.jsx";
+import { USERS_BULK_QUERY_KEY } from "../utils/queryClient.jsx";
 import { normalizeError } from "../utils/utils.js";
 import LoadingText from "./LoadingText.jsx";
 import { useNavigate } from "react-router/internal/react-server-client";

@@ -4,7 +4,7 @@ import { api } from "../api/api.js";
 import { PAYMENTS_QUERY_KEY } from "./usePaymentsQuery.js";
 import { toast } from "sonner";
 import { normalizeError } from "../utils/utils.js";
-import { USER_QUERY_KEY } from "../auth/queryClient.jsx";
+import { USER_QUERY_KEY } from "../utils/queryClient.jsx";
 
 export function usePaymentMutation() {
   const queryClient = useQueryClient();
@@ -22,9 +22,6 @@ export function usePaymentMutation() {
       queryClient.invalidateQueries({
         queryKey: USER_QUERY_KEY,
       });
-    },
-    onError: (err) => {
-      toast.error(normalizeError(err));
     },
   });
 

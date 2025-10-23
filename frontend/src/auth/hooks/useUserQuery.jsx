@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { USER_QUERY_KEY } from "../queryClient.jsx";
+import { USER_QUERY_KEY } from "../../utils/queryClient.jsx";
 import { api } from "../../api/api.js";
 
 export const useUserQuery = () => {

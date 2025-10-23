@@ -53,15 +53,8 @@ const publicDir = path.join(import.meta.dirname, "..", "public");
 app.use(express.static(publicDir));
 
 //Not found
-app.all("/{*splat}", rateLimitMiddleware(notFoundLimiter), (req, _res) => {
-  logger.error(
-    "not-found",
-    `Invalid Request: Could not ${req.method} ${req.url}`
-  );
-  throw new ApiError({
-    statusCode: 404,
-    message: "Page not found",
-  });
+app.all("/{*splat}", rateLimitMiddleware(notFoundLimiter), (_req, res) => {
+  res.sendFile(path.join(publicDir, "index.html"));
 });
 
 app.use((err, req, res, _next) => {

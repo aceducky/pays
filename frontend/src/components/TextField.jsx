@@ -12,10 +12,10 @@ export default function TextField({
     <label className="w-5/6">
       <span className="label mb-1 text-white">{label}</span>
       <input
+      {...register(name)}
       disabled={disabled}
         type={type}
         placeholder={placeholder || label}
-        {...register(name)}
         className={`peer input w-full focus-within:outline-none focus-within:border-2 focus-within:border-base-content/80 ${
           error ? "input-error" : ""
         }`}

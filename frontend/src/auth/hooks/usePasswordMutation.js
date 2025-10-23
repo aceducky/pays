@@ -1,16 +1,18 @@
 import { useMutation } from "@tanstack/react-query";
 import { api } from "../../api/api.js";
+import { normalizeError } from "../../utils/utils.js";
 
 export function usePasswordMutation() {
-  return useMutation({
-    mutationKey: ["change-password"],
-    retry:false,
+  const mutation = useMutation({
     mutationFn: async (data) => {
       const res = await api.post("/auth/password", data);
       return res.data;
     },
-    onError: (error) => {
-      console.error("Failed to change password", error);
-    },
   });
+
+  return {
+    passwordMutationAsync: mutation.mutateAsync,
+    isPasswordChanging: mutation.isPending,
+    passwordError: normalizeError(mutation.error),
+  };
 }

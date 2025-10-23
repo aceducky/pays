@@ -189,7 +189,7 @@ router.post(
     // Verify old password
     if (!(await argon2.verify(user.password, oldPassword))) {
       throw new ApiError({
-        statusCode: 401,
+        statusCode: 400,
         message: "Incorrect old password",
       });
     }

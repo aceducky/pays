@@ -20,10 +20,6 @@ export default function useChangeFullName() {
           return { ...oldUser, fullName: newFullName };
         });
       }
-      console.log("Change name successful");
-    },
-    onError: () => {
-      console.error("Failed to change name");
     },
   });
   return {

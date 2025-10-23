@@ -7,6 +7,7 @@ export default function PasswordField({
   hint,
   register,
   error,
+  disabled = false,
   placeholder = "********",
 }) {
   const [type, setType] = useState("password");
@@ -14,7 +15,7 @@ export default function PasswordField({
   const toggleType = () => {
     setType((prevType) => (prevType === "password" ? "text" : "password"));
   };
-
+ 
   return (
     <label className="w-5/6">
       <span className="label mb-1 text-white">{label}</span>
@@ -25,6 +26,7 @@ export default function PasswordField({
       >
         <input
           type={type}
+          disabled={disabled}
           placeholder={placeholder || label}
           {...register(name)}
           className={`${error ? "input-error" : ""}`}

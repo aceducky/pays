@@ -33,7 +33,7 @@ router.get(
   async (req, res) => {
     const userIdObj = new mongoose.Types.ObjectId(req.userId);
 
-    const { page, limit, skip } = getPaginationValues(req, 1, 10);
+    const { page, limit, skip } = getPaginationValues(req, 1, 20);
     const sort = getQueryParam(req, "sort", paymentSortSchema, "desc");
     const sortFilter = sort === "asc" ? 1 : -1;
 

@@ -1,19 +1,8 @@
 import { Link } from "react-router";
-import { Menu, User, LogOut } from "lucide-react"; // Added Menu and LogOut
-import { useAuth } from "../auth/hooks/useAuth.jsx";
-import { toast } from "sonner";
+import { Menu } from "lucide-react"; 
+
 
 export default function Navbar() {
-  const { logoutAsync, logoutError } = useAuth();
-
-  const handleLogout = async () => {
-    try {
-      await logoutAsync();
-    } catch {
-      toast.error(logoutError);
-    }
-  };
-
   return (
     <header className="bg-base-100 rounded-2xl shadow p-4 mb-6">
       <div className="flex items-center justify-between">

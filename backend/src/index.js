@@ -14,7 +14,11 @@ import { STATUS_CODES } from "node:http";
 const app = express();
 app.disable("x-powered-by");
 
-const allowedOrigins = ["http://localhost:5173", "http://localhost:3000"];
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "https://b0c19e26f6b6.ngrok-free.app",
+];
 app.use(
   cors({
     origin: function (origin, callback) {
@@ -36,15 +40,15 @@ app.use(
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
-// app.use((req, _res, next) => {
-//   console.log("\n________________");
-//   console.log(`${req.method}: ${req.url}`);
-//   console.log("  Params: ", req.params);
-//   console.log("  Body: ", JSON.stringify(req.body, null, 2));
-//   console.log("cookies", req.cookies.accessToken,req.cookies.refreshToken);
-//   console.log("________________\n");
-//   next();
-// });
+app.use((req, _res, next) => {
+  console.log("\n________________");
+  console.log(`${req.method}: ${req.url}`);
+  console.log("  Params: ", req.params);
+  console.log("  Body: ", JSON.stringify(req.body, null, 2));
+  console.log("cookies", req.cookies.accessToken, req.cookies.refreshToken);
+  console.log("________________\n");
+  next();
+});
 app.use("/api/v1", rootRouter);
 
 const publicDir = path.join(import.meta.dirname, "..", "public");

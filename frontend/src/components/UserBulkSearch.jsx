@@ -1,18 +1,17 @@
-import { useEffect, useRef, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { CircleX } from "lucide-react";
-import { api } from "../api/api.js";
-import { USERS_BULK_QUERY_KEY } from "../utils/queryClient.jsx";
 import { normalizeError } from "../utils/utils.js";
 import LoadingText from "./LoadingText.jsx";
 import { useNavigate } from "react-router/internal/react-server-client";
+import Pagination from "./Pagination.jsx";
+import { useUserBulkSearch } from "../hooks/useUserBulkSearch.jsx";
+import { useDebounce } from "../hooks/useDebounce.js";
 
 export default function UserBulkSearch() {
   const [filter, setFilter] = useState("");
-  const [debouncedFilter, setDebouncedFilter] = useState("");
   const [page, setPage] = useState(1);
   const [searchRequested, setSearchRequested] = useState(false);
-  const debounceTimeout = useRef(null);
+  const debouncedFilter = useDebounce(filter, 500);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -21,24 +20,10 @@ export default function UserBulkSearch() {
     }
   }, [filter, page, searchRequested]);
 
-  useEffect(() => {
-    if (!searchRequested) return;
-    clearTimeout(debounceTimeout.current);
-    debounceTimeout.current = setTimeout(() => {
-      setDebouncedFilter(filter);
-    }, 500);
-    return () => clearTimeout(debounceTimeout.current);
-  }, [filter, searchRequested]);
-
-  const { data, isLoading, isFetching, isError, error, refetch } = useQuery({
-    queryKey: [USERS_BULK_QUERY_KEY, { filter: debouncedFilter, page }],
-    queryFn: async () => {
-      const { data } = await api.get("/user/bulk", {
-        params: { filter: debouncedFilter, page, limit: 5 },
-      });
-      return data.data;
-    },
-    keepPreviousData: true,
+  const { data, isLoading, isFetching, isError, error } = useUserBulkSearch({
+    filter: debouncedFilter,
+    page,
+    limit: 5,
     enabled: searchRequested,
   });
 
@@ -49,9 +34,8 @@ export default function UserBulkSearch() {
   const handleSearch = () => {
     setPage(1);
     setSearchRequested(true);
-    setDebouncedFilter(filter);
-    refetch();
   };
+
   const handlePay = (userName) => {
     navigate("/payment", { state: { receiverUserName: userName } });
   };
@@ -107,9 +91,9 @@ export default function UserBulkSearch() {
               className="card bg-base-200 shadow p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-2"
             >
               <div className="flex-1">
-                <div className="font-semibold text-lg">{user.fullName}</div>
-                <div className="text-base-content/70 text-sm">
-                  @{user.userName}
+                <div className="text-lg">@{user.userName}</div>
+                <div className="text-base-content/80 text-sm">
+                  {user.fullName}
                 </div>
               </div>
 
@@ -123,24 +107,13 @@ export default function UserBulkSearch() {
             </div>
           ))}
 
-          {/* Pagination (PaymentsList style) */}
-          {totalPages > 1 && (
-            <div className="join flex justify-center mt-2">
-              {Array.from({ length: totalPages }).map((_, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  className={`join-item btn btn-sm ${
-                    currentPage === i + 1 ? "btn-primary" : "btn-ghost"
-                  }`}
-                  onClick={() => setPage(i + 1)}
-                  disabled={isFetching}
-                >
-                  {i + 1}
-                </button>
-              ))}
-            </div>
-          )}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setPage}
+            isFetching={isFetching}
+            className="mt-2"
+          />
         </div>
       )}
     </div>

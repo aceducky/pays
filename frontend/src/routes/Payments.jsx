@@ -37,7 +37,7 @@ export default function Payments() {
         <div className="flex gap-2 items-center">
           <label className="label">Sort:</label>
           <select
-            className="select select-bordered select-sm w-20"
+            className="select select-sm w-fit"
             value={sort}
             onChange={(e) => updateParams({ sort: e.target.value, page: 1 })}
           >
@@ -47,7 +47,7 @@ export default function Payments() {
 
           <label className="label">Page size:</label>
           <select
-            className="select select-bordered select-sm"
+            className="select select-sm"
             value={limit}
             onChange={(e) => updateParams({ limit: e.target.value, page: 1 })}
           >

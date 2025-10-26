@@ -11,7 +11,7 @@ import {
 import { useAuth } from "../auth/hooks/useAuth.jsx";
 import { usePasswordMutation } from "../auth/hooks/usePasswordMutation.jsx";
 import { toast } from "sonner";
-import { useNavigate } from "react-router/internal/react-server-client";
+import { useNavigate } from "react-router";
 
 export default function Profile() {
   const { user } = useAuth();

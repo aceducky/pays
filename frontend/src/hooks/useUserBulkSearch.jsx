@@ -2,16 +2,23 @@ import { useQuery } from "@tanstack/react-query";
 import { USERS_BULK_QUERY_KEY } from "../utils/queryClient.jsx";
 import { api } from "../api/api.js";
 
-export const useUserBulkSearch = () => {
+export const useUserBulkSearch = ({ filter = "", page = 1, limit = 5, enabled = false }) => {
   return useQuery({
-    queryKey: USERS_BULK_QUERY_KEY,
+    queryKey: [USERS_BULK_QUERY_KEY, { filter, page }],
     queryFn: async () => {
-      const res = await api.get("/user/bulk");
-      return res.data.data;
+      const { data } = await api.get("/user/bulk", {
+        params: { filter, page, limit },
+      });
+      return data.data;
     },
+    keepPreviousData: true,
+    enabled,
     select: (data) => ({
       users: data?.users || [],
-      pagination: data?.pagination || {},
+      pagination: {
+        page: data?.pagination?.page || 1,
+        pages: data?.pagination?.pages || 1,
+      },
     }),
   });
 };

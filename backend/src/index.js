@@ -17,7 +17,7 @@ app.disable("x-powered-by");
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:3000",
-  "https://b0c19e26f6b6.ngrok-free.app",
+  "https://pays.aceducky.deno.net",
 ];
 app.use(
   cors({

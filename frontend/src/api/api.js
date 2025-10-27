@@ -2,7 +2,8 @@ import axios from "axios";
 import { queryClient, USER_QUERY_KEY } from "../utils/queryClient.jsx";
 
 const api = axios.create({
-  baseURL: "http://localhost:3000/api/v1",
+  // baseURL: "http://localhost:3000/api/v1",
+  baseURL: "https://pays.aceducky.deno.net/api/v1",
   withCredentials: true,
 });
 

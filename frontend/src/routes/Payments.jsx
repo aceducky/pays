@@ -1,19 +1,19 @@
-import { usePaymentsSearchQuery } from "../hooks/usePaymentsSearchQuery.js";
+import { usePaymentsQuery } from "../hooks/usePaymentsQuery.js";
 import { useSearchParams } from "react-router";
 import PaymentsList from "../components/PaymentsList.jsx";
 
 export default function Payments() {
   const [searchParams, setSearchParams] = useSearchParams();
+
   const page = Number(searchParams.get("page")) || 1;
   const limit = Number(searchParams.get("limit")) || 10;
   const sort = searchParams.get("sort") || "desc";
 
-  const { data, isLoading, isError, error, isFetching } =
-    usePaymentsSearchQuery({
-      page,
-      limit,
-      sort,
-    });
+  const { data, isLoading, isError, error, isFetching } = usePaymentsQuery({
+    page,
+    limit,
+    sort,
+  });
 
   const payments = data?.payments || [];
   const pageCount = data?.pagination?.pages || 1;

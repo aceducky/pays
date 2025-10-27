@@ -57,6 +57,9 @@ const paymentSchema = new mongoose.Schema(
 );
 
 paymentSchema.index({ createdAt: -1 });
+paymentSchema.index({ senderId: 1, createdAt: -1 });
+paymentSchema.index({ receiverId: 1, createdAt: -1 });
+
 
 const Payments = mongoose.model("Payments", paymentSchema);
 

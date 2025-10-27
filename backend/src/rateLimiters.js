@@ -63,13 +63,6 @@ export const balanceCheckLimiter = makeLimiter({
   category: "balance check",
 });
 
-export const fullNameCheckLimiter = makeLimiter({
-  tokens: 10,
-  refillInterval: "1 m",
-  refillRate: 5,
-  category: "full name check",
-});
-
 export const fullNameChangeLimiter = makeLimiter({
   tokens: 3,
   refillInterval: "3 d",

@@ -13,7 +13,6 @@ import reqBodyValidatorMiddleware from "../middleware/reqBodyValidator.middlewar
 import {
   balanceCheckLimiter,
   fullNameChangeLimiter,
-  fullNameCheckLimiter,
   userListingLimiter,
 } from "../rateLimiters.js";
 import { centsToDollars } from "../utils/amountHelpers.js";
@@ -152,29 +151,6 @@ router.patch(
       statusCode: 200,
       data: { fullName: updatedUser.fullName },
       message: "Updated full name successfully",
-    });
-  }
-);
-
-router.post(
-  "/get-current-fullname",
-  rateLimitMiddleware(fullNameCheckLimiter),
-  authMiddleware,
-  reqBodyValidatorMiddleware(
-    z.object({
-      userName: userNameSchema,
-    })
-  ),
-  async (req, res) => {
-    const { userName } = req.body;
-    const user = await Users.findOne({ userName })
-      .select("-_id fullName")
-      .lean();
-    return new ApiResponse({
-      res,
-      statusCode: 200,
-      data: { fullName: user.fullName },
-      message: "Full name retrieved successfully",
     });
   }
 );

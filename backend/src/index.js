@@ -10,7 +10,6 @@ import { rootRouter } from "./routes/index.js";
 import { ApiError, ServerError } from "./utils/Errors.js";
 import logger from "./utils/logger.js";
 import { STATUS_CODES } from "node:http";
-import { isEnvDEVELOPMENT } from "./utils/envTeller.js";
 
 const app = express();
 app.disable("x-powered-by");

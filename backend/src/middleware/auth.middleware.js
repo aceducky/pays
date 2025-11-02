@@ -57,7 +57,6 @@ const authMiddleware = async (req, res, next) => {
     const userData = await attemptTokenRefreshAndBlackListOldToken(req, res);
     req.userId = userData.userId;
     req.userName = userData.userName;
-    req._userRefreshTokenIsChecked = true;
     return next();
   } catch (err) {
     if (err instanceof ApiError || err instanceof ServerError) throw err;

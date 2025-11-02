@@ -2,7 +2,6 @@ import argon2 from "argon2";
 import { Router } from "express";
 import { Users } from "../db/models/users.models.js";
 import authMiddleware from "../middleware/auth.middleware.js";
-import { criticalOperationMiddleware } from "../middleware/criticalOperation.middleware.js";
 import { rateLimitMiddleware } from "../middleware/rateLimit.middleware.js";
 import reqBodyValidatorMiddleware from "../middleware/reqBodyValidator.middleware.js";
 import {
@@ -175,7 +174,6 @@ router.post(
   "/password",
   rateLimitMiddleware(passwordChangeLimiter),
   authMiddleware,
-  criticalOperationMiddleware,
   reqBodyValidatorMiddleware(passwordChangeSchema),
   async (req, res) => {
     const { oldPassword, newPassword } = req.body;

@@ -7,6 +7,5 @@ export const queryClient = new QueryClient({
     queries: {
       staleTime: 9 * 60 * 1000, // 9 minutes
     },
-    retry: false,
   },
 });

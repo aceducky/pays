@@ -41,7 +41,7 @@ const authMiddleware = async (req, res, next) => {
       if (err instanceof ApiError || err instanceof ServerError) {
         throw err;
       }
-
+      // check if error is not token expired error
       if (err.name !== "TokenExpiredError") {
         throw INVALID_SESSION_ERROR;
       }

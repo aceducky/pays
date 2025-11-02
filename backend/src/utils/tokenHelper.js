@@ -114,6 +114,7 @@ const storeRefreshTokenJti = async (userId, jti, expirySeconds) => {
 const isRefreshTokenWhitelisted = async (userId, jti) => {
   try {
     const storedJti = await redis.get(`whitelist:${userId}`);
+
     return storedJti === jti;
   } catch (error) {
     logger.error("redis", "Error checking token whitelist in Redis:", error);

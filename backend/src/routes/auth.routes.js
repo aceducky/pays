@@ -49,7 +49,6 @@ router.post(
         statusCode: 201,
         data: {
           user: {
-            email: user.email,
             userName: user.userName,
             fullName: user.fullName,
             balance: centsToDollars(user.balance),
@@ -94,7 +93,7 @@ router.post(
     const { email, password } = req.body;
 
     const user = await Users.findOne({ email })
-      .select("password email userName fullName balance")
+      .select("password userName fullName balance")
       .lean();
     if (!user) {
       throw new ApiError({
@@ -125,7 +124,6 @@ router.post(
       statusCode: 200,
       data: {
         user: {
-          email,
           userName: user.userName,
           fullName: user.fullName,
           balance: centsToDollars(user.balance),
@@ -142,14 +140,13 @@ router.get(
   authMiddleware,
   async (req, res) => {
     const user = await Users.findById(req.userId).select(
-      "-_id email userName fullName balance"
+      "-_id userName fullName balance"
     );
     return new ApiResponse({
       res,
       statusCode: 200,
       data: {
         user: {
-          email: user.email,
           userName: user.userName,
           fullName: user.fullName,
           balance: centsToDollars(user.balance),

@@ -34,7 +34,7 @@ export default function Login() {
       fields={loginFields}
       onSubmit={onSubmit}
       isSubmitting={isLoggingIn}
-      submitButtonText={`Log${isLoggingIn ? "gin in" : "in"}`}
+      submitButtonText={`${isLoggingIn ? "Logging in" : "Login"}`}
       footerText="Don't have an account?"
       footerLinkText="Signup"
       onFooterLinkClick={() =>

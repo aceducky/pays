@@ -46,7 +46,7 @@ export default function Signup() {
       fields={signupFields}
       onSubmit={onSubmit}
       isSubmitting={isSigningUp}
-      submitButtonText={`Sign${isSigningUp ? "ing " : " "}up`}
+      submitButtonText={`${isSigningUp ? "Signing up" : "Sign up"}`}
       footerText="Already have an account?"
       footerLinkText="Login"
       onFooterLinkClick={() =>

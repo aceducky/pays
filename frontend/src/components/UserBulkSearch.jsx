@@ -24,13 +24,17 @@ export default function UserBulkSearch() {
     filter: debouncedFilter,
     page,
     limit: 5,
-    enabled: searchRequested,
+    enabled:
+      searchRequested &&
+      (debouncedFilter === "" || debouncedFilter.length >= 3),
   });
 
   const users = data?.users || [];
   const { page: currentPage = 1, pages: totalPages = 1 } =
     data?.pagination || {};
 
+  const isFilterTooShort = filter.length > 0 && filter.length < 3;
+  
   const handleSearch = () => {
     setPage(1);
     setSearchRequested(true);
@@ -72,6 +76,7 @@ export default function UserBulkSearch() {
       </div>
 
       {isLoading && <LoadingText />}
+      
       {isError && (
         <div className="alert alert-error">
           <CircleX />
@@ -81,39 +86,45 @@ export default function UserBulkSearch() {
 
       {!isLoading && !isError && searchRequested && (
         <div className="flex flex-col gap-4 mb-6">
-          {users.length === 0 && (
+          {isFilterTooShort ? (
+            <div className="alert alert-warning">
+              Username must be at least 3 characters
+            </div>
+          ) : users.length === 0 ? (
             <div className="alert alert-info">No users found.</div>
+          ) : (
+            users.map((user) => (
+              <div
+                key={user.userName}
+                className="card bg-base-200 shadow p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-2"
+              >
+                <div className="flex-1">
+                  <div className="text-lg">@{user.userName}</div>
+                  <div className="text-base-content/80 text-sm">
+                    {user.fullName}
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  className="btn btn-primary btn-sm"
+                  onClick={() => handlePay(user.userName)}
+                >
+                  Pay
+                </button>
+              </div>
+            ))
           )}
 
-          {users.map((user) => (
-            <div
-              key={user.userName}
-              className="card bg-base-200 shadow p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-2"
-            >
-              <div className="flex-1">
-                <div className="text-lg">@{user.userName}</div>
-                <div className="text-base-content/80 text-sm">
-                  {user.fullName}
-                </div>
-              </div>
-
-              <button
-                type="button"
-                className="btn btn-primary btn-sm"
-                onClick={() => handlePay(user.userName)}
-              >
-                Pay
-              </button>
-            </div>
-          ))}
-
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setPage}
-            isFetching={isFetching}
-            className="mt-2"
-          />
+          {!isFilterTooShort && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setPage}
+              isFetching={isFetching}
+              className="mt-2"
+            />
+          )}
         </div>
       )}
     </div>

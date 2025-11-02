@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { useNavigate } from "react-router";
 
 export default function Profile() {
+  "use no memo"
   const { user } = useAuth();
   const navigate = useNavigate();
   const { changeFullNameAsync, isChangingFullName, changeFullNameError } =
@@ -32,7 +33,7 @@ export default function Profile() {
     defaultValues: {
       fullName: user?.fullName ?? "",
     },
-    mode: "onBlur",
+    mode: "onTouched",
     reValidateMode: "onChange",
   });
 
@@ -47,7 +48,7 @@ export default function Profile() {
       oldPassword: "",
       newPassword: "",
     },
-    mode: "onBlur",
+    mode: "onTouched",
     reValidateMode: "onChange",
   });
 

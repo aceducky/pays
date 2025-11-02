@@ -11,6 +11,7 @@ export const useUserBulkSearch = ({ filter = "", page = 1, limit = 5, enabled = 
       });
       return data.data;
     },
+    retry:false,
     keepPreviousData: true,
     enabled,
     select: (data) => ({

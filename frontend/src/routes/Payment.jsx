@@ -8,7 +8,8 @@ import { normalizeError } from "../utils/utils.js";
 import { usePaymentMutation } from "../hooks/usePaymentMutation.jsx";
 import { paymentSchema } from "../../../shared/zodSchemas/payment.zodSchema.js";
 
-function Payment() {
+export default function Payment() {
+  "use no memo";
   const location = useLocation();
   const navigate = useNavigate();
   const receiverUserName = location.state?.receiverUserName;
@@ -27,7 +28,7 @@ function Payment() {
       amountStr: "",
       description: "",
     },
-    mode: "onBlur",
+    mode: "onTouched",
     reValidateMode: "onChange",
   });
 
@@ -77,10 +78,10 @@ function Payment() {
               name="amountStr"
               type="text"
               hint="Enter the amount to send"
-              register={register}
               error={errors.amountStr}
               placeholder="1.00"
               disabled={isPending}
+              registration={register("amountStr")}
             />
           </div>
 
@@ -90,10 +91,10 @@ function Payment() {
               name="description"
               type="text"
               hint="Add a short note"
-              register={register}
               error={errors.description}
               placeholder="For dinner, tickets, etc."
               disabled={isPending}
+              registration={register("description")}
             />
           </div>
 
@@ -127,5 +128,3 @@ function Payment() {
     </main>
   );
 }
-
-export default Payment;

@@ -199,13 +199,16 @@ router.post(
         });
 
         await payment.save({ session });
-        return payment;
+        return {
+          payment,
+          newBalance: updatedSender.balance,
+        };
       });
       const formattedPayment = getFormattedPayment(result);
       return new ApiResponse({
         res,
         statusCode: 201,
-        data: formattedPayment,
+        data: { payment: formattedPayment, newBalance: result.newBalance },
         message: "Payment successful",
       });
     } catch (err) {
@@ -275,4 +278,3 @@ router.get(
 );
 
 export { router as paymentRouter };
-

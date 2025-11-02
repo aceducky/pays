@@ -1,5 +1,6 @@
 import { usePaymentsQuery } from "../hooks/usePaymentsQuery.js";
 import { useSearchParams } from "react-router";
+import { useEffect } from "react";
 import PaymentsList from "../components/PaymentsList.jsx";
 
 export default function Payments() {
@@ -8,6 +9,20 @@ export default function Payments() {
   const page = Number(searchParams.get("page")) || 1;
   const limit = Number(searchParams.get("limit")) || 10;
   const sort = searchParams.get("sort") || "desc";
+
+  useEffect(() => {
+    const hasPage = searchParams.has("page");
+    const hasLimit = searchParams.has("limit");
+    const hasSort = searchParams.has("sort");
+
+    if (!hasPage || !hasLimit || !hasSort) {
+      const params = new URLSearchParams(searchParams);
+      if (!hasPage) params.set("page", "1");
+      if (!hasLimit) params.set("limit", "10");
+      if (!hasSort) params.set("sort", "desc");
+      setSearchParams(params, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   const { data, isLoading, isError, error, isFetching } = usePaymentsQuery({
     page,
@@ -35,26 +50,30 @@ export default function Payments() {
         <h2 className="text-xl font-bold">Payments</h2>
 
         <div className="flex gap-2 items-center">
-          <label className="label">Sort:</label>
-          <select
-            className="select select-sm w-fit"
-            value={sort}
-            onChange={(e) => updateParams({ sort: e.target.value, page: 1 })}
-          >
-            <option value="desc">Newest</option>
-            <option value="asc">Oldest</option>
-          </select>
+          <label className="label">
+            Sort:
+            <select
+              className="select select-sm w-fit text-base-content"
+              value={sort}
+              onChange={(e) => updateParams({ sort: e.target.value, page: 1 })}
+            >
+              <option value="desc">Newest</option>
+              <option value="asc">Oldest</option>
+            </select>
+          </label>
 
-          <label className="label">Page size:</label>
-          <select
-            className="select select-sm"
-            value={limit}
-            onChange={(e) => updateParams({ limit: e.target.value, page: 1 })}
-          >
-            <option value={5}>5</option>
-            <option value={10}>10</option>
-            <option value={20}>20</option>
-          </select>
+          <label className="label">
+            Page size:
+            <select
+              className="select select-sm text-base-content"
+              value={limit}
+              onChange={(e) => updateParams({ limit: e.target.value, page: 1 })}
+            >
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+            </select>
+          </label>
         </div>
       </div>
 

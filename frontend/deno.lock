@@ -13,7 +13,7 @@
     "npm:axios@^1.12.2": "1.12.2",
     "npm:babel-plugin-react-compiler@19.1.0-rc.3": "19.1.0-rc.3",
     "npm:daisyui@^5.3.8": "5.3.8",
-    "npm:eslint-plugin-react-hooks@7": "7.0.0_eslint@9.38.0_zod@4.1.12",
+    "npm:eslint-plugin-react-hooks@^7.0.1": "7.0.1_eslint@9.38.0_zod@4.1.12",
     "npm:eslint-plugin-react-refresh@~0.4.24": "0.4.24_eslint@9.38.0",
     "npm:eslint@^9.38.0": "9.38.0",
     "npm:globals@^16.4.0": "16.4.0",
@@ -1011,8 +1011,8 @@
     "escape-string-regexp@4.0.0": {
       "integrity": "sha512-TtpcNJ3XAzx3Gq8sWRzJaVajRs0uVxA2YAkdb1jm2YkPz4G6egUFAyA3n5vtEIZefPk5Wa4UXbKuS5fKkJWdgA=="
     },
-    "eslint-plugin-react-hooks@7.0.0_eslint@9.38.0_zod@4.1.12": {
-      "integrity": "sha512-fNXaOwvKwq2+pXiRpXc825Vd63+KM4DLL40Rtlycb8m7fYpp6efrTp1sa6ZbP/Ap58K2bEKFXRmhURE+CJAQWw==",
+    "eslint-plugin-react-hooks@7.0.1_eslint@9.38.0_zod@4.1.12": {
+      "integrity": "sha512-O0d0m04evaNzEPoSW+59Mezf8Qt0InfgGIBJnpC0h3NH/WjUAR7BIKUfysC6todmtiZ/A0oUVS8Gce0WhBrHsA==",
       "dependencies": [
         "@babel/core",
         "@babel/parser",
@@ -1774,7 +1774,7 @@
         "npm:axios@^1.12.2",
         "npm:babel-plugin-react-compiler@19.1.0-rc.3",
         "npm:daisyui@^5.3.8",
-        "npm:eslint-plugin-react-hooks@7",
+        "npm:eslint-plugin-react-hooks@^7.0.1",
         "npm:eslint-plugin-react-refresh@~0.4.24",
         "npm:eslint@^9.38.0",
         "npm:globals@^16.4.0",

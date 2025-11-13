@@ -16,7 +16,10 @@ export default function LatestPaymentCard() {
           Latest transaction
         </h3>
         {latest ? (
-          <Link className="flex flex-col gap-0.5" to={`/payments/${latest.paymentId}`}>
+          <Link
+            className="flex flex-col gap-0.5"
+            to={`/payments/${latest.paymentId}`}
+          >
             <span className="text-base font-semibold">
               {latest.isSender ? "Sent" : "Received:"} @{latest.otherUserName}
             </span>

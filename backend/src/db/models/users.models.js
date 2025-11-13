@@ -1,10 +1,10 @@
 import argon2 from "argon2";
 import mongoose from "mongoose";
-import { accountSettings } from "../../../../shared/settings/accountSettings.js";
 import { isValidCentsFormat } from "../../utils/amountHelpers.js";
 import { dollarFormatter } from "../../../../shared/formatters/dollarFormatter.js";
 import logger from "../../utils/logger.js";
 import { fullNameField, userNameField } from "./commonFields.js";
+import { accountSettings } from "../../../../shared/settings/accountSettings.js";
 
 const { MIN_EMAIL_LENGTH, MAX_EMAIL_LENGTH, MIN_BALANCE, MAX_BALANCE } =
   accountSettings;

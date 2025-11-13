@@ -1,17 +1,17 @@
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CircleX } from "lucide-react";
-import TextField from "../components/TextField.jsx";
-import PasswordField from "../components/PasswordField.jsx";
-import useChangeFullName from "../hooks/useChangeFullName.jsx";
-import {
-  userFullNameChangeSchema,
-  passwordChangeSchema,
-} from "../../../shared/zodSchemas/index.js";
-import { useAuth } from "../auth/hooks/useAuth.jsx";
-import { usePasswordMutation } from "../auth/hooks/usePasswordMutation.jsx";
+import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router/internal/react-server-client";
 import { toast } from "sonner";
-import { useNavigate } from "react-router";
+import {
+  passwordChangeSchema,
+  userFullNameChangeSchema,
+} from "../../../shared/zodSchemas/index.js";
+import { useAuth } from "../auth/hooks/useAuth.js";
+import { usePasswordMutation } from "../auth/hooks/usePasswordMutation.js";
+import PasswordField from "../components/PasswordField.jsx";
+import TextField from "../components/TextField.jsx";
+import useChangeFullName from "../hooks/useChangeFullName.js";
 
 export default function Profile() {
   "use no memo"
@@ -96,10 +96,10 @@ export default function Profile() {
                 name="fullName"
                 type="text"
                 hint="Your display name"
-                register={registerName}
                 error={nameErrors.fullName}
                 placeholder="Full name"
                 disabled={isChangingFullName || isChangingPassword}
+                registration={registerName("fullName")}
               />
             </div>
 
@@ -133,8 +133,8 @@ export default function Profile() {
                 label="Old password"
                 name="oldPassword"
                 hint="Enter your current password"
-                register={registerPwd}
                 error={pwdErrors.oldPassword}
+                registration={registerPwd("oldPassword")}
               />
             </div>
 
@@ -143,8 +143,8 @@ export default function Profile() {
                 label="New password"
                 name="newPassword"
                 hint="Choose a strong password"
-                register={registerPwd}
                 error={pwdErrors.newPassword}
+                registration={registerPwd("newPassword")}
               />
             </div>
 

@@ -1,24 +1,22 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { CircleX } from "lucide-react";
 import { normalizeError } from "../utils/utils.js";
 import LoadingText from "./LoadingText.jsx";
 import { useNavigate } from "react-router/internal/react-server-client";
 import Pagination from "./Pagination.jsx";
-import { useUserBulkSearch } from "../hooks/useUserBulkSearch.jsx";
+import { useUserBulkSearch } from "../hooks/useUserBulkSearch.js";
 import { useDebounce } from "../hooks/useDebounce.js";
 
 export default function UserBulkSearch() {
   const [filter, setFilter] = useState("");
   const [page, setPage] = useState(1);
-  const [searchRequested, setSearchRequested] = useState(false);
+
+  const [searchRequested, setSearchRequested] = useState(
+    () => filter === "" && page === 1
+  );
+
   const debouncedFilter = useDebounce(filter, 500);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!searchRequested && filter === "" && page === 1) {
-      setSearchRequested(true);
-    }
-  }, [filter, page, searchRequested]);
 
   const { data, isLoading, isFetching, isError, error } = useUserBulkSearch({
     filter: debouncedFilter,
@@ -34,7 +32,7 @@ export default function UserBulkSearch() {
     data?.pagination || {};
 
   const isFilterTooShort = filter.length > 0 && filter.length < 3;
-  
+
   const handleSearch = () => {
     setPage(1);
     setSearchRequested(true);
@@ -76,7 +74,7 @@ export default function UserBulkSearch() {
       </div>
 
       {isLoading && <LoadingText />}
-      
+
       {isError && (
         <div className="alert alert-error">
           <CircleX />

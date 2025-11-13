@@ -14,7 +14,7 @@ const Dashboard = lazy(() => import("./routes/Dashboard.jsx"));
 const Payments = lazy(() => import("./routes/Payments.jsx"));
 const PaymentReceipt = lazy(() => import("./routes/PaymentReceipt.jsx"));
 const Profile = lazy(() => import("./routes/Profile.jsx"));
-const UserBulkSearch = lazy(() => import("./components/UserBulkSearch.jsx"));
+const Users = lazy(() => import("./routes/Users.jsx"));
 const Payment = lazy(() => import("./routes/Payment.jsx"));
 
 const router = createBrowserRouter([
@@ -56,7 +56,7 @@ const router = createBrowserRouter([
           },
           {
             path: "users",
-            element: <UserBulkSearch />,
+            element: <Users />,
           },
           {
             path: "profile",

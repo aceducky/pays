@@ -5,7 +5,7 @@ const {
   MAX_USERNAME_LENGTH,
   MIN_FULLNAME_LENGTH,
   MAX_FULLNAME_LENGTH,
-} = accountSettings;
+} = accountSettings ;
 
 export const userNameField = (options = {}) => ({
   type: String,

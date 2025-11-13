@@ -2,4 +2,4 @@
 
 A virtual payments platform
 
-Check it out here: <a href="https://pays.aceducky.deno.net/" target="_blank">Pays App</a>
+Check it out here: [Pays App](https://pays.aceducky.deno.net/) 

@@ -1,8 +1,6 @@
 import { Router } from "express";
 import mongoose from "mongoose";
-import {
-  userFullNameChangeSchema,
-} from "../../../shared/zodSchemas/user.zodSchema.js";
+import { userFullNameChangeSchema } from "../../../shared/zodSchemas/index.js";
 import { Users } from "../db/models/users.models.js";
 import authMiddleware from "../middleware/auth.middleware.js";
 import { rateLimitMiddleware } from "../middleware/rateLimit.middleware.js";
@@ -10,6 +8,7 @@ import reqBodyValidatorMiddleware from "../middleware/reqBodyValidator.middlewar
 import {
   balanceCheckLimiter,
   fullNameChangeLimiter,
+  selfProfileLimiter,
   userListingLimiter,
 } from "../rateLimiters.js";
 import { centsToDollars } from "../utils/amountHelpers.js";
@@ -18,8 +17,37 @@ import { ApiError, ServerError } from "../utils/Errors.js";
 import logger from "../utils/logger.js";
 import { getPaginationValues } from "../utils/reqQueryHelper.js";
 import { queryUsersSchema } from "../zodSchemas/user.zodSchema.js";
+import { dollarFormatter } from "../../../shared/formatters/dollarFormatter.js";
 
 const router = Router();
+
+router.get(
+  "/me",
+  rateLimitMiddleware(selfProfileLimiter),
+  authMiddleware,
+  async (req, res) => {
+    const fetchedUser = await Users.findById(req.userId)
+      .select("fullName balance")
+      .lean();
+    if (!fetchedUser) {
+      throw new ApiError({
+        statusCode: 400,
+        message: "User not found",
+      });
+    }
+    return new ApiResponse({
+      res,
+      statusCode: 200,
+      data: {
+        user: {
+          userName: req.userName,
+          fullName: fetchedUser.fullName,
+          balance: dollarFormatter(fetchedUser.balance),
+        },
+      },
+    });
+  }
+);
 
 router.get(
   "/bulk",

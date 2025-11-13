@@ -45,7 +45,7 @@ app.use((req, _res, next) => {
   console.log(`${req.method}: ${req.url}`);
   console.log("  Params: ", req.params);
   console.log("  Body: ", JSON.stringify(req.body, null, 2));
-  console.log("cookies", req.cookies.accessToken, req.cookies.refreshToken);
+  console.log("Auth header: ",req.headers?.authorization);
   console.log("________________\n");
   next();
 });

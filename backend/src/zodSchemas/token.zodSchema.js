@@ -1,5 +1,5 @@
 import z from "zod/v4";
-import { userNameSchema } from "../../../shared/zodSchemas/user.zodSchema.js";
+import { userNameSchema } from "../../../shared/zodSchemas/index.js";
 import { userIdSchema } from "./user.zodSchema.js";
 
 export const decodedAccessTokenSchema = z.object({

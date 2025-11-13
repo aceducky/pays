@@ -35,12 +35,19 @@ export const loginLimiter = makeLimiter({
   category: "login",
 });
 
-export const selfProfileLimiter = makeLimiter({
+export const authRefreshLimiter = makeLimiter({
   tokens: 20,
-  refillInterval: "2 m",
+  refillInterval: "5 m",
   refillRate: 10,
   category: "profile",
 });
+
+export const selfProfileLimiter = makeLimiter({
+  tokens: 10,
+  refillInterval: "2 m",
+  refillRate: 5,
+  category: "profile"
+})
 
 export const passwordChangeLimiter = makeLimiter({
   tokens: 3,

@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { USERS_BULK_QUERY_KEY } from "../utils/queryClient.jsx";
+import { USERS_BULK_QUERY_KEY } from "../utils/queryClient.js";
 import { api } from "../api/api.js";
 
 export const useUserBulkSearch = ({ filter = "", page = 1, limit = 5, enabled = false }) => {

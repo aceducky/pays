@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import z from "zod/v4";
-import { userNameSchema } from "../../../shared/zodSchemas/user.zodSchema.js";
+import { userNameSchema } from "../../../shared/zodSchemas/index.js";
 
 
 export const userIdSchema = z

@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router";
 import AuthForm from "../components/AuthForm.jsx";
-import { userSignupSchema } from "../../../shared/zodSchemas/user.zodSchema.js";
-import { useAuth } from "../auth/hooks/useAuth.jsx";
+import { userSignupSchema } from "../../../shared/zodSchemas/index.js";
+import { useAuth } from "../auth/hooks/useAuth.js";
 
 export default function Signup() {
   const navigate = useNavigate();

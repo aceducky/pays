@@ -12,7 +12,6 @@ export default function PaymentReceipt() {
   if (isError)
     return <div className="alert alert-error">{normalizeError(error)}</div>;
   if (!data) return <div className="alert alert-info">No payment found.</div>;
-  console.log(JSON.stringify(data));
   
   return (
     <>
@@ -27,8 +26,8 @@ export default function PaymentReceipt() {
             <span className="font-semibold">From:</span>
             <span className="text-right">
               <div>@{data.senderUserName}</div>
-              <div className="text-xs text-base-content/60" title="Full name at time of payment">
-                {data.senderFullNameSnapshot}
+              <div className="text-xs text-base-content/80" title="Full name at time of payment">
+                {data.senderFullNameSnapshot}<sup>*</sup>
               </div>
             </span>
           </div>
@@ -36,8 +35,8 @@ export default function PaymentReceipt() {
             <span className="font-semibold">To:</span>
             <span className="text-right">
               <div>@{data.receiverUserName}</div>
-              <div className="text-xs text-base-content/60" title="Full name at time of payment">
-                {data.receiverFullNameSnapshot}
+              <div className="text-xs text-base-content/80" title="Full name at time of payment">
+                {data.receiverFullNameSnapshot}<sup>*</sup>
               </div>
             </span>
           </div>

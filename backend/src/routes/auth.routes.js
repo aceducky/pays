@@ -5,22 +5,30 @@ import authMiddleware from "../middleware/auth.middleware.js";
 import { rateLimitMiddleware } from "../middleware/rateLimit.middleware.js";
 import reqBodyValidatorMiddleware from "../middleware/reqBodyValidator.middleware.js";
 import {
+  authRefreshLimiter,
   loginLimiter,
   passwordChangeLimiter,
-  selfProfileLimiter,
   signupLimiter,
 } from "../rateLimiters.js";
 import { centsToDollars } from "../utils/amountHelpers.js";
 import ApiResponse from "../utils/ApiResponse.js";
-import { ApiError, ServerError } from "../utils/Errors.js";
+import {
+  ApiError,
+  INVALID_SESSION_ERROR,
+  ServerError,
+} from "../utils/Errors.js";
 import logger from "../utils/logger.js";
-import { clearAuthCookies, initiateNewTokens } from "../utils/tokenHelper.js";
+import {
+  clearAuthTokens,
+  generateTokenPairFromRefreshToken,
+  initiateNewTokens,
+} from "../utils/tokenHelper.js";
 import { verifyPassword } from "../utils/verifyPassword.js";
 import {
   passwordChangeSchema,
   userSignupSchema,
   userLoginSchema,
-} from "../../../shared/zodSchemas/user.zodSchema.js";
+} from "../../../shared/zodSchemas/index.js";
 
 const router = Router();
 
@@ -41,7 +49,11 @@ router.post(
       });
 
       // Initiate new tokens with full expiry
-      await initiateNewTokens({ req, res, userId: user._id, userName });
+      const { accessToken } = await initiateNewTokens({
+        res,
+        userId: user._id,
+        userName,
+      });
 
       return new ApiResponse({
         res,
@@ -52,6 +64,7 @@ router.post(
             fullName: user.fullName,
             balance: centsToDollars(user.balance),
           },
+          accessToken,
         },
         message: "User created successfully",
       });
@@ -111,8 +124,7 @@ router.post(
 
     // Initiate new tokens with full expiry for fresh login
     // overrides existing ones, if any
-    await initiateNewTokens({
-      req,
+    const { accessToken } = await initiateNewTokens({
       res,
       userId: user._id,
       userName: user.userName,
@@ -127,39 +139,38 @@ router.post(
           fullName: user.fullName,
           balance: centsToDollars(user.balance),
         },
+        accessToken,
       },
       message: "User logged in successfully",
     });
   }
 );
 
-router.get(
-  "/my-profile",
-  rateLimitMiddleware(selfProfileLimiter),
-  authMiddleware,
+router.post(
+  "/refresh",
+  rateLimitMiddleware(authRefreshLimiter),
   async (req, res) => {
-    const user = await Users.findById(req.userId).select(
-      "-_id userName fullName balance"
-    );
-    return new ApiResponse({
-      res,
-      statusCode: 200,
-      data: {
-        user: {
-          userName: user.userName,
-          fullName: user.fullName,
-          balance: centsToDollars(user.balance),
-        },
-      },
-    });
+    try {
+      const { accessToken } = await generateTokenPairFromRefreshToken(req, res);
+
+      return new ApiResponse({
+        res,
+        statusCode: 200,
+        data: { accessToken },
+        message: "Token refreshed successfully",
+      });
+    } catch (err) {
+      if (err instanceof ApiError || err instanceof ServerError) throw err;
+      throw INVALID_SESSION_ERROR;
+    }
   }
 );
 
-router.post("/logout", authMiddleware, async (req, res) => {
+router.post("/logout", async (req, res) => {
   try {
-    await clearAuthCookies(req, res);
+    await clearAuthTokens(req, res);
   } catch (err) {
-    logger.error("logout", "Error clearing auth cookies", err);
+    logger.error("logout", "Error clearing auth tokens", err);
   }
   // show logout success even if there was an error
   return new ApiResponse({
@@ -193,7 +204,7 @@ router.post(
     await user.save();
 
     // Initiate new tokens with full expiry after password change
-    await initiateNewTokens({
+    const { accessToken } = await initiateNewTokens({
       req,
       res,
       userId: user._id,
@@ -203,7 +214,7 @@ router.post(
     return new ApiResponse({
       res,
       statusCode: 200,
-      data: null,
+      data: { accessToken },
       message: "Password updated successfully",
     });
   }

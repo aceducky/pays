@@ -8,6 +8,5 @@ export const paymentIdSchema = z
   .refine((v) => mongoose.Types.ObjectId.isValid(v), {
     error: "Invalid payment id.",
   });
-export const paymentTypeSchema = z.enum(["", "sent", "received"]);
 export const paymentSortSchema = z.enum(["", "asc", "desc"]);
 

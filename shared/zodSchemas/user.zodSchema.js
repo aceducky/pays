@@ -26,7 +26,7 @@ export const userNameSchema = z
   );
 
 export const emailSchema = z
-  .email("Email is required.")
+  .email("Invalid email.")
   .trim()
   .min(
     MIN_EMAIL_LENGTH,

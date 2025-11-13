@@ -1,12 +1,12 @@
-import { useLocation, useNavigate } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { CircleX, ArrowLeft } from "lucide-react";
 import TextField from "../components/TextField.jsx";
 import { normalizeError } from "../utils/utils.js";
-import { usePaymentMutation } from "../hooks/usePaymentMutation.jsx";
-import { paymentSchema } from "../../../shared/zodSchemas/payment.zodSchema.js";
+import { usePaymentMutation } from "../hooks/usePaymentMutation.js";
+import { paymentSchema } from "../../../shared/zodSchemas/index.js";
 
 export default function Payment() {
   "use no memo";
@@ -108,22 +108,16 @@ export default function Payment() {
           <button
             type="submit"
             disabled={isPending}
-            className="btn btn-accent w-full py-3 text-lg font-semibold hover:shadow-lg transition"
+            className="btn btn-accent w-full py-3 mt-4 text-lg font-semibold hover:shadow-lg transition"
           >
             {isPending ? "Processing..." : "Send Payment"}
           </button>
-
-          <div className="text-center text-sm text-base-content/70 mt-4">
-            <button
-              type="button"
-              className="underline hover:text-accent"
-              onClick={() => navigate("/dashboard")}
-              disabled={isPending}
-            >
-              Back to Dashboard
-            </button>
-          </div>
         </form>
+        <div className="text-center text-sm mt-4">
+          <Link className="underline opacity-70 hover:text-accent hover:opacity-100 " to="/dashboard">
+            Back to Dashboard
+          </Link>
+        </div>
       </div>
     </main>
   );

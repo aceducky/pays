@@ -1,7 +1,7 @@
 import z from "zod/v4";
-import { paymentSettings } from "../settings/paymentSettings.js";
 import { dollarFormatter } from "../formatters/dollarFormatter.js";
 import { userNameSchema } from "./user.zodSchema.js";
+import { paymentSettings } from "../settings/paymentSettings.js";
 
 //In dollars
 export const paymentAmountStrSchema = z

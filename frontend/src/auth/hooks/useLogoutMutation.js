@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { api } from "../../api/api.js";
-import { USER_QUERY_KEY } from "../../utils/queryClient.jsx";
 import { toast } from "sonner";
-import { normalizeError } from "../../utils/utils.js";
+import { api } from "../../api/api.js";
+import { USER_QUERY_KEY } from "../../utils/queryClient.js";
+import { normalizeError, removeToken } from "../../utils/utils.js";
 
 export function useLogoutMutation() {
   const queryClient = useQueryClient();
@@ -12,13 +12,17 @@ export function useLogoutMutation() {
     mutationFn: async () => {
       await api.post("/auth/logout");
     },
-    onSuccess: () => {
+    onSettled: () => {
+      removeToken();
       queryClient.setQueryData(USER_QUERY_KEY, null);
+    },
+    onSuccess: () => {
       console.log("Logout successful");
     },
     onError: (error) => {
-      toast.error(normalizeError(error));
-      console.error("Logout failed", error.response?.data?.message ?? error.message);
+      const err = normalizeError(error);
+      toast.error(err);
+      console.error("Logout failed", err);
     },
   });
 }

@@ -21,12 +21,12 @@ export default function PaymentCard({ payment }) {
           )}
         </div>
 
-        <div className="flex items-center gap-4 sm:gap-6">
-          <div className="font-bold text-lg whitespace-nowrap">
+        <div className="flex items-center gap-4 sm:gap-6 flex-wrap justify-between">
+          <div className="font-bold text-lg wrap-break-word">
             {payment.amount}
           </div>
           
-          <div className="text-xs text-base-content whitespace-nowrap">
+          <div className="text-xs text-base-content">
             {new Date(payment.timestamp).toLocaleString()}
           </div>
         </div>

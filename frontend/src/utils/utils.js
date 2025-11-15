@@ -7,3 +7,15 @@ export function normalizeError(error) {
     "An unexpected error occurred"
   );
 }
+
+export function getToken() {
+  return localStorage.getItem("accessToken");
+}
+
+export function setToken(accessToken) {
+  localStorage.setItem("accessToken", accessToken);
+}
+
+export function removeToken() {
+  localStorage.removeItem("accessToken");
+}

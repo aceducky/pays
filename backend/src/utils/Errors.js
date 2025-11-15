@@ -15,7 +15,7 @@ class CustomError extends Error {
     this.success = false;
     this.data = data;
     if (isEnvDEVELOPMENT()) {
-      if (stack) this.stack = stack ?? new Error().stack;
+      this.stack = stack ?? new Error().stack;
     }
   }
 
@@ -55,4 +55,8 @@ class ServerError extends CustomError {
   }
 }
 
-export { ApiError, ServerError };
+const INVALID_SESSION_ERROR = new ApiError({
+  statusCode: 401,
+  message: "Your session has expired or is invalid. Please log in",
+});
+export { ApiError, ServerError, INVALID_SESSION_ERROR };

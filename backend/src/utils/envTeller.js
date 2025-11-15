@@ -1,6 +1,5 @@
-import { ServerError } from "./Errors.js";
 import logger from "./logger.js";
-import process  from "node:process";
+import process from "node:process";
 
 const isEnvDEVELOPMENT = () => {
   if (!process.env.NODE_ENV) {
@@ -13,14 +12,15 @@ const getEnvVar = (key) => {
   const value = process.env[key];
   if (!value) {
     logger.error(key, `ENV does not have ${key} set`);
-    throw new ServerError();
+    const err = new Error("env error", `ENV does not have ${key} set`);
+    err.statusCode = 500;
+    err.success = false;
+    throw err;
   }
   return value;
 };
 
 const getAccessTokenSecret = () => getEnvVar("ACCESS_TOKEN_SECRET");
-const getAccessTokenExpiryForCookie_ms = () =>
-  parseInt(getEnvVar("ACCESS_TOKEN_EXPIRY_MS"), 10); // in ms
 const getAccessTokenExpiryForToken_s = () =>
   Math.floor(parseInt(getEnvVar("ACCESS_TOKEN_EXPIRY_MS"), 10) / 1000); // in s
 const getRefreshTokenSecret = () => getEnvVar("REFRESH_TOKEN_SECRET");
@@ -31,7 +31,6 @@ const getRefreshTokenExpiryForToken_s = () =>
 const getMONGODB_URI = () => getEnvVar("MONGODB_URI");
 
 export {
-  getAccessTokenExpiryForCookie_ms,
   getAccessTokenExpiryForToken_s,
   getAccessTokenSecret,
   getMONGODB_URI,

@@ -1,8 +1,8 @@
-import { useLoginMutation } from "./useLoginMutation.jsx";
-import { useLogoutMutation } from "./useLogoutMutation.jsx";
-import { useSignupMutation } from "./useSignupMutation.jsx";
-import { useUserQuery } from "./useUserQuery.jsx";
-import { usePasswordMutation } from "./usePasswordMutation.jsx";
+import { useLoginMutation } from "./useLoginMutation.js";
+import { useLogoutMutation } from "./useLogoutMutation.js";
+import { useSignupMutation } from "./useSignupMutation.js";
+import { useUserQuery } from "./useUserQuery.js";
+import { usePasswordMutation } from "./usePasswordMutation.js";
 import {normalizeError} from "../../utils/utils.js";
 
 export function useAuth() {

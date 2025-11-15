@@ -3,19 +3,19 @@ import { Eye, EyeOff } from "lucide-react";
 
 export default function PasswordField({
   label,
-  name,
   hint,
-  register,
   error,
   disabled = false,
   placeholder = "********",
+  registration,
 }) {
+  "use no memo"
   const [type, setType] = useState("password");
 
   const toggleType = () => {
     setType((prevType) => (prevType === "password" ? "text" : "password"));
   };
- 
+
   return (
     <label className="w-5/6">
       <span className="label mb-1 text-white">{label}</span>
@@ -25,10 +25,10 @@ export default function PasswordField({
         }`}
       >
         <input
+          {...registration}
           type={type}
           disabled={disabled}
           placeholder={placeholder || label}
-          {...register(name)}
           className={`${error ? "input-error" : ""}`}
         />
         <button

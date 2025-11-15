@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router";
 import AuthForm from "../components/AuthForm.jsx";
 import { userSignupSchema } from "../../../shared/zodSchemas/user.zodSchema.js";
-import { useAuth } from "../auth/hooks/useAuth.jsx";
+import { useAuth } from "../auth/hooks/useAuth.js";
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -46,7 +46,7 @@ export default function Signup() {
       fields={signupFields}
       onSubmit={onSubmit}
       isSubmitting={isSigningUp}
-      submitButtonText={`Sign${isSigningUp ? "ing " : " "}up`}
+      submitButtonText={`${isSigningUp ? "Signing up" : "Sign up"}`}
       footerText="Already have an account?"
       footerLinkText="Login"
       onFooterLinkClick={() =>

@@ -1,21 +1,20 @@
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CircleX } from "lucide-react";
-import TextField from "../components/TextField.jsx";
-import PasswordField from "../components/PasswordField.jsx";
-import useChangeFullName from "../hooks/useChangeFullName.jsx";
-import {
-  userFullNameChangeSchema,
-  passwordChangeSchema,
-} from "../../../shared/zodSchemas/index.js";
-import { useAuth } from "../auth/hooks/useAuth.jsx";
-import { usePasswordMutation } from "../auth/hooks/usePasswordMutation.jsx";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { useNavigate } from "react-router";
+import {
+  passwordChangeSchema,
+  userFullNameChangeSchema,
+} from "../../../shared/zodSchemas/user.zodSchema.js";
+import { useAuth } from "../auth/hooks/useAuth.js";
+import { usePasswordMutation } from "../auth/hooks/usePasswordMutation.js";
+import PasswordField from "../components/PasswordField.jsx";
+import TextField from "../components/TextField.jsx";
+import useChangeFullName from "../hooks/useChangeFullName.js";
 
 export default function Profile() {
+  "use no memo";
   const { user } = useAuth();
-  const navigate = useNavigate();
   const { changeFullNameAsync, isChangingFullName, changeFullNameError } =
     useChangeFullName();
 
@@ -32,7 +31,7 @@ export default function Profile() {
     defaultValues: {
       fullName: user?.fullName ?? "",
     },
-    mode: "onBlur",
+    mode: "onTouched",
     reValidateMode: "onChange",
   });
 
@@ -47,7 +46,7 @@ export default function Profile() {
       oldPassword: "",
       newPassword: "",
     },
-    mode: "onBlur",
+    mode: "onTouched",
     reValidateMode: "onChange",
   });
 
@@ -56,7 +55,6 @@ export default function Profile() {
       const response = await changeFullNameAsync({ fullName: data.fullName });
       resetNameForm({ fullName: data.fullName });
       toast.success(response.message);
-      navigate("/dashboard");
     } catch {
       console.log("Failed updating full name");
     }
@@ -70,7 +68,6 @@ export default function Profile() {
       });
       resetPwdForm({ oldPassword: "", newPassword: "" });
       toast.success(response.message);
-      navigate("/dashboard");
     } catch {
       console.log("Failed changing password");
     }
@@ -95,10 +92,10 @@ export default function Profile() {
                 name="fullName"
                 type="text"
                 hint="Your display name"
-                register={registerName}
                 error={nameErrors.fullName}
                 placeholder="Full name"
                 disabled={isChangingFullName || isChangingPassword}
+                registration={registerName("fullName")}
               />
             </div>
 
@@ -112,15 +109,14 @@ export default function Profile() {
             <button
               type="submit"
               disabled={isChangingFullName || isChangingPassword}
-              className="btn btn-accent w-full py-3 text-lg font-semibold hover:shadow-lg transition"
+              className="btn btn-primary w-full py-3 text-lg font-semibold hover:shadow-lg transition"
             >
               {isChangingFullName ? "Updating..." : "Update name"}
             </button>
           </form>
         </div>
 
-        <hr className="w-full border-base-300 mb-6" />
-
+        <div className="divider m-2"></div>
         <div className="w-full mb-2">
           <h3 className="text-lg font-medium mb-3">Change password</h3>
           <form
@@ -132,8 +128,8 @@ export default function Profile() {
                 label="Old password"
                 name="oldPassword"
                 hint="Enter your current password"
-                register={registerPwd}
                 error={pwdErrors.oldPassword}
+                registration={registerPwd("oldPassword")}
               />
             </div>
 
@@ -142,8 +138,8 @@ export default function Profile() {
                 label="New password"
                 name="newPassword"
                 hint="Choose a strong password"
-                register={registerPwd}
                 error={pwdErrors.newPassword}
+                registration={registerPwd("newPassword")}
               />
             </div>
 
@@ -157,7 +153,7 @@ export default function Profile() {
             <button
               type="submit"
               disabled={isChangingPassword || isChangingFullName}
-              className="btn btn-accent w-full py-3 text-lg font-semibold hover:shadow-lg transition"
+              className="btn btn-primary w-full py-3 text-lg font-semibold hover:shadow-lg transition"
             >
               {isChangingPassword ? "Processing..." : "Change password"}
             </button>

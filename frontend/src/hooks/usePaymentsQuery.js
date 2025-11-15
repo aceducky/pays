@@ -12,6 +12,5 @@ export function usePaymentsQuery({ page = 1, sort = "desc", limit =10, skip } = 
       });
       return res.data.data;
     },
-    keepPreviousData: true,
   });
 }

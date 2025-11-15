@@ -25,10 +25,8 @@ export const userNameSchema = z
     "Username must start and end with a letter, and can contain underscores in between."
   );
 
-export const queryUsersSchema = userNameSchema.or(z.literal(""));
-
 export const emailSchema = z
-  .email("Email is required.")
+  .email("Invalid email.")
   .trim()
   .min(
     MIN_EMAIL_LENGTH,
@@ -59,6 +57,8 @@ export const fullNameSchema = z
         "Full name must only contain letters with a single space between names.",
     }
   );
+
+export const queryUsersSchema = userNameSchema.or(z.literal(""));
 
 export const passwordSchema = z
   .string("Password is required.")

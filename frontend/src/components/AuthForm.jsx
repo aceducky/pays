@@ -16,16 +16,16 @@ export default function AuthForm({
   onFooterLinkClick,
   serverError,
 }) {
-  const {
+  "use no memo"
+   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(schema),
-    mode: "onBlur",
+    mode: "onTouched",
     reValidateMode: "onChange",
   });
-
   return (
     <main className="grid place-items-center h-screen">
       <div className="flex flex-col w-full px-2 max-w-sm">
@@ -43,8 +43,8 @@ export default function AuthForm({
                   label={field.label}
                   name={field.name}
                   hint={field.hint}
-                  register={register}
                   error={errors[field.name]}
+                  registration={register(field.name)}
                 />
               );
             }
@@ -55,9 +55,9 @@ export default function AuthForm({
                 name={field.name}
                 type={field.type || "text"}
                 hint={field.hint}
-                register={register}
                 placeholder={field.placeholder}
                 error={errors[field.name]}
+                registration={register(field.name)}
               />
             );
           })}

@@ -1,6 +1,6 @@
 import { Outlet } from "react-router";
 import Navbar from "./Navbar.jsx";
-import Sidebar from "./Sidebar.jsx"; // New import
+import Sidebar from "./Sidebar.jsx";
 
 export default function SignedInRootLayout() {
   return (
@@ -13,7 +13,11 @@ export default function SignedInRootLayout() {
         </main>
       </div>
       <div className="drawer-side">
-        <label htmlFor="main-drawer" aria-label="close sidebar" className="drawer-overlay" />
+        <label
+          htmlFor="main-drawer"
+          aria-label="close sidebar"
+          className="drawer-overlay"
+        />
         <Sidebar />
       </div>
     </div>

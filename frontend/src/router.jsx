@@ -1,20 +1,21 @@
-import { createBrowserRouter } from "react-router";
-import Homepage from "./routes/Homepage.jsx";
 import { lazy } from "react";
+import { createBrowserRouter } from "react-router";
 import AutoPublicProtectedRoute from "./routes/AutoPublicPrivateRoute.jsx";
-import UserBulkSearch from "./components/UserBulkSearch.jsx";
-import Profile from "./routes/Profile.jsx";
-import Payment from "./routes/Payment.jsx";
-import NotFound from "./components/NotFound.jsx";
+import Homepage from "./routes/Homepage.jsx";
 
-const Dashboard = lazy(() => import("./routes/Dashboard.jsx"));
-const Payments = lazy(() => import("./routes/Payments.jsx"));
 const Signup = lazy(() => import("./routes/Signup.jsx"));
 const Login = lazy(() => import("./routes/Login.jsx"));
-const PaymentReceipt = lazy(() => import("./routes/PaymentReceipt.jsx"));
 const SignedInRootLayout = lazy(() =>
   import("./components/SignedInRootLayout.jsx")
 );
+const NotFound = lazy(() => import("./components/NotFound.jsx"));
+const ErrorElement = lazy(() => import("./components/ErrorElement.jsx"));
+const Dashboard = lazy(() => import("./routes/Dashboard.jsx"));
+const Payments = lazy(() => import("./routes/Payments.jsx"));
+const PaymentReceipt = lazy(() => import("./routes/PaymentReceipt.jsx"));
+const Profile = lazy(() => import("./routes/Profile.jsx"));
+const Users = lazy(() => import("./routes/Users.jsx"));
+const Payment = lazy(() => import("./routes/Payment.jsx"));
 
 const router = createBrowserRouter([
   {
@@ -55,7 +56,7 @@ const router = createBrowserRouter([
           },
           {
             path: "users",
-            element: <UserBulkSearch />,
+            element: <Users />,
           },
           {
             path: "profile",
@@ -72,6 +73,7 @@ const router = createBrowserRouter([
         element: <NotFound />,
       },
     ],
+    errorElement: <ErrorElement />,
   },
 ]);
 

@@ -1,30 +1,40 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { CircleX } from "lucide-react";
 import { normalizeError } from "../utils/utils.js";
 import LoadingText from "./LoadingText.jsx";
-import { useNavigate } from "react-router/internal/react-server-client";
+import { useNavigate } from "react-router";
 import Pagination from "./Pagination.jsx";
-import { useUserBulkSearch } from "../hooks/useUserBulkSearch.jsx";
+import { useUserBulkSearch } from "../hooks/useUserBulkSearch.js";
 import { useDebounce } from "../hooks/useDebounce.js";
+import { queryUsersSchema } from "../../../shared/zodSchemas/user.zodSchema.js";
 
 export default function UserBulkSearch() {
   const [filter, setFilter] = useState("");
   const [page, setPage] = useState(1);
-  const [searchRequested, setSearchRequested] = useState(false);
+  const [searchRequested, setSearchRequested] = useState(
+    () => filter === "" && page === 1
+  );
+
   const debouncedFilter = useDebounce(filter, 500);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!searchRequested && filter === "" && page === 1) {
-      setSearchRequested(true);
+  let validationError = null;
+  if (debouncedFilter !== "") {
+    const result = queryUsersSchema.safeParse(debouncedFilter);
+    if (!result.success) {
+      validationError =
+        result.error?.issues?.[0]?.message || "Invalid username format";
     }
-  }, [filter, page, searchRequested]);
+  }
+
+  const isValidForSearch =
+    debouncedFilter === "" || (debouncedFilter.length >= 3 && !validationError);
 
   const { data, isLoading, isFetching, isError, error } = useUserBulkSearch({
     filter: debouncedFilter,
     page,
     limit: 5,
-    enabled: searchRequested,
+    enabled: searchRequested && isValidForSearch,
   });
 
   const users = data?.users || [];
@@ -39,6 +49,8 @@ export default function UserBulkSearch() {
   const handlePay = (userName) => {
     navigate("/payment", { state: { receiverUserName: userName } });
   };
+
+  const showValidationError = validationError && filter === debouncedFilter;
 
   return (
     <div className="w-full max-w-2xl mx-auto h-full flex flex-col">
@@ -60,18 +72,17 @@ export default function UserBulkSearch() {
             }}
           />
         </label>
-        <button
-          type="button"
-          className="btn btn-primary"
-          onClick={handleSearch}
-          disabled={isFetching}
-        >
-          {isFetching && <span className="loading loading-spinner"></span>}
-          Search
-        </button>
       </div>
 
+      {showValidationError && (
+        <div className="alert alert-warning mb-4">
+          <CircleX />
+          {validationError}
+        </div>
+      )}
+
       {isLoading && <LoadingText />}
+
       {isError && (
         <div className="alert alert-error">
           <CircleX />
@@ -81,39 +92,41 @@ export default function UserBulkSearch() {
 
       {!isLoading && !isError && searchRequested && (
         <div className="flex flex-col gap-4 mb-6">
-          {users.length === 0 && (
+          {users.length === 0 && isValidForSearch ? (
             <div className="alert alert-info">No users found.</div>
+          ) : (
+            users.map((user) => (
+              <div
+                key={user.userName}
+                className="card bg-base-200 shadow p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-2"
+              >
+                <div className="flex-1">
+                  <div className="text-lg">@{user.userName}</div>
+                  <div className="text-base-content/80 text-sm">
+                    {user.fullName}
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  className="btn btn-primary btn-sm"
+                  onClick={() => handlePay(user.userName)}
+                >
+                  Pay
+                </button>
+              </div>
+            ))
           )}
 
-          {users.map((user) => (
-            <div
-              key={user.userName}
-              className="card bg-base-200 shadow p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-2"
-            >
-              <div className="flex-1">
-                <div className="text-lg">@{user.userName}</div>
-                <div className="text-base-content/80 text-sm">
-                  {user.fullName}
-                </div>
-              </div>
-
-              <button
-                type="button"
-                className="btn btn-primary btn-sm"
-                onClick={() => handlePay(user.userName)}
-              >
-                Pay
-              </button>
-            </div>
-          ))}
-
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setPage}
-            isFetching={isFetching}
-            className="mt-2"
-          />
+          {isValidForSearch && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setPage}
+              isFetching={isFetching}
+              className="mt-2"
+            />
+          )}
         </div>
       )}
     </div>

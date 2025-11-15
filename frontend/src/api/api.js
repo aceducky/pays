@@ -1,40 +1,99 @@
 import axios from "axios";
-import { queryClient, USER_QUERY_KEY } from "../utils/queryClient.jsx";
+import { queryClient, USER_QUERY_KEY } from "../utils/queryClient.js";
+import { getToken, removeToken, setToken } from "../utils/utils.js";
+
+const BASE_URL = "https://pays.aceducky.deno.net/api/v1";
 
 const api = axios.create({
-  // baseURL: "http://localhost:3000/api/v1",
-  baseURL: "https://pays.aceducky.deno.net/api/v1",
+  baseURL: BASE_URL,
   withCredentials: true,
+  timeout: 10 * 1000,
 });
 
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach((p) => {
+    if (error) p.reject(error);
+    else p.resolve(token);
+  });
+  failedQueue = [];
+};
+
+api.interceptors.request.use(
+  (config) => {
+    const token = getToken();
+    if (token) {
+      config.headers = config.headers || {};
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (err) => Promise.reject(err)
+);
+
 api.interceptors.response.use(
-  (response) => response,
-  (error) => {
+  (response) => {
+    const accessToken = response.data?.data?.accessToken;
+    if (accessToken) setToken(accessToken);
+    return response;
+  },
+
+  async (error) => {
     const originalRequest = error.config;
 
+    if (!error.response || error.response.status !== 401) {
+      return Promise.reject(error);
+    }
+
+    // don't try to refresh while handling refresh/logout endpoints (avoids infinite loops)
+    const NO_REFRESH_ROUTES = ["/auth/refresh", "/auth/logout"];
     if (
-      originalRequest.url?.includes("/auth/logout") &&
-      error.response?.status === 401
+      NO_REFRESH_ROUTES.some((route) => originalRequest.url?.includes(route))
     ) {
+      removeToken();
       queryClient.setQueryData(USER_QUERY_KEY, null);
-      throw error;
+      return Promise.reject(error);
     }
 
-    if (!originalRequest._retryCount) {
-      originalRequest._retryCount = 0;
+    if (isRefreshing) {
+      return new Promise((resolve, reject) => {
+        failedQueue.push({ resolve, reject });
+      })
+        .then((token) => {
+          originalRequest.headers = originalRequest.headers || {};
+          originalRequest.headers.Authorization = `Bearer ${token}`;
+          return api(originalRequest);
+        })
+        .catch((err) => Promise.reject(err));
     }
 
-    // Retry once
-    if (error.response?.status === 401 && originalRequest._retryCount < 1) {
-      originalRequest._retryCount++;
+    originalRequest._retry = true;
+    isRefreshing = true;
+
+    try {
+      const { data } = await api.post("/auth/refresh");
+      const newToken = data?.data?.accessToken;
+
+      if (!newToken) throw new Error("No access token returned from refresh");
+
+      setToken(newToken);
+      processQueue(null, newToken);
+
+      originalRequest.headers = originalRequest.headers || {};
+      originalRequest.headers.Authorization = `Bearer ${newToken}`;
+
       return api(originalRequest);
-    }
-
-    if (error.response?.status === 401) {
+    } catch (refreshErr) {
+      processQueue(refreshErr, null);
+      removeToken();
       queryClient.setQueryData(USER_QUERY_KEY, null);
+      return Promise.reject(refreshErr);
+    } finally {
+      isRefreshing = false;
+      if (originalRequest._retry) delete originalRequest._retry;
     }
-
-    throw error;
   }
 );
 

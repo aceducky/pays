@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "../api/api.js";
 import { PAYMENTS_QUERY_KEY } from "./usePaymentsQuery.js";
-import { USER_QUERY_KEY } from "../utils/queryClient.jsx";
+import { USER_QUERY_KEY } from "../utils/queryClient.js";
 
 export function usePaymentMutation() {
   const queryClient = useQueryClient();

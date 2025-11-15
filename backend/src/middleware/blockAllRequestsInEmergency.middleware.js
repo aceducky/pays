@@ -1,7 +1,7 @@
 import { appSettings } from "../settings/appSettings.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import logger from "../utils/logger.js";
-import { clearAuthCookies } from "../utils/tokenHelper.js";
+import { clearAuthTokens } from "../utils/tokenHelper.js";
 
 export const blockAllRequestsInEmergencyMiddleware = async (req, res, next) => {
   if (appSettings.EMERGENCY_STATE) {
@@ -9,7 +9,7 @@ export const blockAllRequestsInEmergencyMiddleware = async (req, res, next) => {
       "EMERGENCY_STATE",
       "Server is blocking all requests because EMERGENCY_STATE is enabled and it should be fixed immediately"
     );
-    await clearAuthCookies(req, res);
+    await clearAuthTokens(req, res);
     return new ApiResponse({
       res,
       statusCode: 503,

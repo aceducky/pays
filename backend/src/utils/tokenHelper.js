@@ -1,11 +1,9 @@
 import jwt from "jsonwebtoken";
 import { randomUUID } from "node:crypto";
-import { INVALID_SESSION_ERROR } from "../middleware/auth.middleware.js";
 import { redis } from "../redis.js";
 import { decodedRefreshTokenSchema } from "../zodSchemas/token.zodSchema.js";
-import { ApiError, ServerError } from "./Errors.js";
+import { ApiError, INVALID_SESSION_ERROR, ServerError } from "./Errors.js";
 import {
-  getAccessTokenExpiryForCookie_ms,
   getAccessTokenExpiryForToken_s,
   getAccessTokenSecret,
   getRefreshTokenExpiryForCookie_ms,
@@ -17,7 +15,7 @@ import logger from "./logger.js";
 import { throwEmergencyError } from "./setEmergencyOnAndBlockAllRequests.js";
 import { timeRemainingInSeconds } from "./timeUtils.js";
 
-export const verifyAndParseRefreshToken = async (req) => {
+export const verifyAndParseRefreshToken = async (req, res) => {
   const refreshToken = req.cookies?.refreshToken;
   if (!refreshToken) {
     throw INVALID_SESSION_ERROR;
@@ -33,6 +31,7 @@ export const verifyAndParseRefreshToken = async (req) => {
   // Parse and validate the decoded token
   const parsedResult = decodedRefreshTokenSchema.safeParse(decoded);
   if (!parsedResult.success) {
+    removeRefreshTokenCookie(res);
     throwEmergencyError({ req, parsedResult, decoded });
   }
 
@@ -89,15 +88,6 @@ const setRefreshTokenCookie = (res, token, maxAge) => {
   });
 };
 
-const setAccessTokenCookie = (res, token, maxAge) => {
-  res.cookie("accessToken", token, {
-    httpOnly: true,
-    sameSite: "strict",
-    secure: !isEnvDEVELOPMENT(),
-    maxAge,
-  });
-};
-
 // Store JTI as whitelisted for a user
 const storeRefreshTokenJti = async (userId, jti, expirySeconds) => {
   try {
@@ -114,6 +104,7 @@ const storeRefreshTokenJti = async (userId, jti, expirySeconds) => {
 const isRefreshTokenWhitelisted = async (userId, jti) => {
   try {
     const storedJti = await redis.get(`whitelist:${userId}`);
+
     return storedJti === jti;
   } catch (error) {
     logger.error("redis", "Error checking token whitelist in Redis:", error);
@@ -131,7 +122,16 @@ const removeRefreshTokenFromWhitelist = async (userId) => {
   }
 };
 
-export const clearAuthCookies = async (req, res) => {
+export const removeRefreshTokenCookie = (res) => {
+  const baseCookieOptions = {
+    httpOnly: true,
+    sameSite: "strict",
+    secure: !isEnvDEVELOPMENT(),
+  };
+  res.clearCookie("refreshToken", baseCookieOptions);
+};
+
+export const clearAuthTokens = async (req, res) => {
   const refreshTokenCookie = req.cookies?.refreshToken;
 
   if (refreshTokenCookie) {
@@ -143,32 +143,24 @@ export const clearAuthCookies = async (req, res) => {
         throwEmergencyError({ req, parsedResult, decoded });
       } else {
         const { userId } = parsedResult.data;
-        // Remove from whitelist instead of blacklisting
         await removeRefreshTokenFromWhitelist(userId);
       }
     } catch (err) {
       if (err instanceof ApiError || err instanceof ServerError) {
         throw err;
       }
-      logger.error("clearAuthCookies - Invalid or expired refresh token", {
+      logger.error("clearAuthTokens"," Invalid or expired refresh token", {
         err,
       });
     } finally {
-      // Clear cookies regardless of errors above
-      const baseCookieOptions = {
-        httpOnly: true,
-        sameSite: "strict",
-        secure: !isEnvDEVELOPMENT(),
-      };
-
-      res.clearCookie("accessToken", baseCookieOptions);
-      res.clearCookie("refreshToken", baseCookieOptions);
+      // Clear refresh token cookie
+      removeRefreshTokenCookie(res);
     }
   }
 };
 
-export const attemptTokenRefreshAndBlackListOldToken = async (req, res) => {
-  const { userId, userName, exp } = await verifyAndParseRefreshToken(req);
+export const generateTokenPairFromRefreshToken = async (req, res) => {
+  const { userId, userName, exp } = await verifyAndParseRefreshToken(req, res);
 
   const remainingTime_s = timeRemainingInSeconds(exp);
 
@@ -184,11 +176,10 @@ export const attemptTokenRefreshAndBlackListOldToken = async (req, res) => {
     await storeRefreshTokenJti(userId, newJti, remainingTime_s);
   }
 
-  // Set cookies - refresh token gets remaining time, access token gets full duration
+  // Set refresh token as cookie, access token will be sent in response body
   setRefreshTokenCookie(res, refreshToken, remainingTime_s * 1000); // in ms
-  setAccessTokenCookie(res, accessToken, getAccessTokenExpiryForCookie_ms());
 
-  return { userId, userName };
+  return { userId, userName, accessToken };
 };
 
 // Function to initiate new tokens (for signup/login)
@@ -204,13 +195,13 @@ export const initiateNewTokens = async ({ res, userId, userName }) => {
     // Store JTI in whitelist with full refresh token expiry
     await storeRefreshTokenJti(userId, jti, refreshTokenExpirySeconds);
 
-    // Set cookies with full expiry times
     setRefreshTokenCookie(
       res,
       refreshToken,
       getRefreshTokenExpiryForCookie_ms()
     );
-    setAccessTokenCookie(res, accessToken, getAccessTokenExpiryForCookie_ms());
+
+    return { accessToken };
   } catch (err) {
     if (err instanceof ApiError || err instanceof ServerError) {
       throw err;

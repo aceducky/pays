@@ -9,5 +9,6 @@ export function usePaymentReceiptQuery(paymentId) {
       return res.data.data;
     },
     enabled: !!paymentId,
+    retry: false,
   });
 }

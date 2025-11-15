@@ -1,11 +1,9 @@
 import express from "express";
 import mongoose from "mongoose";
-import { accountSettings } from "../../../shared/settings/accountSettings.js";
 import { paymentSchema } from "../../../shared/zodSchemas/payment.zodSchema.js";
 import { Payments } from "../db/models/payments.models.js";
 import { Users } from "../db/models/users.models.js";
 import authMiddleware from "../middleware/auth.middleware.js";
-import { criticalOperationMiddleware } from "../middleware/criticalOperation.middleware.js";
 import { rateLimitMiddleware } from "../middleware/rateLimit.middleware.js";
 import reqBodyValidatorMiddleware from "../middleware/reqBodyValidator.middleware.js";
 import {
@@ -23,6 +21,7 @@ import {
   paymentIdSchema,
   paymentSortSchema,
 } from "../zodSchemas/payment.zodSchema.js";
+import { accountSettings } from "../../../shared/settings/accountSettings.js";
 
 const router = express.Router();
 
@@ -106,7 +105,6 @@ router.post(
   "/",
   rateLimitMiddleware(paymentWriteLimiter),
   authMiddleware,
-  criticalOperationMiddleware,
   reqBodyValidatorMiddleware(paymentSchema),
   async (req, res) => {
     const senderId = req.userId;
@@ -199,13 +197,16 @@ router.post(
         });
 
         await payment.save({ session });
-        return payment;
+        return {
+          payment,
+          newBalance: updatedSender.balance,
+        };
       });
       const formattedPayment = getFormattedPayment(result);
       return new ApiResponse({
         res,
         statusCode: 201,
-        data: formattedPayment,
+        data: { payment: formattedPayment, newBalance: result.newBalance },
         message: "Payment successful",
       });
     } catch (err) {
@@ -240,7 +241,6 @@ router.get(
   "/:id",
   rateLimitMiddleware(paymentReceiptLimiter),
   authMiddleware,
-  criticalOperationMiddleware,
   async (req, res) => {
     const incomingId = req.params.id;
     const parsedResult = paymentIdSchema.safeParse(incomingId);
@@ -275,4 +275,3 @@ router.get(
 );
 
 export { router as paymentRouter };
-

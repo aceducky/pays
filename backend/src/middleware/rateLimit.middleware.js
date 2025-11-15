@@ -5,10 +5,10 @@ import { formatDuration } from "../utils/timeUtils.js";
 export const rateLimitMiddleware = ({ limiter, category }) => {
   return async (req, res, next) => {
     // skip rate limiting in development mode
-    if(isEnvDEVELOPMENT()) {
+    if (isEnvDEVELOPMENT()) {
       return next();
     }
-    const key = category === "not-found" ? `${req.ip}` : `${req.ip}:${req.url}`;
+    const key = `${req.ip}:${req.url}`;
     try {
       const { success, limit, remaining, reset } = await limiter.limit(key);
 
@@ -32,16 +32,13 @@ export const rateLimitMiddleware = ({ limiter, category }) => {
 
         return res.status(429).json({
           statusCode: 429,
-          message:
-            category === "not-found"
-              ? "Too many requests. Please try later."
-              : `Too many ${category} requests, please try after ${formatDuration(retryAfterSec)}.`,
+          message: `Too many ${category} requests, please try after ${formatDuration(retryAfterSec)}.`,
         });
       }
 
       next();
     } catch (err) {
-      console.error("Rate limit error:", err);
+      logger.error("rate-limit", err);
       // Fallback: allow request in case of error
       next();
     }

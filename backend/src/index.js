@@ -2,6 +2,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import "dotenv/config";
 import express from "express";
+import { STATUS_CODES } from "node:http";
 import path from "node:path";
 import process from "node:process";
 import { connectToMongoDB } from "./db/index.js";
@@ -9,7 +10,6 @@ import { blockAllRequestsInEmergencyMiddleware } from "./middleware/blockAllRequ
 import { rootRouter } from "./routes/index.js";
 import { ApiError, ServerError } from "./utils/Errors.js";
 import logger from "./utils/logger.js";
-import { STATUS_CODES } from "node:http";
 
 const app = express();
 app.disable("x-powered-by");
@@ -39,16 +39,6 @@ app.use(
 );
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
-
-// app.use((req, _res, next) => {
-//   console.log("\n________________");
-//   console.log(`${req.method}: ${req.url}`);
-//   console.log("  Params: ", req.params);
-//   console.log("  Body: ", JSON.stringify(req.body, null, 2));
-//   console.log("cookies", req.cookies.accessToken, req.cookies.refreshToken);
-//   console.log("________________\n");
-//   next();
-// });
 
 app.use("/api/v1", rootRouter);
 

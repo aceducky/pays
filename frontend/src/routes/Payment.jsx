@@ -1,14 +1,15 @@
-import { useLocation, useNavigate } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { CircleX, ArrowLeft } from "lucide-react";
 import TextField from "../components/TextField.jsx";
 import { normalizeError } from "../utils/utils.js";
-import { usePaymentMutation } from "../hooks/usePaymentMutation.jsx";
+import { usePaymentMutation } from "../hooks/usePaymentMutation.js";
 import { paymentSchema } from "../../../shared/zodSchemas/payment.zodSchema.js";
 
-function Payment() {
+export default function Payment() {
+  "use no memo";
   const location = useLocation();
   const navigate = useNavigate();
   const receiverUserName = location.state?.receiverUserName;
@@ -27,7 +28,7 @@ function Payment() {
       amountStr: "",
       description: "",
     },
-    mode: "onBlur",
+    mode: "onTouched",
     reValidateMode: "onChange",
   });
 
@@ -77,10 +78,10 @@ function Payment() {
               name="amountStr"
               type="text"
               hint="Enter the amount to send"
-              register={register}
               error={errors.amountStr}
               placeholder="1.00"
               disabled={isPending}
+              registration={register("amountStr")}
             />
           </div>
 
@@ -90,10 +91,10 @@ function Payment() {
               name="description"
               type="text"
               hint="Add a short note"
-              register={register}
               error={errors.description}
               placeholder="For dinner, tickets, etc."
               disabled={isPending}
+              registration={register("description")}
             />
           </div>
 
@@ -107,25 +108,17 @@ function Payment() {
           <button
             type="submit"
             disabled={isPending}
-            className="btn btn-accent w-full py-3 text-lg font-semibold hover:shadow-lg transition"
+            className="btn btn-accent w-full py-3 mt-4 text-lg font-semibold hover:shadow-lg transition"
           >
             {isPending ? "Processing..." : "Send Payment"}
           </button>
-
-          <div className="text-center text-sm text-base-content/70 mt-4">
-            <button
-              type="button"
-              className="underline hover:text-accent"
-              onClick={() => navigate("/dashboard")}
-              disabled={isPending}
-            >
-              Back to Dashboard
-            </button>
-          </div>
         </form>
+        <div className="text-center text-sm mt-4">
+          <Link className="underline opacity-70 hover:text-accent hover:opacity-100 " to="/dashboard">
+            Back to Dashboard
+          </Link>
+        </div>
       </div>
     </main>
   );
 }
-
-export default Payment;

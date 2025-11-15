@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "../../api/api.js";
-import { USER_QUERY_KEY } from "../../utils/queryClient.jsx";
+import { USER_QUERY_KEY } from "../../utils/queryClient.js";
+import { removeToken, setToken } from "../../utils/utils.js";
 
 export function useLoginMutation() {
   const queryClient = useQueryClient();
@@ -12,12 +13,14 @@ export function useLoginMutation() {
       return res.data;
     },
     onSuccess: (data) => {
-      const user = data.data.user;
+      const { user, accessToken } = data.data;
+      setToken(accessToken)
       queryClient.setQueryData(USER_QUERY_KEY, user);
       console.log("Login successful");
     },
     onError: (error) => {
       console.error("Login failed", error);
+      removeToken();
       queryClient.setQueryData(USER_QUERY_KEY, null);
     },
   });

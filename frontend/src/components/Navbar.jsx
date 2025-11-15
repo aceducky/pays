@@ -1,6 +1,5 @@
 import { Link } from "react-router";
-import { Menu } from "lucide-react"; 
-
+import { Menu } from "lucide-react";
 
 export default function Navbar() {
   return (
@@ -15,7 +14,6 @@ export default function Navbar() {
             Pays
           </Link>
         </div>
-
       </div>
     </header>
   );

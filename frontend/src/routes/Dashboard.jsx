@@ -27,7 +27,7 @@ export default function Dashboard() {
         <div className="bg-base-100 rounded-2xl shadow-lg p-6 flex flex-col flex-1">
           <div className="flex items-center justify-between mb-4 flex-wrap">
             <h2 className="text-xl font-bold">Recent Activity</h2>
-            <Link to="/payments" className="btn btn-link btn-sm px-0">
+            <Link to="/payments" className="link-primary underline">
               View all payments
             </Link>
           </div>

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import mongoose from "mongoose";
-import { userFullNameChangeSchema } from "../../../shared/zodSchemas/index.js";
+import { userFullNameChangeSchema } from "../../../shared/zodSchemas/user.zodSchema.js";
 import { Users } from "../db/models/users.models.js";
 import authMiddleware from "../middleware/auth.middleware.js";
 import { rateLimitMiddleware } from "../middleware/rateLimit.middleware.js";
@@ -16,7 +16,7 @@ import ApiResponse from "../utils/ApiResponse.js";
 import { ApiError, ServerError } from "../utils/Errors.js";
 import logger from "../utils/logger.js";
 import { getPaginationValues } from "../utils/reqQueryHelper.js";
-import { queryUsersSchema } from "../zodSchemas/user.zodSchema.js";
+import { queryUsersSchema } from "../../../shared/zodSchemas/user.zodSchema.js";
 import { dollarFormatter } from "../../../shared/formatters/dollarFormatter.js";
 
 const router = Router();

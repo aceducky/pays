@@ -58,6 +58,8 @@ export const fullNameSchema = z
     }
   );
 
+export const queryUsersSchema = userNameSchema.or(z.literal(""));
+
 export const passwordSchema = z
   .string("Password is required.")
   .min(8, "Password must be at least 8 characters long.")

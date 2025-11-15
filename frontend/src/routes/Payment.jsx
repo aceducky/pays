@@ -6,7 +6,7 @@ import { CircleX, ArrowLeft } from "lucide-react";
 import TextField from "../components/TextField.jsx";
 import { normalizeError } from "../utils/utils.js";
 import { usePaymentMutation } from "../hooks/usePaymentMutation.js";
-import { paymentSchema } from "../../../shared/zodSchemas/index.js";
+import { paymentSchema } from "../../../shared/zodSchemas/payment.zodSchema.js";
 
 export default function Payment() {
   "use no memo";

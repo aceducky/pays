@@ -28,7 +28,7 @@ import {
   passwordChangeSchema,
   userSignupSchema,
   userLoginSchema,
-} from "../../../shared/zodSchemas/index.js";
+} from "../../../shared/zodSchemas/user.zodSchema.js";
 
 const router = Router();
 

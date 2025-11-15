@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { dollarFormatter } from "../../../../shared/formatters/dollarFormatter.js";
-import { paymentAmountStrSchema } from "../../../../shared/zodSchemas/index.js";
+import { paymentAmountStrSchema } from "../../../../shared/zodSchemas/payment.zodSchema.js";
 import { fullNameField, userNameField } from "./commonFields.js";
 import { paymentSettings } from "../../../../shared/settings/paymentSettings.js";
 

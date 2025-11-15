@@ -24,7 +24,8 @@ export default function LatestPaymentCard() {
               {latest.isSender ? "Sent" : "Received:"} @{latest.otherUserName}
             </span>
             <span className="text-white/90">{latest.otherFullName}</span>
-            <span className="text-white/80 text-lg">{latest.amount}</span>
+            <span className="text-white text-lg">{latest.amount}</span>
+            <span className="truncate">{latest.description}</span>
           </Link>
         ) : (
           <p className="text-white/80 text-sm">No transactions yet</p>

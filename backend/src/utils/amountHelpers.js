@@ -1,4 +1,4 @@
-import { paymentAmountStrSchema } from "../../../shared/zodSchemas/index.js";
+import { paymentAmountStrSchema } from "../../../shared/zodSchemas/payment.zodSchema.js";
 import { ApiError, ServerError } from "./Errors.js";
 import { dollarFormatter } from "../../../shared/formatters/dollarFormatter.js";
 

@@ -1,12 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CircleX } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router/internal/react-server-client";
 import { toast } from "sonner";
 import {
   passwordChangeSchema,
   userFullNameChangeSchema,
-} from "../../../shared/zodSchemas/index.js";
+} from "../../../shared/zodSchemas/user.zodSchema.js";
 import { useAuth } from "../auth/hooks/useAuth.js";
 import { usePasswordMutation } from "../auth/hooks/usePasswordMutation.js";
 import PasswordField from "../components/PasswordField.jsx";
@@ -14,9 +13,8 @@ import TextField from "../components/TextField.jsx";
 import useChangeFullName from "../hooks/useChangeFullName.js";
 
 export default function Profile() {
-  "use no memo"
+  "use no memo";
   const { user } = useAuth();
-  const navigate = useNavigate();
   const { changeFullNameAsync, isChangingFullName, changeFullNameError } =
     useChangeFullName();
 
@@ -57,7 +55,6 @@ export default function Profile() {
       const response = await changeFullNameAsync({ fullName: data.fullName });
       resetNameForm({ fullName: data.fullName });
       toast.success(response.message);
-      navigate("/dashboard");
     } catch {
       console.log("Failed updating full name");
     }
@@ -71,7 +68,6 @@ export default function Profile() {
       });
       resetPwdForm({ oldPassword: "", newPassword: "" });
       toast.success(response.message);
-      navigate("/dashboard");
     } catch {
       console.log("Failed changing password");
     }
@@ -113,15 +109,14 @@ export default function Profile() {
             <button
               type="submit"
               disabled={isChangingFullName || isChangingPassword}
-              className="btn btn-accent w-full py-3 text-lg font-semibold hover:shadow-lg transition"
+              className="btn btn-primary w-full py-3 text-lg font-semibold hover:shadow-lg transition"
             >
               {isChangingFullName ? "Updating..." : "Update name"}
             </button>
           </form>
         </div>
 
-        <hr className="w-full border-base-300 mb-6" />
-
+        <div className="divider m-2"></div>
         <div className="w-full mb-2">
           <h3 className="text-lg font-medium mb-3">Change password</h3>
           <form
@@ -158,7 +153,7 @@ export default function Profile() {
             <button
               type="submit"
               disabled={isChangingPassword || isChangingFullName}
-              className="btn btn-accent w-full py-3 text-lg font-semibold hover:shadow-lg transition"
+              className="btn btn-primary w-full py-3 text-lg font-semibold hover:shadow-lg transition"
             >
               {isChangingPassword ? "Processing..." : "Change password"}
             </button>

@@ -1,6 +1,6 @@
 import express from "express";
 import mongoose from "mongoose";
-import { paymentSchema } from "../../../shared/zodSchemas/index.js";
+import { paymentSchema } from "../../../shared/zodSchemas/payment.zodSchema.js";
 import { Payments } from "../db/models/payments.models.js";
 import { Users } from "../db/models/users.models.js";
 import authMiddleware from "../middleware/auth.middleware.js";

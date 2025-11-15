@@ -9,7 +9,7 @@ export default function AutoPublicProtectedRoute() {
   const { user, isUserLoading } = useAuth();
 
   if (isUserLoading) return <LoadingBars />;
-  
+
   const isPublicRoute = checkIsPublicRoute(pathname);
 
   if (isPublicRoute && user) {

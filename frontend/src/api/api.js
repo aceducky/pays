@@ -2,7 +2,7 @@ import axios from "axios";
 import { queryClient, USER_QUERY_KEY } from "../utils/queryClient.js";
 import { getToken, removeToken, setToken } from "../utils/utils.js";
 
-const BASE_URL = "http://localhost:3000/api/v1";
+const BASE_URL = "https://pays.aceducky.deno.net/api/v1";
 
 const api = axios.create({
   baseURL: BASE_URL,

@@ -48,7 +48,7 @@ export default function Payment() {
       toast.success("Payment sent successfully!");
       navigate("/dashboard");
     } catch (err) {
-      toast.error(normalizeError(err));
+      console.error(normalizeError(err));
     }
   };
 

@@ -1,1 +1,0 @@
-import{c as i,j as o}from"./index-jBZXzTaY.js";function s(){const t=i.c(1);let e;return t[0]===Symbol.for("react.memo_cache_sentinel")?(e=o.jsx("div",{className:"grid place-items-center w-full h-full",children:"Loading..."}),t[0]=e):e=t[0],e}export{s as L};

@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import { USER_QUERY_KEY } from "../../utils/queryClient.js";
 import { api } from "../../api/api.js";
 import { normalizeError, removeToken } from "../../utils/utils.js";
+
+export const USER_QUERY_KEY = ["user"];
 
 export const useUserQuery = () => {
   return useQuery({

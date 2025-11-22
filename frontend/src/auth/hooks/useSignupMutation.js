@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "../../api/api.js";
-import { USER_QUERY_KEY } from "../../utils/queryClient.js";
 import { removeToken, setToken } from "../../utils/utils.js";
+import { USER_QUERY_KEY } from "./useUserQuery.js";
 
 export function useSignupMutation() {
   const queryClient = useQueryClient();

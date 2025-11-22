@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { api } from "../../api/api.js";
-import { USER_QUERY_KEY } from "../../utils/queryClient.js";
 import { normalizeError, removeToken } from "../../utils/utils.js";
+import { USER_QUERY_KEY } from "./useUserQuery.js";
 
 export function useLogoutMutation() {
   const queryClient = useQueryClient();

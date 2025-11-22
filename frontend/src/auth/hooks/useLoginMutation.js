@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "../../api/api.js";
-import { USER_QUERY_KEY } from "../../utils/queryClient.js";
 import { removeToken, setToken } from "../../utils/utils.js";
+import { USER_QUERY_KEY } from "./useUserQuery.js";
 
 export function useLoginMutation() {
   const queryClient = useQueryClient();
@@ -14,7 +14,7 @@ export function useLoginMutation() {
     },
     onSuccess: (data) => {
       const { user, accessToken } = data.data;
-      setToken(accessToken)
+      setToken(accessToken);
       queryClient.setQueryData(USER_QUERY_KEY, user);
       console.log("Login successful");
     },

@@ -13,6 +13,7 @@ export default function Signup() {
       name: "userName",
       placeholder: "John",
       hint: "Start and end with a letter, and can contain underscores in between.",
+      autofocus: true,
     },
     {
       label: "Full Name",
@@ -49,9 +50,7 @@ export default function Signup() {
       submitButtonText={`${isSigningUp ? "Signing up" : "Sign up"}`}
       footerText="Already have an account?"
       footerLinkText="Login"
-      onFooterLinkClick={() =>
-        navigate("/auth/login")
-      }
+      onFooterLinkClick={() => navigate("/auth/login")}
       serverError={signupError}
     />
   );

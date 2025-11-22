@@ -5,6 +5,7 @@ export default function TextField({
   type = "text",
   placeholder,
   disabled = false,
+  autofocus=false,
   registration,
 }) {
   "use no memo"
@@ -15,6 +16,7 @@ export default function TextField({
         {...registration}
         disabled={disabled}
         type={type}
+        autoFocus={autofocus}
         placeholder={placeholder || label}
         className={`peer input w-full focus-within:outline-none focus-within:border-2 focus-within:border-base-content/80 ${
           error ? "input-error" : ""

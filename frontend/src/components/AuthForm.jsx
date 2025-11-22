@@ -16,8 +16,8 @@ export default function AuthForm({
   onFooterLinkClick,
   serverError,
 }) {
-  "use no memo"
-   const {
+  "use no memo";
+  const {
     register,
     handleSubmit,
     formState: { errors },
@@ -55,6 +55,7 @@ export default function AuthForm({
                 name={field.name}
                 type={field.type || "text"}
                 hint={field.hint}
+                autofocus={field.autofocus}
                 placeholder={field.placeholder}
                 error={errors[field.name]}
                 registration={register(field.name)}

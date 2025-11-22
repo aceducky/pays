@@ -1,6 +1,7 @@
 import axios from "axios";
-import { queryClient, USER_QUERY_KEY } from "../utils/queryClient.js";
+import { queryClient } from "../utils/queryClient.js";
 import { getToken, removeToken, setToken } from "../utils/utils.js";
+import { USER_QUERY_KEY } from "../auth/hooks/useUserQuery.js";
 
 const BASE_URL = "https://pays.aceducky.deno.net/api/v1";
 

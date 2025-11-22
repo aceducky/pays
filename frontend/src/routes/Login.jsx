@@ -13,6 +13,7 @@ export default function Login() {
       name: "email",
       type: "email",
       placeholder: "user@example.com",
+      autofocus: true,
     },
     {
       label: "Password",
@@ -37,9 +38,7 @@ export default function Login() {
       submitButtonText={`${isLoggingIn ? "Logging in" : "Login"}`}
       footerText="Don't have an account?"
       footerLinkText="Signup"
-      onFooterLinkClick={() =>
-        navigate("/auth/signup")
-      }
+      onFooterLinkClick={() => navigate("/auth/signup")}
       serverError={loginError}
     />
   );

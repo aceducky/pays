@@ -48,9 +48,6 @@ const userSchema = new mongoose.Schema(
         message: "Balance must be a number with at most 2 decimal places.",
       },
     },
-    refreshToken: {
-      type: String,
-    },
   },
   { timestamps: true, strict: "throw" }
 );
